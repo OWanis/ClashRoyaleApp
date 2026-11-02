@@ -1,6 +1,6 @@
 (function(){
 'use strict';
-const model=OneShot.build(DATA.cards),dialog=$('breakpoint-detail');let kind='both';
+const model=OneShot.build(DATA.cards),dialog=$('breakpoint-detail');let kind='both',matchupView='icons';
 function universe(){return OneShot.ranked(model.rows,$('bp-version').value)}
 function label(r){return title(r.form.formType)+' · '+(r.context==='Card'?'':r.context+' · ')+r.label}
 function rowButton(r,{rank=true,note=''}={}){const b=el('button','rank-row '+r.kind);b.type='button';b.dataset.entry=r.id;
@@ -13,11 +13,25 @@ function openEntry(r){const body=$('bp-detail-body');body.replaceChildren();cons
  if(r.shield)body.append(el('p','breakpoint-hint','This is shield HP only. Breaking it does not mean the underlying unit is defeated.'));
  const source=el('p','breakpoint-evidence','Level '+r.observation.displayedLevel+' · Screenshot value: '+r.field+' = '+r.raw+' · '+(r.observation.capturedOn?'Captured '+r.observation.capturedOn:'Drive batch · capture date unknown'));body.append(source);
  const statsButton=el('button','chip','View full card stats');statsButton.addEventListener('click',()=>{dialog.close();openCard(r.card,r.form.id)});body.append(statsButton);
- const opposing=universe().filter(x=>x.kind!==r.kind),groups={yes:[],no:[],mechanic:[],inapplicable:[]};
+ const versions=el('div','matchup-versions');versions.setAttribute('role','group');versions.setAttribute('aria-label','Compare this stat across versions');
+ const related=model.rows.filter(x=>x.card===r.card&&x.panelKind===r.panelKind&&x.context===r.context&&x.label===r.label).sort((a,b)=>({base:0,evolution:1,hero:2})[a.form.formType]-({base:0,evolution:1,hero:2})[b.form.formType]);
+ for(const entry of related){const b=el('button','chip',title(entry.form.formType)+' · '+entry.value.toLocaleString('en-US'));b.setAttribute('aria-pressed',String(entry.id===r.id));b.addEventListener('click',()=>openEntry(entry));versions.append(b);}body.append(versions);
+ const opposing=model.rows.filter(x=>x.kind!==r.kind),groups={yes:[],no:[],mechanic:[],inapplicable:[]};
  for(const other of opposing){const result=r.kind==='damage'?OneShot.compare(r,other):OneShot.compare(other,r);groups[result.group].push({other,result});}
  const headings=r.kind==='damage'?{yes:'One-shot HP thresholds reached',no:'Not enough damage for one hit',mechanic:'Shield / reduction needs a mechanic check',inapplicable:'Not applicable to this attack'}:{yes:'Does not survive this hit by HP',no:'Survives this hit by HP',mechanic:'Shield / reduction needs a mechanic check',inapplicable:'Not applicable to this HP entry'};
- body.append(el('p','breakpoint-hint','Comparing against all '+($('bp-version').value==='all'?'card versions':title($('bp-version').value)+' entries')+' in this view. List search and HP/damage filters do not hide matchup results. Components and spawned units are separate entries; defeating one body does not clear a whole swarm or its death spawns.'));
- for(const [key,items]of Object.entries(groups)){const details=el('details','matchup-group '+key);details.open=key==='yes';details.append(el('summary','',headings[key]+' · '+items.length));if(!items.length)details.append(el('p','','No entries in this group.'));const contents=el('div');let rendered=false;const populate=()=>{if(rendered||!details.open)return;rendered=true;for(const {other,result}of items)contents.append(rowButton(other,{rank:false,note:result.reason+(result.conditional?' Conditional state.':'')}));};details.addEventListener('toggle',populate);populate();details.append(contents);body.append(details);}
+ body.append(el('p','breakpoint-hint','All versions included · Each icon uses its own stats. Shared outcomes sit together; different outcomes stay separate.'));
+ const switcher=el('div','matchup-switcher');switcher.setAttribute('role','group');switcher.setAttribute('aria-label','Matchup display');
+ const resultArea=el('div','matchup-results'),buttons=[];
+ function drawGroups(){body.classList.toggle('compact-matchup',matchupView==='icons');resultArea.replaceChildren();for(const b of buttons)b.setAttribute('aria-pressed',String(b.dataset.view===matchupView));
+  for(const [key,items]of Object.entries(groups)){const grouped=OneShot.groupMatchups(items),details=el('details','matchup-group '+key);details.open=key==='yes'||key==='no';details.append(el('summary','',headings[key]+' · '+items.length+' entries'));if(!items.length)details.append(el('p','','No entries in this group.'));const contents=el('div',matchupView==='icons'?'matchup-icon-grid':'matchup-detailed-list');let rendered=false;
+   const populate=()=>{if(rendered||!details.open)return;rendered=true;for(const group of grouped){const family=el('section','matchup-family'+(group.items.length>=3?' three-versions':''));family.dataset.card=group.card.forms.find(f=>f.formType==='base').id;family.append(el('h3','',group.card.name),el('p','matchup-stat-label',(group.context==='Card'?'':group.context+' · ')+group.label));const strip=el('div','matchup-icon-strip');
+    for(const {other,result}of group.items){const b=el('button','matchup-icon '+other.form.formType);b.dataset.entry=other.id;b.dataset.form=other.form.formType;b.title=other.card.name+' · '+label(other)+' · '+other.value+' · '+result.reason; b.setAttribute('aria-label',b.title);const img=el('img');img.src=other.image;img.alt='';img.loading='lazy';b.append(img,el('span','matchup-form',title(other.form.formType)),el('strong','',other.value.toLocaleString('en-US')));if(other.conditional)b.append(el('span','matchup-condition','Conditional'));b.addEventListener('click',()=>openEntry(other));strip.append(b);
+     if(matchupView==='details'){const explanation=el('span','matchup-explanation',result.reason+(result.conditional?' Conditional state.':''));b.append(explanation);}
+    }family.append(strip);contents.append(family);}
+   };details.addEventListener('toggle',populate);populate();details.append(contents);resultArea.append(details);
+  }
+ }
+ for(const [mode,name]of [['icons','Icons'],['details','Details']]){const b=el('button','chip',name);b.dataset.view=mode;b.addEventListener('click',()=>{matchupView=mode;drawGroups()});buttons.push(b);switcher.append(b);}body.append(switcher,el('p','compact-matchup-rule','HP thresholds only: the hit must connect. Shields and active mechanics can change the outcome. Click any icon to inspect it.'),resultArea);drawGroups();
  const evidence=el('details','panel');evidence.append(el('summary','','Calculation & source'),el('p','breakpoint-evidence','Rule: damage ≥ HP. Values are per unit and per hit, with no DPS conversion or multiplied projectiles. Source observation: '+r.observation.id+(r.sourceImageHash?' · Panel SHA-256: '+r.sourceImageHash:'')));body.append(evidence);if(!dialog.open)dialog.showModal();dialog.scrollTop=0;$('bp-close').focus();}
 for(const b of document.querySelectorAll('[data-bp-kind]'))b.addEventListener('click',()=>{kind=b.dataset.bpKind;renderBreakpoints()});
 for(const id of ['bp-search','bp-version','bp-numbering'])$(id).addEventListener(id==='bp-search'?'input':'change',renderBreakpoints);

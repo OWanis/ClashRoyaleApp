@@ -15,8 +15,14 @@ Rank descending by numeric value. Equal amounts put damage before HP (equality r
 
 ## Matchups
 
-Compare opposite-type entries within the selected version scope, independent of the list's search/type filters. Damage >= HP reaches the selected HP threshold; otherwise report HP minus damage. This assumes a hit connects, full starting HP in the displayed state, and no active defense/healing. It is not a simulation or a guarantee that an attacker can hit the target. Air/ground mobility, range, timing, active abilities and whole-swarm/death-spawn resolution are not fully modeled.
+Compare opposite-type entries across all Base, Evolution and Hero versions, independent of the ranking's version, search and type filters. Damage >= HP reaches the selected HP threshold; otherwise report HP minus damage. This assumes a hit connects, full starting HP in the displayed state, and no active defense/healing. It is not a simulation or a guarantee that an attacker can hit the target. Air/ground mobility, range, timing, active abilities and whole-swarm/death-spawn resolution are not fully modeled.
 
 Explicit building-only targeting blocks ordinary troop targets. Crown Tower damage applies only to main Tower Troop HP entries. When a separate Crown Tower field exists, ordinary damage is not applied to tower HP. HP fields alongside shield/reduction stats are sent to a mechanic-check group. A separate shield HP row means shield break only, never a unit kill. Conditional attacks and states remain labeled.
 
 Tests cover thresholds including equality, surviving HP, shields, Crown Tower targeting, building-only targeting, range endpoints, per-hit multipliers, DPS exclusions, deduplication, deterministic tie ordering, and original/filtered positions. Browser checks cover tab navigation, filters, both numbering modes, clickable reciprocal matchups, Escape, empty states, versions, and desktop/mobile layout.
+
+## Matchup views
+
+Icons (default) and Details share exactly the same comparisons. View choice persists while browsing entries in the current page session. Matching stats are grouped by the parent Base form ID, panel kind, component/ability context and exact stat label within each outcome section. Each version retains its own value, source and clickable icon; different outcomes never collapse into the same group. Special attacks and HP states remain separate. Groups order versions Base, Evolution, Hero. The selected stat also has version buttons where an equivalent displayed stat exists; missing values are never inherited from Base.
+
+Regression coverage includes Bats 81 Base / 122 Evolution HP against a 99-damage hit, Tesla 220 Base / 351 Evolution damage against 304 HP, and grouped Knight Base/Evolution/Hero damage icons.

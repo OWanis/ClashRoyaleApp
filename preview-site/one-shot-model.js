@@ -50,5 +50,16 @@ function compare(d,h){
  if(h.protected)return {group:'mechanic',reason:(enough?'Damage reaches body HP':'Damage is below body HP')+'; shield or damage reduction must be resolved separately.',enough,remaining};
  return {group:enough?'yes':'no',enough,remaining,reason:enough?(h.shield?'Enough to break this shield layer; not a whole-unit kill.':'Damage reaches this HP threshold if the hit connects.'):`${remaining.toLocaleString('en-US')} HP remains after this hit.`,conditional:d.conditional||h.conditional};
 }
-root.OneShot={parseValue,build,ranked,filter,compare};
+// Group only corresponding stats of one canonical parent, never by matching values.
+function groupMatchups(items){
+ const groups=new Map(),order={base:0,evolution:1,hero:2};
+ for(const item of items){const r=item.other,parent=r.card.forms.find(f=>f.formType==='base').id;
+  const key=JSON.stringify([parent,r.panelKind,r.context,r.label]);
+  if(!groups.has(key))groups.set(key,{key,card:r.card,context:r.context,label:r.label,items:[]});
+  groups.get(key).items.push(item);
+ }
+ for(const group of groups.values())group.items.sort((a,b)=>order[a.other.form.formType]-order[b.other.form.formType]||b.other.value-a.other.value);
+ return [...groups.values()];
+}
+root.OneShot={parseValue,build,ranked,filter,compare,groupMatchups};
 })(globalThis);

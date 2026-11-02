@@ -12,3 +12,20 @@ test('equality reaches HP threshold; shield never means whole-unit death',()=>{c
 test('crown damage and building targeting are scoped',()=>{const tower=find('Tower Princess','Hitpoints');assert.equal(M.compare(find('Fireball','Area Damage'),tower).group,'inapplicable');assert.equal(M.compare(find('Fireball','Crown Tower Damage'),tower).group,'no');assert.equal(M.compare(find('Fireball','Crown Tower Damage'),find('Skeletons','Hitpoints')).group,'inapplicable');assert.equal(M.compare(find('Golem','Damage'),find('Skeletons','Hitpoints')).group,'inapplicable');});
 test('original positions survive search/type filters; filtered mode renumbers',()=>{const ranked=M.ranked(rows,'base'),filtered=M.filter(ranked,{kind:'damage',query:'Sparky'});assert.equal(filtered.length,1);assert.equal(filtered[0].displayRank,ranked.find(r=>r.id===filtered[0].id).rank);assert.ok(filtered[0].displayRank>1);assert.equal(M.filter(ranked,{kind:'damage',query:'Sparky',numbering:'filtered'})[0].displayRank,1);assert.equal(M.filter(ranked,{kind:'hp'}).every(r=>r.kind==='hp'),true);});
 test('stable ranking, unique state IDs, one observation per form and tie order',()=>{assert.equal(new Set(rows.map(r=>r.id)).size,rows.length);for(let i=1;i<rows.length;i++){assert.ok(rows[i-1].value>=rows[i].value);if(rows[i-1].value===rows[i].value&&rows[i-1].kind==='hp')assert.equal(rows[i].kind,'hp');}assert.equal(rows.filter(r=>r.card.name==='Knight'&&r.field==='Damage'&&r.form.formType==='base').length,1);assert.ok(rows.some(r=>r.context==='Golemite'));assert.ok(rows.some(r=>r.context==='Trusty Turret'));assert.deepEqual(M.build(cards).rows.map(r=>r.id),rows.map(r=>r.id));});
+test('form-specific HP and damage yield independent outcomes',()=>{
+ const hit=find('Electro Spirit','Ranged Damage');
+ assert.equal(M.compare(hit,find('Bats','Hitpoints')).group,'yes');
+ assert.equal(M.compare(hit,find('Bats','Hitpoints','evolution')).group,'no');
+ assert.equal(find('Tesla','Damage').value,220);assert.equal(find('Tesla','Damage','evolution').value,351);
+ assert.equal(M.compare(find('Tesla','Damage'),find('Archers','Hitpoints')).group,'no');
+ assert.equal(M.compare(find('Tesla','Damage','evolution'),find('Archers','Hitpoints')).group,'yes');
+ assert.equal(find('Knight','Hitpoints','hero').value,1766);
+ assert.ok(rows.some(r=>r.card.name==='Knight'&&r.form.formType==='hero'&&r.field==='Shield Hitpoints'&&r.value===512));
+});
+test('corresponding Base/Evolution/Hero icons share a family without losing per-form values',()=>{
+ const hits=rows.filter(r=>r.card.name==='Knight'&&r.field==='Damage'&&r.panelKind==='main');
+ const grouped=M.groupMatchups(hits.map(other=>({other,result:M.compare(other,find('Skeletons','Hitpoints'))})));
+ assert.equal(grouped.length,1);assert.deepEqual(grouped[0].items.map(i=>i.other.form.formType),['base','evolution','hero']);
+ const health=rows.filter(r=>r.card.name==='Bats'&&r.kind==='hp');const groups=M.groupMatchups(health.map(other=>({other,result:M.compare(find('Sparky','Area Damage'),other)})));
+ const normal=groups.find(g=>g.label==='Hitpoints');assert.deepEqual(normal.items.map(i=>i.other.value),[81,122]);assert.ok(groups.some(g=>g.label==='Max Hitpoints'));assert.equal(groups.find(g=>g.label==='Max Hitpoints').items.length,1);
+});
