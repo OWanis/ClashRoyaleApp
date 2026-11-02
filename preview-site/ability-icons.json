@@ -1,0 +1,575 @@
+[
+  {
+    "name": "Banner Brigade",
+    "cardFormId": "2320fd7e-e390-4405-8ed5-a65761bfeb2d",
+    "filename": "938a720495e974a53108d3cb78c387fe0ce35718e02d23aec8c9b589ed9d7486.png",
+    "sha256": "938a720495e974a53108d3cb78c387fe0ce35718e02d23aec8c9b589ed9d7486",
+    "bytes": 42836,
+    "sourceImageSha256": "daf9ccf4d719d5dbe48fadf9b6ab4b92c58cc0f9cdc8829d8ce8a65bcf67253a",
+    "sourceDimensions": [
+      1179,
+      2556
+    ],
+    "cropBox": [
+      120,
+      1377,
+      318,
+      1564
+    ],
+    "panelSourceHashes": [
+      "daf9ccf4d719d5dbe48fadf9b6ab4b92c58cc0f9cdc8829d8ce8a65bcf67253a"
+    ],
+    "provenance": "Exact screenshot crop; includes displayed activation elixir badge"
+  },
+  {
+    "name": "Snowstorm",
+    "cardFormId": "bc583f1a-5451-4d56-a68f-2a7a28300a78",
+    "filename": "2686389350a39320eff3691ec06af2c2bfda6412b0c09e315cdadd85ad42ae50.png",
+    "sha256": "2686389350a39320eff3691ec06af2c2bfda6412b0c09e315cdadd85ad42ae50",
+    "bytes": 41430,
+    "sourceImageSha256": "c2e1eefb29bb610a58bbbc9559e4429bfe77d5fdd2317ce523fa9896bb82ad77",
+    "sourceDimensions": [
+      1179,
+      2556
+    ],
+    "cropBox": [
+      120,
+      1377,
+      318,
+      1564
+    ],
+    "panelSourceHashes": [
+      "c2e1eefb29bb610a58bbbc9559e4429bfe77d5fdd2317ce523fa9896bb82ad77"
+    ],
+    "provenance": "Exact screenshot crop; includes displayed activation elixir badge"
+  },
+  {
+    "name": "Savage Survival",
+    "cardFormId": "ffdb088b-ec8c-4d87-a997-c6db5500f950",
+    "filename": "6c43d0b69d27a92ee906b0cd0293468a267d5f2c32db93a04a9f4963bc5c7416.png",
+    "sha256": "6c43d0b69d27a92ee906b0cd0293468a267d5f2c32db93a04a9f4963bc5c7416",
+    "bytes": 40012,
+    "sourceImageSha256": "d3d0916484b79c61c8debde38105eeb4e04b580a1e22e66c79799aa78ea8e4b2",
+    "sourceDimensions": [
+      1179,
+      2556
+    ],
+    "cropBox": [
+      120,
+      1377,
+      318,
+      1564
+    ],
+    "panelSourceHashes": [
+      "d3d0916484b79c61c8debde38105eeb4e04b580a1e22e66c79799aa78ea8e4b2"
+    ],
+    "provenance": "Exact screenshot crop; includes displayed activation elixir badge"
+  },
+  {
+    "name": "Rowdy Reroll",
+    "cardFormId": "1420b83e-f8fa-45ec-952f-03235e366753",
+    "filename": "dda7498331d9021801280423ec0a79d4d67d2518e2c8de4211a4bfee7785a105.png",
+    "sha256": "dda7498331d9021801280423ec0a79d4d67d2518e2c8de4211a4bfee7785a105",
+    "bytes": 44254,
+    "sourceImageSha256": "feceb11fde3c8f079c70ed7418181db4ac804c672965643ad8051f5f8ca07613",
+    "sourceDimensions": [
+      1179,
+      2556
+    ],
+    "cropBox": [
+      120,
+      1377,
+      318,
+      1564
+    ],
+    "panelSourceHashes": [
+      "feceb11fde3c8f079c70ed7418181db4ac804c672965643ad8051f5f8ca07613"
+    ],
+    "provenance": "Exact screenshot crop; includes displayed activation elixir badge"
+  },
+  {
+    "name": "Triumphant Taunt",
+    "cardFormId": "4b8237e9-4039-4e74-9338-4208a745be2b",
+    "filename": "cfc77f4d62153bcf54307419322633b320bee45d2686ce8f8834799d6a00e670.png",
+    "sha256": "cfc77f4d62153bcf54307419322633b320bee45d2686ce8f8834799d6a00e670",
+    "bytes": 40848,
+    "sourceImageSha256": "7208cd2735263525b435e5e0f6619d9c2b094be0866543a70616ec37591287f7",
+    "sourceDimensions": [
+      1179,
+      2556
+    ],
+    "cropBox": [
+      120,
+      1377,
+      318,
+      1564
+    ],
+    "panelSourceHashes": [
+      "7208cd2735263525b435e5e0f6619d9c2b094be0866543a70616ec37591287f7"
+    ],
+    "provenance": "Exact screenshot crop; includes displayed activation elixir badge"
+  },
+  {
+    "name": "Regal Revival",
+    "cardFormId": "905a8c1b-6de9-40c9-b04e-249bfec396d6",
+    "filename": "e3c515e54853ffa0c0fb586c247b097c988993d0b5f186604d95ef77d175766d.png",
+    "sha256": "e3c515e54853ffa0c0fb586c247b097c988993d0b5f186604d95ef77d175766d",
+    "bytes": 42616,
+    "sourceImageSha256": "3500ca46ccdd915d7af5203faeca35fc5b9238deccddd20bc1abd2f5913c8364",
+    "sourceDimensions": [
+      1179,
+      2556
+    ],
+    "cropBox": [
+      120,
+      1377,
+      318,
+      1564
+    ],
+    "panelSourceHashes": [
+      "3500ca46ccdd915d7af5203faeca35fc5b9238deccddd20bc1abd2f5913c8364"
+    ],
+    "provenance": "Exact screenshot crop; includes displayed activation elixir badge"
+  },
+  {
+    "name": "Frosty Fella",
+    "cardFormId": "cca6ee60-6afd-4229-a5ef-c8f254804dff",
+    "filename": "8b6f1b1e9631a63bcb7043faab928021c3d507e89a65e148dc20e966a81aa94c.png",
+    "sha256": "8b6f1b1e9631a63bcb7043faab928021c3d507e89a65e148dc20e966a81aa94c",
+    "bytes": 42773,
+    "sourceImageSha256": "14ec38bc9f663438771d63e23082b80942e2b24aa671304f346a7c50728313bb",
+    "sourceDimensions": [
+      1179,
+      2556
+    ],
+    "cropBox": [
+      120,
+      1377,
+      318,
+      1564
+    ],
+    "panelSourceHashes": [
+      "14ec38bc9f663438771d63e23082b80942e2b24aa671304f346a7c50728313bb"
+    ],
+    "provenance": "Exact screenshot crop; includes displayed activation elixir badge"
+  },
+  {
+    "name": "Royal Rescue",
+    "cardFormId": "1be19c3a-a859-4eab-ad72-c68e51e57f48",
+    "filename": "f2e5fe2ff60278009ef49d7487c0757179e65e7f0615bf8471c8ecd459dec8ba.png",
+    "sha256": "f2e5fe2ff60278009ef49d7487c0757179e65e7f0615bf8471c8ecd459dec8ba",
+    "bytes": 44580,
+    "sourceImageSha256": "4dcf2dad1efa094a8a5019a4c975f77b552d26103cf1bdc5ea5c547b221d480b",
+    "sourceDimensions": [
+      1179,
+      2556
+    ],
+    "cropBox": [
+      120,
+      1377,
+      318,
+      1564
+    ],
+    "panelSourceHashes": [
+      "4dcf2dad1efa094a8a5019a4c975f77b552d26103cf1bdc5ea5c547b221d480b"
+    ],
+    "provenance": "Exact screenshot crop; includes displayed activation elixir badge"
+  },
+  {
+    "name": "Wounding Warp",
+    "cardFormId": "6e42604e-d2b2-47d8-b370-8454483d8455",
+    "filename": "c7c65b5332d3903a288c3aca46ab6b10ebd5cf8877e3b4d00b0860c53d7f0b6f.png",
+    "sha256": "c7c65b5332d3903a288c3aca46ab6b10ebd5cf8877e3b4d00b0860c53d7f0b6f",
+    "bytes": 44161,
+    "sourceImageSha256": "445a2dde69e4e76fdb490bad95429883d7abcc0b5690343b68ddcab79bff7397",
+    "sourceDimensions": [
+      1179,
+      2556
+    ],
+    "cropBox": [
+      120,
+      1377,
+      318,
+      1564
+    ],
+    "panelSourceHashes": [
+      "445a2dde69e4e76fdb490bad95429883d7abcc0b5690343b68ddcab79bff7397"
+    ],
+    "provenance": "Exact screenshot crop; includes displayed activation elixir badge"
+  },
+  {
+    "name": "Trusty Turret",
+    "cardFormId": "14134112-a2a7-4e98-8c5e-89abd20814b5",
+    "filename": "64c4c5f74a40424350e3376979f27135d7741a53676a25b2b38f5639711b4a2e.png",
+    "sha256": "64c4c5f74a40424350e3376979f27135d7741a53676a25b2b38f5639711b4a2e",
+    "bytes": 44424,
+    "sourceImageSha256": "54722851bd45a7624e6fb8a6f5f57f04145e33b77726883c4ab078eb0ba5e1fa",
+    "sourceDimensions": [
+      1179,
+      2556
+    ],
+    "cropBox": [
+      120,
+      1377,
+      318,
+      1564
+    ],
+    "panelSourceHashes": [
+      "54722851bd45a7624e6fb8a6f5f57f04145e33b77726883c4ab078eb0ba5e1fa",
+      "9a0f7c09a565386f3047d9dcb96ba96cc37521a7190efc14937b5c76f20c201d"
+    ],
+    "provenance": "Exact screenshot crop; includes displayed activation elixir badge"
+  },
+  {
+    "name": "Breakfast Boost",
+    "cardFormId": "efec0ba5-fc70-4588-a3b3-40a912722751",
+    "filename": "ebca9c0d19e18cae350b6ab662e2841eb8c3512807b6d1d9a790170f31b391a6.png",
+    "sha256": "ebca9c0d19e18cae350b6ab662e2841eb8c3512807b6d1d9a790170f31b391a6",
+    "bytes": 41347,
+    "sourceImageSha256": "933f05da8352ee9e0b89ca69993a4bb83b07575a5e897d070da86135a4d0e6ef",
+    "sourceDimensions": [
+      1179,
+      2556
+    ],
+    "cropBox": [
+      120,
+      1377,
+      318,
+      1564
+    ],
+    "panelSourceHashes": [
+      "933f05da8352ee9e0b89ca69993a4bb83b07575a5e897d070da86135a4d0e6ef"
+    ],
+    "provenance": "Exact screenshot crop; includes displayed activation elixir badge"
+  },
+  {
+    "name": "Wild Whirlwind",
+    "cardFormId": "412e74f4-2215-4ed4-b8aa-1850fc4c1950",
+    "filename": "34face38ec4a51548ee45f4a6d943081a41c5402cc1d9c39593c3263f68b73ba.png",
+    "sha256": "34face38ec4a51548ee45f4a6d943081a41c5402cc1d9c39593c3263f68b73ba",
+    "bytes": 40786,
+    "sourceImageSha256": "f428187adaae6b10ebf83faa01ea55b16f685ff126d9e02f1200b4ed91d05c6f",
+    "sourceDimensions": [
+      1179,
+      2556
+    ],
+    "cropBox": [
+      120,
+      1377,
+      318,
+      1564
+    ],
+    "panelSourceHashes": [
+      "f428187adaae6b10ebf83faa01ea55b16f685ff126d9e02f1200b4ed91d05c6f"
+    ],
+    "provenance": "Exact screenshot crop; includes displayed activation elixir badge"
+  },
+  {
+    "name": "Destructive Dismount",
+    "cardFormId": "11f10df7-6770-44db-bcb5-51f2adb7e65c",
+    "filename": "08c8bda99e8d9c581369ff0963a4cfbd5201d32b3e6637092f524db1dff62241.png",
+    "sha256": "08c8bda99e8d9c581369ff0963a4cfbd5201d32b3e6637092f524db1dff62241",
+    "bytes": 38615,
+    "sourceImageSha256": "f238a1b20c5e33e13adb8e8c39c2bd13d61c7eeddb188d7e41bff1d47e899504",
+    "sourceDimensions": [
+      1179,
+      2556
+    ],
+    "cropBox": [
+      120,
+      1377,
+      318,
+      1564
+    ],
+    "panelSourceHashes": [
+      "f238a1b20c5e33e13adb8e8c39c2bd13d61c7eeddb188d7e41bff1d47e899504"
+    ],
+    "provenance": "Exact screenshot crop; includes displayed activation elixir badge"
+  },
+  {
+    "name": "Surging Strikes",
+    "cardFormId": "41da656a-dbda-41c7-927f-1b13cba273d6",
+    "filename": "a46a8917b00da87f58f263f7932164a8f3cfe4fe5638e3c695892f1017f92ed5.png",
+    "sha256": "a46a8917b00da87f58f263f7932164a8f3cfe4fe5638e3c695892f1017f92ed5",
+    "bytes": 50733,
+    "sourceImageSha256": "26017cfce5a695efec6f8fd56608e9bfe61e56811bec5a9f5c61d24a7d1ceab2",
+    "sourceDimensions": [
+      1179,
+      2556
+    ],
+    "cropBox": [
+      120,
+      1377,
+      318,
+      1564
+    ],
+    "panelSourceHashes": [
+      "26017cfce5a695efec6f8fd56608e9bfe61e56811bec5a9f5c61d24a7d1ceab2"
+    ],
+    "provenance": "Exact screenshot crop; includes displayed activation elixir badge"
+  },
+  {
+    "name": "Triple Threat",
+    "cardFormId": "2b3824b4-efd6-4c27-a1a2-1b42a7b81382",
+    "filename": "76b3803b0ed98a524f8d06f7bf53f507bd9c5923ece4b32d5706526b2d488b87.png",
+    "sha256": "76b3803b0ed98a524f8d06f7bf53f507bd9c5923ece4b32d5706526b2d488b87",
+    "bytes": 42190,
+    "sourceImageSha256": "95c195ae9185d9c78c84a6352042e672e3ec2422f5be539232171b755caf7329",
+    "sourceDimensions": [
+      1179,
+      2556
+    ],
+    "cropBox": [
+      120,
+      1377,
+      318,
+      1564
+    ],
+    "panelSourceHashes": [
+      "95c195ae9185d9c78c84a6352042e672e3ec2422f5be539232171b755caf7329"
+    ],
+    "provenance": "Exact screenshot crop; includes displayed activation elixir badge"
+  },
+  {
+    "name": "Soul Summoning",
+    "cardFormId": "77cd3941-8d84-4716-ab82-caac48467a89",
+    "filename": "a2115085de8301eac8d3b30aa0bb98fff9f52d9d58e5eaf5ed89f8497dbb5711.png",
+    "sha256": "a2115085de8301eac8d3b30aa0bb98fff9f52d9d58e5eaf5ed89f8497dbb5711",
+    "bytes": 38984,
+    "sourceImageSha256": "3e5941101a42e522ccea2ce8919b4c88c64fc27c7258a09d80a08f439225d0b4",
+    "sourceDimensions": [
+      1179,
+      2556
+    ],
+    "cropBox": [
+      120,
+      1377,
+      318,
+      1564
+    ],
+    "panelSourceHashes": [
+      "3e5941101a42e522ccea2ce8919b4c88c64fc27c7258a09d80a08f439225d0b4"
+    ],
+    "provenance": "Exact screenshot crop; includes displayed activation elixir badge"
+  },
+  {
+    "name": "Dashing Dash",
+    "cardFormId": "3af194c6-d93a-4da1-aaff-38b514d27b40",
+    "filename": "e36bb7101d4518e5f3c46ea8b39d96ea7733b415f9fce8ae57e0d4ade37b0a62.png",
+    "sha256": "e36bb7101d4518e5f3c46ea8b39d96ea7733b415f9fce8ae57e0d4ade37b0a62",
+    "bytes": 37166,
+    "sourceImageSha256": "1cfb579b6c13ef899eca0ae5fb54c30ed0fe914ae5b01c0a00cf0f36fbe768b9",
+    "sourceDimensions": [
+      1179,
+      2556
+    ],
+    "cropBox": [
+      120,
+      1377,
+      318,
+      1564
+    ],
+    "panelSourceHashes": [
+      "1cfb579b6c13ef899eca0ae5fb54c30ed0fe914ae5b01c0a00cf0f36fbe768b9"
+    ],
+    "provenance": "Exact screenshot crop; includes displayed activation elixir badge"
+  },
+  {
+    "name": "Explosive Escape",
+    "cardFormId": "75a32cbf-4388-492d-8519-97411cc63913",
+    "filename": "33f32d234f1f38f261897b4e13afc816b26117b960defede14baa6099f331a17.png",
+    "sha256": "33f32d234f1f38f261897b4e13afc816b26117b960defede14baa6099f331a17",
+    "bytes": 38528,
+    "sourceImageSha256": "8b6563733940a17182a485be71f226dbd8a644bae5cf2ea29f4270a1ffcd1c80",
+    "sourceDimensions": [
+      1179,
+      2556
+    ],
+    "cropBox": [
+      120,
+      1377,
+      318,
+      1564
+    ],
+    "panelSourceHashes": [
+      "8b6563733940a17182a485be71f226dbd8a644bae5cf2ea29f4270a1ffcd1c80"
+    ],
+    "provenance": "Exact screenshot crop; includes displayed activation elixir badge"
+  },
+  {
+    "name": "Heroic Hurl",
+    "cardFormId": "c1d525a9-ddb2-4545-8a79-ec8483d4ad05",
+    "filename": "742bde3503e25dae61bf30597c6954caa0c66e951ec4308659c74a927ce81132.png",
+    "sha256": "742bde3503e25dae61bf30597c6954caa0c66e951ec4308659c74a927ce81132",
+    "bytes": 42244,
+    "sourceImageSha256": "9c5d44b65b59d2ba92086201ad2073cf4696eea59ec003088d8a66762189eb8e",
+    "sourceDimensions": [
+      1179,
+      2556
+    ],
+    "cropBox": [
+      120,
+      1377,
+      318,
+      1564
+    ],
+    "panelSourceHashes": [
+      "9c5d44b65b59d2ba92086201ad2073cf4696eea59ec003088d8a66762189eb8e"
+    ],
+    "provenance": "Exact screenshot crop; includes displayed activation elixir badge"
+  },
+  {
+    "name": "Fiery Flight",
+    "cardFormId": "648c7d32-dcba-41c2-a2ce-ca3d5f4c00a4",
+    "filename": "2cf39c30a020233d9ca3b0bcb971163e69846c0a9eecf218c2bb461feece5279.png",
+    "sha256": "2cf39c30a020233d9ca3b0bcb971163e69846c0a9eecf218c2bb461feece5279",
+    "bytes": 40603,
+    "sourceImageSha256": "b409cfd0db912eb545ad575dfb6f38ade1891168532551f5cbcc12d4f0cede28",
+    "sourceDimensions": [
+      1179,
+      2556
+    ],
+    "cropBox": [
+      120,
+      1377,
+      318,
+      1564
+    ],
+    "panelSourceHashes": [
+      "b409cfd0db912eb545ad575dfb6f38ade1891168532551f5cbcc12d4f0cede28"
+    ],
+    "provenance": "Exact screenshot crop; includes displayed activation elixir badge"
+  },
+  {
+    "name": "Coffin Cadets",
+    "cardFormId": "2a62acfd-953d-4cd2-ba84-b11c6f90b5eb",
+    "filename": "388a2592e117a4c13d1349b460199d9c5a28cd5747ba858a02d631992996c7aa.png",
+    "sha256": "388a2592e117a4c13d1349b460199d9c5a28cd5747ba858a02d631992996c7aa",
+    "bytes": 42598,
+    "sourceImageSha256": "1f6484498899b1f8ecc3385dd587899fd50fc0d88ac70788dff1bfd7c5bd8b3d",
+    "sourceDimensions": [
+      1179,
+      2556
+    ],
+    "cropBox": [
+      120,
+      1377,
+      318,
+      1564
+    ],
+    "panelSourceHashes": [
+      "1f6484498899b1f8ecc3385dd587899fd50fc0d88ac70788dff1bfd7c5bd8b3d"
+    ],
+    "provenance": "Exact screenshot crop; includes displayed activation elixir badge"
+  },
+  {
+    "name": "Stone Swish",
+    "cardFormId": "fdd9c3a3-bf08-49bd-b96a-e323b34ee49b",
+    "filename": "ddf345e35e39f95ec10a5cb83bf0db856340bca481a2a455a572c45974fa4b4e.png",
+    "sha256": "ddf345e35e39f95ec10a5cb83bf0db856340bca481a2a455a572c45974fa4b4e",
+    "bytes": 44528,
+    "sourceImageSha256": "1f077d1c68f22490c72d47781f7b2f114a5ee0a24b8848aec6a2b6562cc0cbb1",
+    "sourceDimensions": [
+      1179,
+      2556
+    ],
+    "cropBox": [
+      120,
+      1377,
+      318,
+      1564
+    ],
+    "panelSourceHashes": [
+      "1f077d1c68f22490c72d47781f7b2f114a5ee0a24b8848aec6a2b6562cc0cbb1"
+    ],
+    "provenance": "Exact screenshot crop; includes displayed activation elixir badge"
+  },
+  {
+    "name": "Cloaking Cape",
+    "cardFormId": "38b0ab1a-45c5-48ad-94fe-a8583b7381e8",
+    "filename": "614557611109be62d6da7a8a249981cc44bf6ab52e9884686d2d42856d510717.png",
+    "sha256": "614557611109be62d6da7a8a249981cc44bf6ab52e9884686d2d42856d510717",
+    "bytes": 38581,
+    "sourceImageSha256": "fefe1b224a8f98914d58f6d93e247e5bc2066b35a0f637048f691245ac52f7bc",
+    "sourceDimensions": [
+      1179,
+      2556
+    ],
+    "cropBox": [
+      120,
+      1377,
+      318,
+      1564
+    ],
+    "panelSourceHashes": [
+      "fefe1b224a8f98914d58f6d93e247e5bc2066b35a0f637048f691245ac52f7bc"
+    ],
+    "provenance": "Exact screenshot crop; includes displayed activation elixir badge"
+  },
+  {
+    "name": "Pensive Protection",
+    "cardFormId": "81a902a1-1aa8-4118-9771-9b542eecb1d0",
+    "filename": "16a9005c24332edd56f286192de24bd544bacbdcff83a05d457f933331e81d0b.png",
+    "sha256": "16a9005c24332edd56f286192de24bd544bacbdcff83a05d457f933331e81d0b",
+    "bytes": 41298,
+    "sourceImageSha256": "cecf9f195c7608eae31c7235ae8d23a9db115bc9ba442a606667e0d25b5c06df",
+    "sourceDimensions": [
+      1179,
+      2556
+    ],
+    "cropBox": [
+      120,
+      1377,
+      318,
+      1564
+    ],
+    "panelSourceHashes": [
+      "cecf9f195c7608eae31c7235ae8d23a9db115bc9ba442a606667e0d25b5c06df"
+    ],
+    "provenance": "Exact screenshot crop; includes displayed activation elixir badge"
+  },
+  {
+    "name": "Lightning Link",
+    "cardFormId": "51bc6e37-a801-4270-b825-38691581c60d",
+    "filename": "d347de59e6060d41e702c558cbaf1a0843136356e0fb3a054f0395dc02eb6724.png",
+    "sha256": "d347de59e6060d41e702c558cbaf1a0843136356e0fb3a054f0395dc02eb6724",
+    "bytes": 44524,
+    "sourceImageSha256": "6ad9ffbf5df8136ebf99d48009231a559169fd0046841eb0ef4ee7debae9fad3",
+    "sourceDimensions": [
+      1179,
+      2556
+    ],
+    "cropBox": [
+      120,
+      1377,
+      318,
+      1564
+    ],
+    "panelSourceHashes": [
+      "6ad9ffbf5df8136ebf99d48009231a559169fd0046841eb0ef4ee7debae9fad3"
+    ],
+    "provenance": "Exact screenshot crop; includes displayed activation elixir badge"
+  },
+  {
+    "name": "Getaway Grenade",
+    "cardFormId": "bb2a8980-9700-4daa-a2bd-92e8cd4b7f4a",
+    "filename": "d44e455e5d9d57578e34fe34677583850a7404fe51c595fac4b243cc8ed62c47.png",
+    "sha256": "d44e455e5d9d57578e34fe34677583850a7404fe51c595fac4b243cc8ed62c47",
+    "bytes": 41603,
+    "sourceImageSha256": "305ba0e19260a35f2e8c5af4de2ef3b9e8c4188bc55c2d28a3bb2b597464057c",
+    "sourceDimensions": [
+      1179,
+      2556
+    ],
+    "cropBox": [
+      120,
+      1377,
+      318,
+      1564
+    ],
+    "panelSourceHashes": [
+      "305ba0e19260a35f2e8c5af4de2ef3b9e8c4188bc55c2d28a3bb2b597464057c"
+    ],
+    "provenance": "Exact screenshot crop; includes displayed activation elixir badge"
+  }
+]

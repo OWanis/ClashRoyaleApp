@@ -19,3 +19,12 @@ async function download(a){
 }
 await Promise.all(Array.from({length:6},async()=>{while(next<assets.length){const asset=assets[next++];await download(asset);}}));
 console.log('Built card explorer with '+completed+' verified original icons.');
+const abilityIcons=JSON.parse(await readFile('ability-icons.json','utf8'));
+await mkdir('public/ability-icons',{recursive:true});
+for(const a of abilityIcons){
+ if(!/^[a-f0-9]{64}\.png$/.test(a.filename))throw new Error('Invalid ability icon filename');
+ const bytes=await readFile('ability-icons/'+a.filename);
+ if(bytes.length!==a.bytes||createHash('sha256').update(bytes).digest('hex')!==a.sha256)throw new Error('Ability icon checksum mismatch');
+ await writeFile('public/ability-icons/'+a.filename,bytes);
+}
+console.log('Copied '+abilityIcons.length+' verified screenshot ability icons.');

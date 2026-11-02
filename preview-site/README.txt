@@ -1,1 +1,3 @@
-Extract this ZIP, open a terminal in this folder, and run npx vercel --prod. Use the settings supplied by vercel.json. During the build, original artwork is fetched from the official CDN and verified against the approved SHA-256 hashes. No API key or database is required.
+Vercel project: use Root Directory preview-site, Framework Other, build command node build.mjs, output directory public. No API key or database is required.
+
+The build fetches 188 original card images from the official CDN and verifies their SHA-256 hashes. It also verifies and copies 26 ability icons extracted from owner-supplied game screenshots. ability-icons.json records source image hashes, exact crop coordinates, form bindings, and output checksums. Crops retain the original activation-elixir badge. Full screenshots are not published. These presentation assets do not change canonical observations or imply historical ability artwork.
