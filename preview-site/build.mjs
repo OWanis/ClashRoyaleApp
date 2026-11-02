@@ -28,3 +28,4 @@ for(const a of abilityIcons){
  await writeFile('public/ability-icons/'+a.filename,bytes);
 }
 console.log('Copied '+abilityIcons.length+' verified screenshot ability icons.');
+for(const file of ['one-shot-model.js','one-shot-ui.js','one-shot.css'])await copyFile(file,'public/'+file);
