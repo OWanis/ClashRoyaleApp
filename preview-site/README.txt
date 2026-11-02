@@ -1,0 +1,1 @@
+Extract this ZIP, open a terminal in this folder, and run npx vercel --prod. Use the settings supplied by vercel.json. During the build, original artwork is fetched from the official CDN and verified against the approved SHA-256 hashes. No API key or database is required.
