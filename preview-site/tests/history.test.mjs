@@ -78,7 +78,7 @@ test('mixed numerical buffs and nerfs are grouped as a rework even inside a sour
 
 test('2025 archive covers every month, separates maintenance dates and preserves explicitly scoped levels',()=>{
  const year=HISTORY_DATA.updates.filter(u=>u.effectiveDate.startsWith('2025'));assert.equal(year.length,24);assert.equal(year.reduce((n,u)=>n+u.changes.length,0),274);assert.equal(new Set(year.map(u=>u.effectiveDate.slice(0,7))).size,12);
- assert.equal(HISTORY_DATA.updates.length,40);assert.equal(HISTORY_DATA.updates.reduce((n,u)=>n+u.changes.length,0),570);
+ assert.equal(HISTORY_DATA.updates.length,54);assert.equal(HISTORY_DATA.updates.reduce((n,u)=>n+u.changes.length,0),728);
  const furnace=year.find(u=>u.effectiveDate==='2025-08-06');assert.equal(furnace.changes.length,2);assert.equal(furnace.effectiveDateKnown,true);
  const april=year.find(u=>u.effectiveDate==='2025-04-09');assert.equal(april.effectiveDateKnown,false);assert.equal(april.level,null);assert.equal(april.changes.find(c=>c.cardName==='Tornado').before,'84 × 2');
  const january=year.find(u=>u.effectiveDate==='2025-01-30');assert.ok(january.changes.filter(c=>c.cardName==='P.E.K.K.A').every(c=>c.levelReference===11));
@@ -87,4 +87,15 @@ test('2025 archive covers every month, separates maintenance dates and preserves
 });
 test('Hero Ice Wizard freeze maps to Frosty Fella, producing combat outcomes rather than parent-attack comparisons',async()=>{
  const {readFileSync}=await import('node:fs');await import('../one-shot-model.js');const {cards}=JSON.parse(readFileSync(new URL('../index.html',import.meta.url),'utf8').match(/<script id="catalog-data" type="application\/json">(.*?)<\/script>/s)[1]);const rows=OneShot.build(cards).rows;const patch=HISTORY_DATA.updates.find(u=>u.effectiveDate==='2026-10-06');const change=patch.changes.find(c=>c.cardName==='Ice Wizard');const source=HistoryModel.referenceForChange(change,rows);assert.equal(source.context,'Frosty Fella');assert.equal(source.panelKind,'ability');const report=HistoryModel.detectCrossings({...patch,changes:[change]},rows)[0];assert.ok(report.thresholds.some(t=>t.other.card.name==='Skeletons'&&t.before&&!t.after));assert.ok(report.thresholds.some(t=>t.other.card.name==='Bats'&&t.before&&!t.after));
+});
+test('2024 verified archive retains source levels, final March corrections and all 158 changes',()=>{
+ const year=HISTORY_DATA.updates.filter(u=>u.effectiveDate.startsWith('2024'));assert.equal(year.length,14);assert.equal(year.reduce((n,u)=>n+u.changes.length,0),158);
+ const march=year.find(u=>u.effectiveDate==='2024-03-05');assert.equal(new URL(march.sourceUrl).hostname,'royaleapi.com');assert.equal(march.level,null);assert.ok(march.changes.some(c=>c.cardName==='Little Prince'&&c.after===4));
+});
+test('shared base damage includes existing Evolution without a false same-family ranking',async()=>{
+ const {readFileSync}=await import('node:fs');await import('../one-shot-model.js');const {cards}=JSON.parse(readFileSync(new URL('../index.html',import.meta.url),'utf8').match(/<script id="catalog-data" type="application\/json">(.*?)<\/script>/s)[1]);const rows=OneShot.build(cards).rows;
+ const c=update.changes.find(c=>c.cardName==='Dart Goblin');const report=HistoryModel.detectCrossings(update,rows).find(r=>r.change===c);const evo=rows.find(r=>r.card.name==='Dart Goblin'&&r.form.formType==='evolution')||rows.find(r=>r.card.name==='Dart Goblin'&&r.form.id!==c.cardFormId);
+ assert.ok(report.affectedFormIds.includes(evo.form.id));assert.ok(!report.rankings.some(r=>r.other.form.id===evo.form.id&&r.other.panelKind==='main'));
+ const different={...update,changes:[c,{...c,id:'different',cardFormId:evo.form.id,formType:'evolution',before:160}]};assert.deepEqual(HistoryModel.affectedForms(different,c,rows),[c.cardFormId]);assert.ok(HistoryModel.detectCrossings(different,rows)[0].rankings.some(r=>r.other.form.id===evo.form.id));
+ assert.deepEqual(HistoryModel.affectedForms({...update,effectiveDate:'2000-01-01'},c,rows),[c.cardFormId]);
 });

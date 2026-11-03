@@ -76,10 +76,31 @@ function referenceForChange(change,rows){
  }
  return null;
 }
+function coreStat(change){
+ if(change.unit==='damage'&&/^(Damage|Ranged Damage|Area Damage|Melee Damage)$/.test(change.stat))return 'damage';
+ if(['hp','hitpoints'].includes(change.unit)&&change.stat==='Hitpoints')return 'hp';
+ return null;
+}
+function affectedForms(update,change,rows,history=root.HISTORY_DATA?.updates||[update]){
+ const source=referenceForChange(change,rows),forms=[change.cardFormId],kind=coreStat(change);
+ if(!kind||source?.panelKind!=='main')return forms;
+ for(const c of update.changes)if(c.cardFormId!==change.cardFormId&&source.card.forms?.some(f=>f.id===c.cardFormId)&&coreStat(c)===kind&&c.before===change.before&&c.after===change.after)forms.push(c.cardFormId);
+ const siblings=rows.filter(r=>r.card===source.card&&r.kind===kind&&r.panelKind==='main'&&!r.aggregate&&r.observation.displayedLevel===update.level&&r.value===change.after&&(kind==='hp'?r.field==='Hitpoints':/^(Damage|Ranged Damage|Area Damage|Melee Damage)$/.test(r.field)));
+ for(const row of siblings){
+  if(forms.includes(row.form.id))continue;
+  const explicit=update.changes.find(c=>c.cardFormId===row.form.id&&coreStat(c)===kind);
+  if(explicit){if(explicit.before===change.before&&explicit.after===change.after)forms.push(row.form.id);continue;}
+  // Base core stats are shared only with a matching main-panel value and a form
+  // documented by this patch date. Never project later forms or ability damage.
+  if(change.formType==='base'&&history.some(u=>u.effectiveDate<=update.effectiveDate&&u.changes.some(c=>c.cardFormId===row.form.id)))forms.push(row.form.id);
+ }
+ return forms;
+}
 function detectCrossings(update,rows){
  if(update.level===null)return [];
  return update.changes.filter(c=>changeKind(c)).map(change=>{
   const kind=changeKind(change),thresholds=[],rankings=[],hitCounts=[];
+  const sharedForms=affectedForms(update,change,rows);
   const source=referenceForChange(change,rows),unmapped=!source&&rows.some(r=>r.card);
   let excludedTargets=0;
   for(const row of rows){
@@ -89,6 +110,7 @@ function detectCrossings(update,rows){
    const beforeRelation=Math.sign(change.before-row.value),afterRelation=Math.sign(change.after-row.value);
    const needsCheck=!!(row.shield||row.protected||row.unverified||/shield/i.test(change.stat));
    if(row.kind===kind){
+    if(sharedForms.includes(row.form.id)&&row.panelKind==='main'&&coreStat(change)&&row.value===change.after)continue;
     if(beforeRelation!==afterRelation)rankings.push({other:row,beforeRelation,afterRelation,needsCheck});
    }else{
     if(unmapped)continue;
@@ -100,8 +122,8 @@ function detectCrossings(update,rows){
     if(before!==after)thresholds.push({other:row,before,after,needsCheck});
    }
   }
-  return {change,kind,thresholds,rankings,hitCounts,excludedTargets,unmapped};
+  return {change,kind,thresholds,rankings,hitCounts,excludedTargets,unmapped,affectedFormIds:sharedForms};
  });
 }
-root.HistoryModel={updatePresentation,changeCategory,cardCategory,damageChanges,compare,additionalStats,changeKind,referenceForChange,detectCrossings};
+root.HistoryModel={updatePresentation,changeCategory,cardCategory,damageChanges,compare,additionalStats,changeKind,referenceForChange,affectedForms,detectCrossings};
 })(globalThis);

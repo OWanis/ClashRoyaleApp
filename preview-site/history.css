@@ -16,3 +16,4 @@
 .history-effects{font-size:22px;min-width:44px;min-height:44px}.history-season{scroll-margin-top:90px}.history-nav{scroll-margin-top:18px}
 .history-effect-tabs{display:flex;gap:8px;margin:18px 0;flex-wrap:wrap}.history-effect-tabs button{padding:10px 16px;border:1px solid #526981;border-radius:9px;background:#16273c;color:#b9cde1;font:inherit;cursor:pointer}.history-effect-tabs button[aria-pressed=true]{background:#285175;color:#fff;border-color:#8bcaff}.ranking-explanation{margin:22px 0 10px;color:#e5f1ff;font-size:16px}
 .crossing-report{scroll-margin-top:90px}
+.history-affected-forms{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}.history-affected-forms .badge{display:inline-flex;align-items:center;gap:5px}.history-affected-forms img,.history-card-heading .history-affected-forms img{width:24px;height:30px;object-fit:contain}

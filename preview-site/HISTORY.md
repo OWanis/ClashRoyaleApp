@@ -67,3 +67,9 @@ Older sources do not establish an article-wide numeric level. Preserve unknown l
 Combat clarity revision: default to Combat outcomes; keep damage-vs-damage and HP-vs-HP comparisons in a separate Stat rankings view. Rankings have explicit group labels (for example, “Now deals less damage than”) so arrows cannot be mistaken for kill results. Effects shortcuts select the applicable view. Hero Ice Wizard's source Freeze Damage is explicitly mapped to Frosty Fella's ability-panel Area Damage, never the main attack; regression and browser checks verify the lost Skeleton/Bat one-hit outcomes. Empty results remain omitted.
 
 Combat outcomes now shows only gained/lost one-hit kills or one-hit survival. Multi-hit count changes, shield-only thresholds, protected/unverified outcomes and aggregate multi-hit reference attacks are excluded from this view. Cards without a qualifying one-hit change are omitted; numerical rankings remain separate. Browser checks cover all 40 patches, Cannon Cart's omission and Hero Ice Wizard's retained one-hit losses.
+
+### 2024 archive and affected forms
+
+Added 14 source-backed updates / 158 changes for 2024 (54 updates / 728 changes overall). The March 5 final report is retained from RoyaleAPI because the old Supercell March URL now serves a different year. It remains a secondary source, distinct from official notes. Unknown levels, source-unit ambiguities, and publication-date placement remain explicit; they do not generate normalized combat results.
+
+Shared main HP/damage changes display affected form icons together. A matching existing Evolution/Hero is excluded from same-family rank crossings when it inherits the base change. Explicitly different before/after values remain separate. Ability and component damage are not treated as shared main attacks. Combat outcomes remain limited to gained/lost one-hit outcomes.
