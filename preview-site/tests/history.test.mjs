@@ -48,3 +48,12 @@ test('automatic Minion Giant report removes Wall Breakers HP but retains valid b
  const valid=HistoryModel.detectCrossings({level:11,changes:[report.change]},[...rows,{...building,id:'test-building',value:160}])[0];assert.ok(valid.thresholds.some(e=>e.other.id==='test-building'));
  const barrel=HistoryModel.detectCrossings(update,rows).find(r=>r.change.cardName==='Skeleton Barrel'&&r.change.formType==='evolution');assert.ok(barrel.thresholds.some(e=>e.other.card.cardType==='troop'));
 });
+test('source classifications drive colors instead of numeric direction; season label is evidence-bound',()=>{
+ assert.equal(HistoryModel.updatePresentation(update).seasonLabel,'October 2026 · Season 88');
+ assert.equal(HistoryModel.changeCategory(update,update.changes.find(c=>c.cardName==='Electro Dragon')),'buff');
+ assert.equal(HistoryModel.changeCategory(update,update.changes.find(c=>c.stat==='Mass')),'nerf');
+ assert.equal(HistoryModel.cardCategory(update,update.changes.filter(c=>c.cardName==='Skeleton Barrel')),'rework');
+ assert.equal(HistoryModel.updatePresentation({id:'unknown'}).seasonLabel,null);
+ assert.equal(HistoryModel.changeCategory(update,{id:'unknown'}),'unclassified');
+ assert.deepEqual(update.changes.reduce((n,c)=>{const k=HistoryModel.changeCategory(update,c);n[k]=(n[k]||0)+1;return n;},{}),{nerf:5,buff:4,rework:3});
+});

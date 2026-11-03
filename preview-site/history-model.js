@@ -1,5 +1,30 @@
 (function(root){
 'use strict';
+const presentation={
+  "ea043182-2e45-515c-9e6e-7f0aa4a171a5": {
+    "seasonLabel": "October 2026 \u00b7 Season 88",
+    "seasonBasis": "Owner-supplied RoyaleAPI October 2026 Season 88 screenshot. Calendar-season label; the selected patch remains October 19.",
+    "classificationBasis": "Supercell October 19 subsection headings: NERFS, BUFFS and REWORKS.",
+    "changes": {
+      "00f3489b-1f3c-54e8-b556-11c491ac6257": "nerf",
+      "cf4d392e-7575-545c-ba4e-7b753a0cc4c5": "nerf",
+      "afb5dd05-81d7-5b64-95d6-cd1abbabe091": "nerf",
+      "49b07490-d43a-551d-a0e2-7548361d2968": "nerf",
+      "5fc75733-6bfe-55e1-a28c-9553f885bd49": "nerf",
+      "5c1f7401-960a-565a-9562-82528e867870": "buff",
+      "75a35506-1b30-5566-89b5-222aeca29460": "buff",
+      "10a52d84-430b-5c26-8b58-ff4cc686bb2d": "buff",
+      "3ad2d09c-f6f2-5d2f-98d4-2aefd76fbd41": "buff",
+      "548ddacc-696b-5991-9282-241ecca9d3a9": "rework",
+      "c3720e3c-7d38-575a-9913-5d7a527af9be": "rework",
+      "2dd4a268-2672-5506-a3f5-e9b92d996b86": "rework"
+    }
+  }
+};
+function updatePresentation(update){return presentation[update.id]||{seasonLabel:null,changes:{}};}
+function changeCategory(update,change){return updatePresentation(update).changes[change.id]||'unclassified';}
+function cardCategory(update,changes){const kinds=[...new Set(changes.map(c=>changeCategory(update,c)))];return kinds.length===1?kinds[0]:kinds.includes('unclassified')?'unclassified':'rework';}
+
 function damageChanges(update){return update.changes.filter(c=>c.unit==='damage'&&Number.isFinite(c.before)&&Number.isFinite(c.after));}
 function compare(change,hp){
  if(change.unit!=='damage'||!Number.isFinite(change.before)||!Number.isFinite(change.after)||hp.kind!=='hp')throw Error('Numeric damage and HP required');
@@ -52,5 +77,5 @@ function detectCrossings(update,rows){
   return {change,kind,thresholds,rankings,hitCounts,excludedTargets};
  });
 }
-root.HistoryModel={damageChanges,compare,additionalStats,changeKind,detectCrossings};
+root.HistoryModel={updatePresentation,changeCategory,cardCategory,damageChanges,compare,additionalStats,changeKind,detectCrossings};
 })(globalThis);
