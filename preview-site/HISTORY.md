@@ -73,3 +73,11 @@ Combat outcomes now shows only gained/lost one-hit kills or one-hit survival. Mu
 Added 14 source-backed updates / 158 changes for 2024 (54 updates / 728 changes overall). The March 5 final report is retained from RoyaleAPI because the old Supercell March URL now serves a different year. It remains a secondary source, distinct from official notes. Unknown levels, source-unit ambiguities, and publication-date placement remain explicit; they do not generate normalized combat results.
 
 Shared main HP/damage changes display affected form icons together. A matching existing Evolution/Hero is excluded from same-family rank crossings when it inherits the base change. Explicitly different before/after values remain separate. Ability and component damage are not treated as shared main attacks. Combat outcomes remain limited to gained/lost one-hit outcomes.
+
+### Releases alongside balances
+
+The timeline now includes 27 reviewed release/mechanic records covering 42 canonical forms. All / Balance / Releases / Mechanics filters apply to navigation and the picker. Heroes links its four launch forms, with the November announcement retained separately from December availability. Mega Minion Hero keeps early access and general availability distinct.
+
+`release-data.js` is a source-backed public release ledger, separate from the balance importer and screenshot observations. This is an initial backfill, not a complete release catalog. Unknown playable dates use clearly labeled announcement placement. Source excerpts and hashes are retained; current card buttons explicitly open current observations, never implied launch stats. Unsupported launch statistics remain blank.
+
+Spell rankings distinguish troop/building damage from Crown Tower damage; reduced Crown Tower entries do not appear in ordinary damage crossings. Void exposes one, two and three hits for each of its three target-count tiers, separately for normal and Crown Tower damage. Cumulative totals assume the tier remains unchanged and never produce one-hit outcomes.

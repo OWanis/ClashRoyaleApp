@@ -29,4 +29,4 @@ for(const a of abilityIcons){
 }
 console.log('Copied '+abilityIcons.length+' verified screenshot ability icons.');
 for(const file of ['one-shot-model.js','one-shot-ui.js','one-shot.css'])await copyFile(file,'public/'+file);
-for(const file of ['history-data.js','history-model.js','history-ui.js','history.css'])await copyFile(file,'public/'+file);
+for(const file of ['history-data.js','release-data.js','history-model.js','history-ui.js','history.css'])await copyFile(file,'public/'+file);

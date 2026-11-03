@@ -110,6 +110,8 @@ function detectCrossings(update,rows){
    const beforeRelation=Math.sign(change.before-row.value),afterRelation=Math.sign(change.after-row.value);
    const needsCheck=!!(row.shield||row.protected||row.unverified||/shield/i.test(change.stat));
    if(row.kind===kind){
+    if(kind==='damage'&&source&&(!!source.towerDamage!==!!row.towerDamage))continue;
+    if(kind==='damage'&&source?.targets==='Buildings'&&row.card?.cardType==='spell'&&row.panelKind==='main'&&['Barbarian Barrel','Royal Delivery'].includes(row.card.name))continue;
     if(sharedForms.includes(row.form.id)&&row.panelKind==='main'&&coreStat(change)&&row.value===change.after)continue;
     if(beforeRelation!==afterRelation)rankings.push({other:row,beforeRelation,afterRelation,needsCheck});
    }else{

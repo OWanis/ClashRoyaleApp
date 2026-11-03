@@ -69,6 +69,7 @@ const MULTI_PROFILES={
   }
 };
 function attackValues(card,field,raw){
+ if(card.forms.some(f=>f.id==='aa24fdb4-6edc-4e2c-87fe-8d2231b6a190')&&/^(Damage:|Crown Tower:)/.test(field)&&/^\d+$/.test(String(raw)))return [1,2,3].map(hits=>({value:Number(raw)*hits,suffix:hits+' hit'+(hits===1?'':'s'),scope:hits===1?'single':'cast',aggregate:hits>1,formula:Number(raw)+' × '+hits+' = '+Number(raw)*hits,mechanicNote:'Assumes the same target-count damage tier for every hit. Target count can change between strikes.'}));
  const values=parseValue(raw),match=String(raw).trim().match(/^(\d+(?:\.\d+)?)\s*[x×]\s*(\d+)$/i);
  if(!match)return values;
  const parent=card.forms.find(f=>f.formType==='base'),profile=MULTI_PROFILES[parent?.id];
@@ -84,18 +85,18 @@ function build(cards){
   if(!o||o.displayedLevel!==11)continue;
   const panels=[{key:'main',context:'Card',fields:o.fieldsDisplayed,source:null},...o.supplementalPanels.filter(p=>p.kind!=='description'&&p.kind!=='identity').map(p=>({key:p.kind,context:p.fieldsDisplayed.Component||p.fieldsDisplayed.Ability||(p.kind==='deployment_variant_stats'?'Alternate deployment':'Component / ability'),fields:p.fieldsDisplayed,source:p.sourceImageHash}))];
   for(const p of panels)for(const [field,raw]of Object.entries(p.fields)){
-   if(!/hitpoints|damage/i.test(field))continue;
+   if(!/hitpoints|damage|^crown tower:/i.test(field))continue;
    const kind=/hitpoints/i.test(field)?'hp':'damage';
    if(/\/sec|per second|reduction|healed|boost/i.test(field)||String(raw).includes('%')){excluded.push({card:c.name,form:f.formType,field,raw,reason:'Rate or percentage; not HP or damage per hit'});continue;}
    const values=attackValues(c,field,raw);
    if(!values.length){excluded.push({card:c.name,form:f.formType,field,raw,reason:'No unambiguous numeric hit value'});continue;}
    for(const part of values){
     const id=JSON.stringify([f.id,p.key,p.context,field,String(raw),part.suffix]);if(seen.has(id))continue;seen.add(id);
-    rows.push({id,card:c,form:f,observation:o,context:p.context,panelKind:p.key,field,raw:String(raw),value:part.value,kind,label:field+(part.suffix?' · '+part.suffix:''),sourceImageHash:p.source,scope:part.scope||'single',aggregate:!!part.aggregate,unverified:!!part.unverified,formula:part.formula||null,mechanicNote:part.mechanicNote||null,
+    rows.push({id,card:c,form:f,observation:o,context:p.context,panelKind:p.key,field,raw:String(raw),value:part.value,kind,label:field+(part.suffix?' · '+part.suffix:'')+(kind==='damage'&&c.cardType==='spell'?(/crown tower/i.test(field)?' · Crown Towers':(['Barbarian Barrel','Royal Delivery'].includes(c.name)&&p.key==='main'?' · Troops only':p.key!=='main'?' · Spawned troop damage':' · Troops & buildings')):''),sourceImageHash:p.source,scope:part.scope||'single',aggregate:!!part.aggregate,unverified:!!part.unverified,formula:part.formula||null,mechanicNote:part.mechanicNote||null,
      fields:p.fields,targets:p.fields.Targets||(p.key==='main'?o.fieldsDisplayed.Targets:null),
      shield:kind==='hp'&&/shield/i.test(field),
      protected:kind==='hp'&&field==='Hitpoints'&&Object.keys(p.fields).some(k=>/shield hitpoints|damage reduction/i.test(k)),
-     towerDamage:/crown tower damage|reflected tower damage/i.test(field),
+     towerDamage:/crown tower|reflected tower damage/i.test(field),
      towerHP:kind==='hp'&&c.cardType==='tower_troop'&&p.key==='main',
      conditional:part.suffix!==''||p.key!=='main'||!/^(Hitpoints|Damage|Area Damage|Ranged Damage|Crown Tower Damage)$/i.test(field),
      image:c.assets.find(a=>a.cardFormId===f.id)?.data});
@@ -110,8 +111,9 @@ function filter(rows,{kind='both',query='',numbering='original',cardId=''}={}){
  const q=query.trim().toLowerCase();return rows.filter(r=>(!cardId||r.card.forms.some(f=>f.formType==='base'&&f.id===cardId))&&(kind==='both'||r.kind===kind)&&[r.card.name,r.form.formType,r.context,r.label].join(' ').toLowerCase().includes(q)).map((r,i)=>({...r,displayRank:numbering==='filtered'?i+1:r.rank}));
 }
 function targetEligibility(d,h){
+ if(d.card?.cardType==='spell'&&d.panelKind==='main'&&['Barbarian Barrel','Royal Delivery'].includes(d.card.name)&&(h.towerHP||h.card?.cardType==='building'))return 'This spell hit damages troops only.';
  if(d.towerDamage&&!h.towerHP)return 'Crown Tower damage applies only to Crown Towers.';
- if(h.towerHP&&!d.towerDamage&&Object.keys(d.fields||{}).some(k=>/crown tower damage|reflected tower damage/i.test(k)))return 'Use this attack’s separate Crown Tower damage entry.';
+ if(h.towerHP&&!d.towerDamage&&Object.keys(d.fields||{}).some(k=>/crown tower|reflected tower damage/i.test(k)))return 'Use this attack’s separate Crown Tower damage entry.';
  // Normal targeting does not govern death/spawn damage or other special effects.
  const ordinary=/^(Damage|Ranged Damage|Area Damage|Melee Damage)$/i.test(d.field);
  if(ordinary&&d.targets==='Buildings'){
