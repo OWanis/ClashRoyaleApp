@@ -67,6 +67,7 @@ function changeKind(change){
 function referenceForChange(change,rows){
  const kind=changeKind(change),key=change.comparisonKey||change.stat;
  const candidates=rows.filter(r=>r.form.id===change.cardFormId&&r.kind===kind&&!r.aggregate);
+ if(change.cardName==='Ice Wizard'&&change.formType==='hero'&&change.stat==='Freeze Damage'){const freeze=candidates.filter(r=>r.panelKind==='ability'&&r.context==='Frosty Fella'&&r.field==='Area Damage');if(freeze.length===1)return freeze[0];}
  const exact=candidates.filter(r=>r.field===key);
  if(exact.length===1)return exact[0];
  if(key==='Damage'){

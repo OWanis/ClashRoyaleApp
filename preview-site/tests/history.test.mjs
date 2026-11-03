@@ -85,3 +85,6 @@ test('2025 archive covers every month, separates maintenance dates and preserves
  const november=year.find(u=>u.effectiveDate==='2025-11-26');assert.equal(november.changes.find(c=>c.cardName==='Tower Princess').levelReference,16);
  const cycle=year.find(u=>u.effectiveDate==='2025-09-25');assert.match(cycle.presentation.notices[0],/only the newest/);
 });
+test('Hero Ice Wizard freeze maps to Frosty Fella, producing combat outcomes rather than parent-attack comparisons',async()=>{
+ const {readFileSync}=await import('node:fs');await import('../one-shot-model.js');const {cards}=JSON.parse(readFileSync(new URL('../index.html',import.meta.url),'utf8').match(/<script id="catalog-data" type="application\/json">(.*?)<\/script>/s)[1]);const rows=OneShot.build(cards).rows;const patch=HISTORY_DATA.updates.find(u=>u.effectiveDate==='2026-10-06');const change=patch.changes.find(c=>c.cardName==='Ice Wizard');const source=HistoryModel.referenceForChange(change,rows);assert.equal(source.context,'Frosty Fella');assert.equal(source.panelKind,'ability');const report=HistoryModel.detectCrossings({...patch,changes:[change]},rows)[0];assert.ok(report.thresholds.some(t=>t.other.card.name==='Skeletons'&&t.before&&!t.after));assert.ok(report.thresholds.some(t=>t.other.card.name==='Bats'&&t.before&&!t.after));
+});
