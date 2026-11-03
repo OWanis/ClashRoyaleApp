@@ -30,7 +30,9 @@ function changeKind(change){
 }
 function detectCrossings(update,rows){
  return update.changes.filter(c=>changeKind(c)).map(change=>{
-  const kind=changeKind(change),thresholds=[],rankings=[];
+  const kind=changeKind(change),thresholds=[],rankings=[],hitCounts=[];
+  const source=rows.find(r=>r.form.id===change.cardFormId&&r.field===(change.comparisonKey||change.stat)&&r.kind===kind&&!r.aggregate);
+  let excludedTargets=0;
   for(const row of rows){
    if(row.observation.displayedLevel!==update.level)continue;
    if(row.form.id===change.cardFormId&&row.field===(change.comparisonKey||change.stat))continue;
@@ -39,13 +41,15 @@ function detectCrossings(update,rows){
    if(row.kind===kind){
     if(beforeRelation!==afterRelation)rankings.push({other:row,beforeRelation,afterRelation,needsCheck});
    }else{
+    if(source&&root.OneShot?.targetEligibility(kind==='damage'?source:row,kind==='damage'?row:source)){excludedTargets++;continue;}
+    if(kind==='damage'&&source&&!source.aggregate&&/^(Damage|Ranged Damage|Area Damage|Melee Damage)$/i.test(source.field)&&change.before>0&&change.after>0&&!row.shield&&!row.protected){const beforeHits=Math.ceil(row.value/change.before),afterHits=Math.ceil(row.value/change.after);if(beforeHits!==afterHits)hitCounts.push({other:row,beforeHits,afterHits,needsCheck:false});}
     // For HP, equality is not survival; for damage, equality reaches HP.
     const before=kind==='damage'?change.before>=row.value:change.before>row.value;
     const after=kind==='damage'?change.after>=row.value:change.after>row.value;
     if(before!==after)thresholds.push({other:row,before,after,needsCheck});
    }
   }
-  return {change,kind,thresholds,rankings};
+  return {change,kind,thresholds,rankings,hitCounts,excludedTargets};
  });
 }
 root.HistoryModel={damageChanges,compare,additionalStats,changeKind,detectCrossings};

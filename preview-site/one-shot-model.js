@@ -109,11 +109,19 @@ function ranked(rows,version='all'){return rows.filter(r=>version==='all'||r.for
 function filter(rows,{kind='both',query='',numbering='original',cardId=''}={}){
  const q=query.trim().toLowerCase();return rows.filter(r=>(!cardId||r.card.forms.some(f=>f.formType==='base'&&f.id===cardId))&&(kind==='both'||r.kind===kind)&&[r.card.name,r.form.formType,r.context,r.label].join(' ').toLowerCase().includes(q)).map((r,i)=>({...r,displayRank:numbering==='filtered'?i+1:r.rank}));
 }
+function targetEligibility(d,h){
+ if(d.towerDamage&&!h.towerHP)return 'Crown Tower damage applies only to Crown Towers.';
+ if(h.towerHP&&!d.towerDamage&&Object.keys(d.fields||{}).some(k=>/crown tower damage|reflected tower damage/i.test(k)))return 'Use this attack’s separate Crown Tower damage entry.';
+ // Normal targeting does not govern death/spawn damage or other special effects.
+ const ordinary=/^(Damage|Ranged Damage|Area Damage|Melee Damage)$/i.test(d.field);
+ if(ordinary&&d.targets==='Buildings'){
+  if(!h.towerHP&&!(h.card?.cardType==='building'&&h.panelKind==='main'))return 'This attack targets buildings; this HP entry is not a building or Crown Tower.';
+ }
+ return null;
+}
 function compare(d,h){
  if(d.kind!=='damage'||h.kind!=='hp')throw Error('Compare damage against HP');
- if(d.towerDamage&&!h.towerHP)return {group:'inapplicable',reason:'Crown Tower damage applies only to Crown Towers.'};
- if(h.towerHP&&!d.towerDamage&&Object.keys(d.fields).some(k=>/crown tower damage|reflected tower damage/i.test(k)))return {group:'inapplicable',reason:'Use this attack’s separate Crown Tower damage entry.'};
- if(d.targets==='Buildings'&&h.card.cardType==='troop'&&h.panelKind==='main')return {group:'inapplicable',reason:'This attack targets buildings, not troops.'};
+ const ineligible=targetEligibility(d,h);if(ineligible)return {group:'inapplicable',reason:ineligible};
  const enough=d.value>=h.value,remaining=Math.max(0,h.value-d.value);
  if(d.unverified)return {group:'mechanic',reason:'Potential total only: same-target projectile overlap is unverified.',enough,remaining};
  if(h.protected)return {group:'mechanic',reason:(enough?'Damage reaches body HP':'Damage is below body HP')+'; shield or damage reduction must be resolved separately.'+(d.aggregate?' Multiple-hit shield interactions are not inferred from the total.':''),enough,remaining};
@@ -130,5 +138,5 @@ function groupMatchups(items){
  for(const group of groups.values())group.items.sort((a,b)=>order[a.other.form.formType]-order[b.other.form.formType]||b.other.value-a.other.value);
  return [...groups.values()];
 }
-root.OneShot={parseValue,attackValues,build,ranked,filter,compare,groupMatchups};
+root.OneShot={parseValue,attackValues,build,ranked,filter,compare,targetEligibility,groupMatchups};
 })(globalThis);

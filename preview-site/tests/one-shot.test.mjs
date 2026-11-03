@@ -66,3 +66,11 @@ test('card isolation is exact across forms and preserves original positions',()=
  assert.deepEqual(M.filter(ranked,{cardId,numbering:'filtered'}).map(r=>r.displayRank),isolated.map((_,i)=>i+1));
  assert.ok(M.filter(ranked,{cardId,kind:'hp',query:'shield'}).every(r=>r.kind==='hp'&&r.label.toLowerCase().includes('shield')));
 });
+test('building-only attacks reject troop components; death damage does not inherit deployment targets',()=>{
+ const giant=find('Minion Giant','Damage');
+ assert.equal(M.compare(giant,find('Wall Breakers','Hitpoints','evolution')).group,'inapplicable');
+ assert.equal(M.targetEligibility(giant,find('Inferno Tower','Hitpoints')),null);
+ assert.equal(M.targetEligibility(giant,find('Tower Princess','Hitpoints')),null);
+ const golemite=rows.find(r=>r.context==='Golemite'&&r.kind==='hp');assert.ok(M.targetEligibility(giant,golemite));
+ assert.equal(M.targetEligibility(find('Skeleton Barrel','Death Damage'),find('Skeletons','Hitpoints')),null);
+});

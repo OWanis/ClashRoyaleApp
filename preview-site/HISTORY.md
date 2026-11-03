@@ -31,3 +31,9 @@ Each numeric damage/HP change is scanned against all Level 11 reference rows fro
 The primary report is automatic, with clickable card artwork, stat icons and form grouping. The manual comparison remains optional and collapsed. Patch changes are bundled under their canonical parent card, with separate form subsections and stat rows. Repeated source quotations are removed from each visible change card; evidence remains in the stored data and update-level source link.
 
 These detections are numerical movements relative to fixed screenshot references, not reconstructed ordering against every other card's historical values. References that also changed in the same patch are still fixed reference values, as labeled.
+
+## Target eligibility and repeated attacks
+
+Automatic opposite-type threshold comparisons now call the same recorded-target eligibility helper as One-shot matchups. Ordinary building-only attacks are compared only with main building HP and Crown Tower HP, excluding troops and their components. Explicit Crown Tower damage fields are scoped to towers. The historical change uses the matching screenshot attack's targeting as reference context; unrecorded historical targeting is not invented. Death/spawn and other special effects do not inherit the unit's ordinary building-only targeting.
+
+Where a sourced ordinary per-hit damage changes, the report also detects changes in `ceil(reference HP / damage)` for eligible unshielded reference HP. These are repeated normal attacks with no healing, regeneration or active defenses; special effects and aggregate volleys are excluded from this calculation. For Minion Giant versus the fixed 1,748-HP Inferno Tower reference, 168 → 153 damage changes 11 → 12 attacks. Manual comparisons reject known incompatible targets as well. Same-type damage ordering remains explicitly numerical rather than an interaction claim. Air/ground mobility and other unrecorded mechanics remain incomplete.

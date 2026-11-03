@@ -39,3 +39,12 @@ test('detector retains mechanic cautions and skips nonnumeric mechanics',()=>{
  const c=update.changes.find(c=>c.cardName==='Void');const report=HistoryModel.detectCrossings({level:11,changes:[c]},[{...reference('hp',304),protected:true}])[0];assert.equal(report.thresholds[0].needsCheck,true);
  assert.equal(HistoryModel.detectCrossings(update,[]).length,7);
 });
+test('automatic Minion Giant report removes Wall Breakers HP but retains valid building crossings',async()=>{
+ const {readFileSync}=await import('node:fs');await import('../one-shot-model.js');
+ const {cards}=JSON.parse(readFileSync(new URL('../index.html',import.meta.url),'utf8').match(/<script id="catalog-data" type="application\/json">(.*?)<\/script>/s)[1]);
+ const rows=OneShot.build(cards).rows;const report=HistoryModel.detectCrossings(update,rows).find(r=>r.change.cardName==='Minion Giant');
+ assert.ok(report.excludedTargets>0);const inferno=report.hitCounts.find(e=>e.other.card.name==='Inferno Tower');assert.equal(inferno.beforeHits,11);assert.equal(inferno.afterHits,12);assert.ok(report.hitCounts.every(e=>e.other.towerHP||e.other.card.cardType==='building'));assert.ok(report.thresholds.every(e=>e.other.towerHP||e.other.card.cardType==='building'));
+ const building=rows.find(r=>r.card.cardType==='building'&&r.kind==='hp'&&r.panelKind==='main');
+ const valid=HistoryModel.detectCrossings({level:11,changes:[report.change]},[...rows,{...building,id:'test-building',value:160}])[0];assert.ok(valid.thresholds.some(e=>e.other.id==='test-building'));
+ const barrel=HistoryModel.detectCrossings(update,rows).find(r=>r.change.cardName==='Skeleton Barrel'&&r.change.formType==='evolution');assert.ok(barrel.thresholds.some(e=>e.other.card.cardType==='troop'));
+});
