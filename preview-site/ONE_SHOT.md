@@ -43,3 +43,7 @@ Owner authorized replacing the blanket per-hit-only rule after confirming Firecr
 | Magic Archer Hero Triple Threat | 46 projectile | 138 potential total | Same-target behavior unverified; mechanic-check results only |
 
 Profiles encode the owner-approved mechanic interpretation, not an additional official source. Calculation and conditions are visible in both compact and detailed matchup views. Attack/cast totals are not labeled single-hit kills. Shielded body comparisons remain mechanic checks, because the total alone cannot resolve hit-by-hit shield behavior. Electro Wizard Hero ability DPS remains excluded.
+
+## Isolate a card
+
+The exact-card selector filters by canonical Base form ID after global rank assignment. Selecting a card switches to all versions, both stat types and an empty text search, preserving the numbering preference. Its HP, shield, attack states and component entries remain separate. Search and stat/version filters can then narrow the isolated list. Original numbers stay global to the selected version scope; filtered numbering is consecutive within the visible isolated rows. Full-stats buttons open each documented form in the card explorer. Matchups still include all cards/forms. Show all cards clears only isolation; Reset returns every ranking filter to its default.

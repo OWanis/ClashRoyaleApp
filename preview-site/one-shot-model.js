@@ -106,8 +106,8 @@ function build(cards){
  return {rows,excluded};
 }
 function ranked(rows,version='all'){return rows.filter(r=>version==='all'||r.form.formType===version).map((r,i)=>({...r,rank:i+1}));}
-function filter(rows,{kind='both',query='',numbering='original'}={}){
- const q=query.trim().toLowerCase();return rows.filter(r=>(kind==='both'||r.kind===kind)&&[r.card.name,r.form.formType,r.context,r.label].join(' ').toLowerCase().includes(q)).map((r,i)=>({...r,displayRank:numbering==='filtered'?i+1:r.rank}));
+function filter(rows,{kind='both',query='',numbering='original',cardId=''}={}){
+ const q=query.trim().toLowerCase();return rows.filter(r=>(!cardId||r.card.forms.some(f=>f.formType==='base'&&f.id===cardId))&&(kind==='both'||r.kind===kind)&&[r.card.name,r.form.formType,r.context,r.label].join(' ').toLowerCase().includes(q)).map((r,i)=>({...r,displayRank:numbering==='filtered'?i+1:r.rank}));
 }
 function compare(d,h){
  if(d.kind!=='damage'||h.kind!=='hp')throw Error('Compare damage against HP');

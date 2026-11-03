@@ -56,3 +56,13 @@ test('direct, volley, sequential and unverified totals have distinct matchup sem
  assert.equal(M.compare(find('Arrows','Area Damage'),find('Guards','Hitpoints')).group,'mechanic');
  assert.match(M.compare(find('Hunter','Ranged Damage'),find('Knight','Hitpoints')).reason,/all listed hits/);
 });
+test('card isolation is exact across forms and preserves original positions',()=>{
+ const cardId=cards.find(c=>c.name==='Knight').forms.find(f=>f.formType==='base').id;
+ const ranked=M.ranked(rows),isolated=M.filter(ranked,{cardId});
+ assert.ok(isolated.length>5);assert.ok(isolated.every(r=>r.card.name==='Knight'));
+ assert.deepEqual([...new Set(isolated.map(r=>r.form.formType))].sort(),['base','evolution','hero']);
+ assert.ok(isolated.some(r=>r.field==='Shield Hitpoints'));assert.ok(isolated.some(r=>r.kind==='damage'));assert.ok(isolated.some(r=>r.kind==='hp'));
+ for(const r of isolated)assert.equal(r.displayRank,ranked.find(x=>x.id===r.id).rank);
+ assert.deepEqual(M.filter(ranked,{cardId,numbering:'filtered'}).map(r=>r.displayRank),isolated.map((_,i)=>i+1));
+ assert.ok(M.filter(ranked,{cardId,kind:'hp',query:'shield'}).every(r=>r.kind==='hp'&&r.label.toLowerCase().includes('shield')));
+});
