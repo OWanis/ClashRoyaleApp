@@ -21,8 +21,19 @@ const presentation={
     }
   }
 };
-function updatePresentation(update){return presentation[update.id]||{seasonLabel:null,changes:{}};}
-function changeCategory(update,change){return updatePresentation(update).changes[change.id]||'unclassified';}
+function updatePresentation(update){return update.presentation||presentation[update.id]||{seasonLabel:null,changes:{}};}
+function changeCategory(update,change){
+ const category=change.classification||updatePresentation(update).changes?.[change.id]||'unclassified';
+ // Some source sections group mixed changes under one heading. Only reverse a
+ // heading for a stat whose benefit direction is unambiguous; mass/range and
+ // explicitly labeled reworks/fixes retain the source classification.
+ if(['buff','nerf'].includes(category)&&Number.isFinite(change.before)&&Number.isFinite(change.after)&&change.before!==change.after){
+  if(['damage','hp','healing'].includes(change.unit))return change.after>change.before?'buff':'nerf';
+  if(change.unit==='seconds'&&/hit speed|hit frequency|first hit|first attack|deploy time|cooldown|cast time|cooking time|production speed/i.test(change.stat))return change.after<change.before?'buff':'nerf';
+  if(change.unit==='elixir')return change.after<change.before?'buff':'nerf';
+ }
+ return category;
+}
 function cardCategory(update,changes){const kinds=[...new Set(changes.map(c=>changeCategory(update,c)))];return kinds.length===1?kinds[0]:kinds.includes('unclassified')?'unclassified':'rework';}
 
 function damageChanges(update){return update.changes.filter(c=>c.unit==='damage'&&Number.isFinite(c.before)&&Number.isFinite(c.after));}
@@ -50,22 +61,36 @@ function additionalStats(updates,formId,displayedFields={}){
 function changeKind(change){
  if(!Number.isFinite(change.before)||!Number.isFinite(change.after))return null;
  if(change.unit==='damage')return 'damage';
- if(['hp','hitpoints'].includes(change.unit)||/hitpoints/i.test(change.stat))return 'hp';
+ if(['hp','hitpoints'].includes(change.unit))return 'hp';
+ return null;
+}
+function referenceForChange(change,rows){
+ const kind=changeKind(change),key=change.comparisonKey||change.stat;
+ const candidates=rows.filter(r=>r.form.id===change.cardFormId&&r.kind===kind&&!r.aggregate);
+ const exact=candidates.filter(r=>r.field===key);
+ if(exact.length===1)return exact[0];
+ if(key==='Damage'){
+  const main=candidates.filter(r=>r.panelKind==='main'&&/^(Damage|Ranged Damage|Area Damage|Melee Damage)$/.test(r.field));
+  if(main.length===1)return main[0];
+ }
  return null;
 }
 function detectCrossings(update,rows){
+ if(update.level===null)return [];
  return update.changes.filter(c=>changeKind(c)).map(change=>{
   const kind=changeKind(change),thresholds=[],rankings=[],hitCounts=[];
-  const source=rows.find(r=>r.form.id===change.cardFormId&&r.field===(change.comparisonKey||change.stat)&&r.kind===kind&&!r.aggregate);
+  const source=referenceForChange(change,rows),unmapped=!source&&rows.some(r=>r.card);
   let excludedTargets=0;
   for(const row of rows){
    if(row.observation.displayedLevel!==update.level)continue;
+   if(source&&row.id&&row.id===source.id)continue;
    if(row.form.id===change.cardFormId&&row.field===(change.comparisonKey||change.stat))continue;
    const beforeRelation=Math.sign(change.before-row.value),afterRelation=Math.sign(change.after-row.value);
    const needsCheck=!!(row.shield||row.protected||row.unverified||/shield/i.test(change.stat));
    if(row.kind===kind){
     if(beforeRelation!==afterRelation)rankings.push({other:row,beforeRelation,afterRelation,needsCheck});
    }else{
+    if(unmapped)continue;
     if(source&&root.OneShot?.targetEligibility(kind==='damage'?source:row,kind==='damage'?row:source)){excludedTargets++;continue;}
     if(kind==='damage'&&source&&!source.aggregate&&/^(Damage|Ranged Damage|Area Damage|Melee Damage)$/i.test(source.field)&&change.before>0&&change.after>0&&!row.shield&&!row.protected){const beforeHits=Math.ceil(row.value/change.before),afterHits=Math.ceil(row.value/change.after);if(beforeHits!==afterHits)hitCounts.push({other:row,beforeHits,afterHits,needsCheck:false});}
     // For HP, equality is not survival; for damage, equality reaches HP.
@@ -74,8 +99,8 @@ function detectCrossings(update,rows){
     if(before!==after)thresholds.push({other:row,before,after,needsCheck});
    }
   }
-  return {change,kind,thresholds,rankings,hitCounts,excludedTargets};
+  return {change,kind,thresholds,rankings,hitCounts,excludedTargets,unmapped};
  });
 }
-root.HistoryModel={updatePresentation,changeCategory,cardCategory,damageChanges,compare,additionalStats,changeKind,detectCrossings};
+root.HistoryModel={updatePresentation,changeCategory,cardCategory,damageChanges,compare,additionalStats,changeKind,referenceForChange,detectCrossings};
 })(globalThis);

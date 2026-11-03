@@ -57,3 +57,21 @@ test('source classifications drive colors instead of numeric direction; season l
  assert.equal(HistoryModel.changeCategory(update,{id:'unknown'}),'unclassified');
  assert.deepEqual(update.changes.reduce((n,c)=>{const k=HistoryModel.changeCategory(update,c);n[k]=(n[k]||0)+1;return n;},{}),{nerf:5,buff:4,rework:3});
 });
+test('2026 archive keeps all patch dates, explicit source quotes and unknown levels',()=>{
+ assert.equal(HISTORY_DATA.updates.length,16);assert.equal(HISTORY_DATA.updates.reduce((n,u)=>n+u.changes.length,0),296);
+ assert.equal(new Set(HISTORY_DATA.updates.map(u=>u.effectiveDate.slice(0,7))).size,10);
+ const ids=new Set();for(const u of HISTORY_DATA.updates){assert.ok(u.effectiveDate<='2026-11-03');for(const c of u.changes){assert.ok(!ids.has(c.id));ids.add(c.id);assert.ok(u.excerpt.includes(c.quote));assert.notEqual(HistoryModel.changeCategory(u,c),'unclassified');}}
+ const august=HISTORY_DATA.updates.find(u=>u.effectiveDate==='2026-08-04');assert.equal(august.level,null);assert.match(august.presentation.notices[0],/except Boss Bandit/);assert.deepEqual(HistoryModel.detectCrossings(august,[reference('hp',220)]),[]);
+ const march=HISTORY_DATA.updates.find(u=>u.effectiveDate==='2026-03-02');assert.ok(march.publishedDate>march.effectiveDate);assert.ok(march.excerpt.includes(march.effectiveDateBasis));
+ assert.equal(HistoryModel.changeKind({unit:'percent',stat:'Hitpoints bonus',before:10,after:0}),null);
+});
+test('component damage cannot silently become parent damage or unrestricted matchup results',async()=>{
+ const {readFileSync}=await import('node:fs');await import('../one-shot-model.js');const {cards}=JSON.parse(readFileSync(new URL('../index.html',import.meta.url),'utf8').match(/<script id="catalog-data" type="application\/json">(.*?)<\/script>/s)[1]);const rows=OneShot.build(cards).rows;
+ const april=HISTORY_DATA.updates.find(u=>u.effectiveDate==='2026-04-06'),souldier=april.changes.find(c=>c.stat==='Souldier Damage');const source=HistoryModel.referenceForChange(souldier,rows);assert.ok(!source||source.panelKind!=='main');
+ const fake={...souldier,stat:'Unmapped component damage',comparisonKey:null};const report=HistoryModel.detectCrossings({...april,changes:[fake]},rows)[0];assert.equal(report.unmapped,true);assert.equal(report.thresholds.length,0);assert.equal(report.hitCounts.length,0);
+ const cannon=april.changes.find(c=>c.cardName==='Cannon');assert.equal(HistoryModel.referenceForChange(cannon,rows).panelKind,'main');
+ const september=HISTORY_DATA.updates.find(u=>u.effectiveDate==='2026-09-08');const fireball=september.changes.find(c=>c.cardName==='Fireball');assert.ok(HistoryModel.detectCrossings({...september,changes:[fireball]},rows)[0].thresholds.every(e=>e.other.towerHP));
+});
+test('mixed numerical buffs and nerfs are grouped as a rework even inside a source buff section',()=>{
+ const october=HISTORY_DATA.updates.find(u=>u.effectiveDate==='2026-10-06');const lava=october.changes.filter(c=>c.cardName==='Lava Hound');assert.equal(HistoryModel.cardCategory(october,lava),'rework');assert.equal(HistoryModel.changeCategory(october,lava.find(c=>c.stat==='Hit Speed')),'nerf');assert.equal(HistoryModel.changeCategory(october,lava.find(c=>c.stat==='Damage')),'buff');
+});

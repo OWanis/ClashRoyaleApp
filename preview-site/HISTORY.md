@@ -41,3 +41,15 @@ Where a sourced ordinary per-hit damage changes, the report also detects changes
 ## Classification and season labels
 
 Patch panels use green Buff, red Nerf and blue Rework badges, borders and arrows, with text labels so meaning is not color-only. Classification follows the official subsection headings rather than whether a numeric value rises or falls. For example, Electro Dragon's reduced first-hit time is a Buff; Cannon Cart's mass change remains part of its source-classified Nerf. The October 2026 · Season 88 label is supported by the owner-supplied RoyaleAPI screenshot; it does not conflate the October 6 and October 19 patches. Unknown future labels remain unspecified until supported.
+
+## 2026 archive (reviewed November 3)
+
+The selector now exposes 16 source-backed updates and 296 card/form/stat changes from January through October, including February 23 and March 16 gameplay fixes. August 4's global single-use ability rule is shown separately, with its Boss Bandit exception. The October 19 notes explicitly brought November seasonal changes forward; no November-start patch or future December patch is invented.
+
+Each patch retains its publication day, effective day, source URL/hash, quotes, form identity and classification. A retroactively published article needs an explicit effective-date basis. January, February and August do not explicitly establish the numeric level, so their level is unknown and Level 11 comparisons are disabled. Source wording and disagreements between articles are preserved rather than silently reconciled. Non-numeric fixes stay non-numeric.
+
+Season names come from official season posts. October's Season 88 number comes from the owner's screenshot; other season numbers are not extrapolated. Green/red arrows follow clear benefit direction for HP/damage and timed attack intervals; ambiguous mechanics retain the official heading. Mixed buffs/nerfs group as a blue rework. Explicit reworks remain blue; bug fixes have a separate blue label.
+
+Automatic matchup comparisons require an unambiguous screenshot component mapping. Generic Damage may map to exactly one main-card Damage/Ranged Damage/Area Damage/Melee Damage field. Component names never fall back to parent attacks. Unmapped values can show numerical ranking shifts, with an explicit warning, but no target outcomes. Percentages and DPS cannot become hit damage or HP. Historical data does not overwrite screenshot observations or create complete historical snapshots.
+
+Canonical ingestion: `scripts/history-year.ts`; retained manifests, transcription, source audit and commit/repeat receipts: `docs/reviews/history-2026/` (workspace only). Re-running verifies existing values and refuses drift. Public `history-data.js` is exported from PostgreSQL; no private evidence paths or credentials are published. Merge Tactics and temporary C.H.A.O.S modifiers are outside this 1v1 history.
