@@ -127,5 +127,22 @@ function detectCrossings(update,rows){
   return {change,kind,thresholds,rankings,hitCounts,excludedTargets,unmapped,affectedFormIds:sharedForms};
  });
 }
-root.HistoryModel={updatePresentation,changeCategory,cardCategory,damageChanges,compare,additionalStats,changeKind,referenceForChange,affectedForms,detectCrossings};
+
+function timelineGroups(items,mode,allItems=items){
+ const monthName=key=>new Intl.DateTimeFormat('en-GB',{month:'long',year:'numeric',timeZone:'UTC'}).format(new Date(key+'-01T00:00:00Z'));
+ const seasons=new Map(),bySource=new Map();
+ for(const item of allItems){const label=updatePresentation(item).seasonLabel;if(label&&label.includes(' · ')){const key=item.effectiveDate.slice(0,7);seasons.set(key,label);if(item.presentation?.seasonSource)bySource.set(item.presentation.seasonSource,key);}}
+ const result=new Map();
+ for(const item of items){let key=item.effectiveDate.slice(0,7);
+  if(mode==='season'&&item.eventType){key=bySource.get(item.sourceUrl)||key;
+   // This source explicitly announces June content in May; do not place it in May's season.
+   if(item.sourceUrl.endsWith('/june-update-2026/'))key='2026-06';
+  }
+  const label=mode==='season'?(seasons.get(key)||monthName(key)+' · Season unspecified'):monthName(key);
+  if(!result.has(key))result.set(key,{key,label,items:[]});result.get(key).items.push(item);
+ }
+ return [...result.values()].sort((a,b)=>b.key.localeCompare(a.key));
+}
+
+root.HistoryModel={timelineGroups,updatePresentation,changeCategory,cardCategory,damageChanges,compare,additionalStats,changeKind,referenceForChange,affectedForms,detectCrossings};
 })(globalThis);

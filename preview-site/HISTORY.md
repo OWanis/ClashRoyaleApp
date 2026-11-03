@@ -81,3 +81,7 @@ The timeline now includes 27 reviewed release/mechanic records covering 42 canon
 `release-data.js` is a source-backed public release ledger, separate from the balance importer and screenshot observations. This is an initial backfill, not a complete release catalog. Unknown playable dates use clearly labeled announcement placement. Source excerpts and hashes are retained; current card buttons explicitly open current observations, never implied launch stats. Unsupported launch statistics remain blank.
 
 Spell rankings distinguish troop/building damage from Crown Tower damage; reduced Crown Tower entries do not appear in ordinary damage crossings. Void exposes one, two and three hits for each of its three target-count tiers, separately for normal and Crown Tower damage. Cumulative totals assume the tier remains unchanged and never produce one-hit outcomes.
+
+### Date, month and season views
+
+Date remains the default. Month and Season combine the selected timeline type into dated event sections, retaining individual changes, releases and global rules. Arrows and the group selector navigate groups; Open date and combat-effect buttons return to the original detailed event. Search applies within the selected group. Season attribution uses recorded season labels/source associations (including June 2026's May announcement); missing season metadata stays explicitly unspecified, without invented season numbers or start/end boundaries.
