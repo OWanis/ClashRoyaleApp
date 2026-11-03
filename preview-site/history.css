@@ -10,3 +10,4 @@
 .balance-category.fix{color:#70b8ff;border-color:#70b8ff}
 .history-global-rules{margin:1rem 0}
 .history-change.balance-fix{border-top:4px solid var(--balance-color);background:linear-gradient(145deg,#1c3654,#142238 65%)}
+.crossing-direction.effect-up{color:#70e0a1}.crossing-direction.effect-down{color:#ff8c96}.crossing-report>.matchup-icon-grid{margin-top:16px}.crossing-direction{font-weight:700;font-size:14px}.history-comparison[hidden]{display:none}
