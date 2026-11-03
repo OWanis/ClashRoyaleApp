@@ -14,3 +14,22 @@ function compare(){const c=update.changes.find(c=>c.id===$('history-attack').val
 }
 $('history-search').addEventListener('input',render);for(const id of ['history-attack','history-hp'])$(id).addEventListener('change',compare);render();compare();
 })();
+
+// Enrich card details from persisted deltas without changing screenshot observations.
+globalThis.appendBalanceStats=function(body,form,observation){
+ const displayed={...observation.fieldsDisplayed,...observation.metadataDisplayed};
+ for(const panel of observation.supplementalPanels)Object.assign(displayed,panel.fieldsDisplayed);
+ for(const ability of observation.abilities)Object.assign(displayed,ability.fieldsDisplayed);
+ const facts=HistoryModel.additionalStats(HISTORY_DATA.updates,form.id,displayed);
+ if(!facts.length)return;
+ const section=statSection('Additional stats from balance notes','','Latest documented values in the imported balance notes. Dates apply to the notes, not the selected screenshot. Later unimported updates may change these values.');section.classList.add('balance-extra-stats');
+ for(const fact of facts){const {change,update}=fact,box=el('article','balance-extra-stat');
+  box.append(el('h4','',change.stat));
+  const value=el('div','balance-extra-value');value.append(statIcon(change.stat),el('strong','',fact.conflict?'Conflicting source values':String(change.after)+(change.unit==='seconds'?' s':change.unit==='tiles'?' tiles':'')));box.append(value);
+  box.append(el('p','breakpoint-hint','Previously: '+String(change.before)+' · Effective '+update.effectiveDate+' · Level '+update.level));
+  const source=el('a','history-source',update.sourceTitle+' ↗');source.href=update.sourceUrl;source.target='_blank';source.rel='noopener noreferrer';box.append(source);
+  const history=el('details','balance-extra-history');history.append(el('summary','','Recorded changes ('+fact.history.length+')'));
+  for(const entry of fact.history){const line=el('p','breakpoint-evidence',entry.update.effectiveDate+' · '+String(entry.change.before)+' → '+String(entry.change.after)+' · '+entry.change.unit+' · ');const link=el('a','history-source','Source');link.href=entry.update.sourceUrl;link.target='_blank';link.rel='noopener noreferrer';line.append(link);history.append(line);}box.append(history);section.append(box);
+ }
+ body.append(section);
+};
