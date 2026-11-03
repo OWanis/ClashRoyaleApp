@@ -1,0 +1,8 @@
+import {test} from 'node:test';
+import assert from 'node:assert/strict';
+import '../history-data.js';
+import '../history-model.js';
+const update=HISTORY_DATA.updates[0];
+test('effective day differs from article publication; explicit form scopes and complete first-section count',()=>{assert.equal(update.effectiveDate,'2026-10-19');assert.equal(update.publishedDate,'2026-10-06');assert.equal(update.datePrecision,'day');assert.equal(update.level,11);assert.equal(update.changes.length,12);assert.equal(new Set(update.changes.map(c=>c.cardFormId)).size,11);assert.equal(update.changes.filter(c=>c.cardName==='Skeleton Barrel').length,2);assert.equal(update.changes.find(c=>c.cardName==='Electro Wizard').formType,'hero');for(const c of update.changes)assert.ok(update.excerpt.includes(c.quote));});
+test('Void crosses 304 reference HP; no historical HP is inferred',()=>{const c=update.changes.find(c=>c.cardName==='Void');const r=HistoryModel.compare(c,{kind:'hp',value:304});assert.equal(r.before.remaining,8);assert.equal(r.before.reaches,false);assert.equal(r.after.reaches,true);assert.equal(r.changed,true);assert.equal(r.referenceHP,304);});
+test('non-damage mechanics cannot enter HP comparisons; equality and shield cautions preserved',()=>{assert.equal(HistoryModel.damageChanges(update).length,7);assert.throws(()=>HistoryModel.compare(update.changes.find(c=>c.unit==='seconds'),{kind:'hp',value:10}));const c=update.changes.find(c=>c.cardName==='Flying Machine');assert.equal(HistoryModel.compare(c,{kind:'hp',value:179,shield:true}).after.reaches,true);assert.equal(HistoryModel.compare(c,{kind:'hp',value:179,shield:true}).mechanicCheck,true);});
