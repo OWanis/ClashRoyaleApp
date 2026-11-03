@@ -23,3 +23,11 @@ This GitHub/Vercel project remains a read-only exported preview; the PostgreSQL 
 ## Additional card stats
 
 Card details derive an “Additional stats from balance notes” section from the persisted update collection. Facts are scoped to the exact form, stat and reference level, ordered by effective date (not retrieval/import date). The latest documented value, previous value, effective date and source link are displayed, with all earlier changes expandable. A fact already identical to a screenshot field is not duplicated; missing or differing values remain separately sourced rather than replacing screenshot observations. Same-day conflicting values are flagged. These are latest imported documentary facts, not a guarantee that no later balance update exists. Cannon Cart mass 3 → 6 is the first example. The exporter retains all imported history updates so older facts are not lost when the next patch is added.
+
+## Automatic threshold and ordering report
+
+Each numeric damage/HP change is scanned against all Level 11 reference rows from the One-shot model. Opposite-type crossings compare damage >= HP or HP > damage; equality therefore reaches HP but is not survival. Same-type ordering compares the sign of before/reference and after/reference, including entering or leaving ties. Exact self-stat rows are excluded, while related forms, conditional attacks and other HP states retain their own entries. Different-level rows are excluded. Shield/reduction and unverified entries retain mechanic-check labels. No crossings is shown explicitly, and an update with no HP changes does not invent any.
+
+The primary report is automatic, with clickable card artwork, stat icons and form grouping. The manual comparison remains optional and collapsed. Patch changes are bundled under their canonical parent card, with separate form subsections and stat rows. Repeated source quotations are removed from each visible change card; evidence remains in the stored data and update-level source link.
+
+These detections are numerical movements relative to fixed screenshot references, not reconstructed ordering against every other card's historical values. References that also changed in the same patch are still fixed reference values, as labeled.

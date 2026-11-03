@@ -22,5 +22,31 @@ function additionalStats(updates,formId,displayedFields={}){
   return {...latest,history,conflict,peers};
  }).filter(fact=>fact.conflict||String(displayedFields[fact.change.comparisonKey||fact.change.stat])!==String(fact.change.after)).sort((a,b)=>a.change.stat.localeCompare(b.change.stat));
 }
-root.HistoryModel={damageChanges,compare,additionalStats};
+function changeKind(change){
+ if(!Number.isFinite(change.before)||!Number.isFinite(change.after))return null;
+ if(change.unit==='damage')return 'damage';
+ if(['hp','hitpoints'].includes(change.unit)||/hitpoints/i.test(change.stat))return 'hp';
+ return null;
+}
+function detectCrossings(update,rows){
+ return update.changes.filter(c=>changeKind(c)).map(change=>{
+  const kind=changeKind(change),thresholds=[],rankings=[];
+  for(const row of rows){
+   if(row.observation.displayedLevel!==update.level)continue;
+   if(row.form.id===change.cardFormId&&row.field===(change.comparisonKey||change.stat))continue;
+   const beforeRelation=Math.sign(change.before-row.value),afterRelation=Math.sign(change.after-row.value);
+   const needsCheck=!!(row.shield||row.protected||row.unverified||/shield/i.test(change.stat));
+   if(row.kind===kind){
+    if(beforeRelation!==afterRelation)rankings.push({other:row,beforeRelation,afterRelation,needsCheck});
+   }else{
+    // For HP, equality is not survival; for damage, equality reaches HP.
+    const before=kind==='damage'?change.before>=row.value:change.before>row.value;
+    const after=kind==='damage'?change.after>=row.value:change.after>row.value;
+    if(before!==after)thresholds.push({other:row,before,after,needsCheck});
+   }
+  }
+  return {change,kind,thresholds,rankings};
+ });
+}
+root.HistoryModel={damageChanges,compare,additionalStats,changeKind,detectCrossings};
 })(globalThis);

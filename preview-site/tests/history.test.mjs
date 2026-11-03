@@ -21,3 +21,21 @@ test('newest effective fact wins regardless of import order, retaining older cha
  const conflict={...later,id:'conflict',changes:[{...c,id:'other-change',after:8}]};
  assert.equal(HistoryModel.additionalStats([update,later,conflict],c.cardFormId,{'Ranged Damage':'202'})[0].conflict,true);
 });
+const reference=(kind,value,field=kind==='hp'?'Hitpoints':'Damage',form='reference')=>({id:kind+value+form,kind,value,field,form:{id:form},observation:{displayedLevel:11}});
+test('automatic detector catches gained/lost thresholds and rank ties, excluding unchanged/self/other levels',()=>{
+ const c={id:'change',cardFormId:'source',unit:'damage',stat:'Damage',before:100,after:120};
+ const report=HistoryModel.detectCrossings({level:11,changes:[c]},[reference('hp',120),reference('hp',100),reference('hp',130),reference('damage',110),reference('damage',120),reference('damage',100),reference('damage',120,'Damage','source'),{...reference('hp',110),observation:{displayedLevel:12}}])[0];
+ assert.equal(report.thresholds.length,1);assert.equal(report.thresholds[0].after,true);
+ assert.deepEqual(report.rankings.map(r=>[r.beforeRelation,r.afterRelation]),[[-1,1],[-1,0],[0,1]]);
+ const nerf=HistoryModel.detectCrossings({level:11,changes:[{...c,before:120,after:100}]},[reference('hp',120)])[0];assert.equal(nerf.thresholds[0].after,false);
+});
+test('HP changes reverse survival equality and detect HP ordering crossings',()=>{
+ const c={id:'hp-change',cardFormId:'source',unit:'hp',stat:'Hitpoints',before:100,after:120};
+ const report=HistoryModel.detectCrossings({level:11,changes:[c]},[reference('damage',100),reference('damage',120),reference('hp',110),reference('hp',120)])[0];
+ assert.equal(report.thresholds.length,1);assert.equal(report.thresholds[0].other.value,100);assert.equal(report.thresholds[0].after,true);assert.equal(report.rankings.length,2);
+ const nerf=HistoryModel.detectCrossings({level:11,changes:[{...c,before:120,after:100}]},[reference('damage',100)])[0];assert.equal(nerf.thresholds[0].after,false);
+});
+test('detector retains mechanic cautions and skips nonnumeric mechanics',()=>{
+ const c=update.changes.find(c=>c.cardName==='Void');const report=HistoryModel.detectCrossings({level:11,changes:[c]},[{...reference('hp',304),protected:true}])[0];assert.equal(report.thresholds[0].needsCheck,true);
+ assert.equal(HistoryModel.detectCrossings(update,[]).length,7);
+});
