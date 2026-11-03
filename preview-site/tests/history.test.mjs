@@ -58,8 +58,8 @@ test('source classifications drive colors instead of numeric direction; season l
  assert.deepEqual(update.changes.reduce((n,c)=>{const k=HistoryModel.changeCategory(update,c);n[k]=(n[k]||0)+1;return n;},{}),{nerf:5,buff:4,rework:3});
 });
 test('2026 archive keeps all patch dates, explicit source quotes and unknown levels',()=>{
- assert.equal(HISTORY_DATA.updates.length,16);assert.equal(HISTORY_DATA.updates.reduce((n,u)=>n+u.changes.length,0),296);
- assert.equal(new Set(HISTORY_DATA.updates.map(u=>u.effectiveDate.slice(0,7))).size,10);
+ const year=HISTORY_DATA.updates.filter(u=>u.effectiveDate.startsWith('2026'));assert.equal(year.length,16);assert.equal(year.reduce((n,u)=>n+u.changes.length,0),296);
+ assert.equal(new Set(year.map(u=>u.effectiveDate.slice(0,7))).size,10);
  const ids=new Set();for(const u of HISTORY_DATA.updates){assert.ok(u.effectiveDate<='2026-11-03');for(const c of u.changes){assert.ok(!ids.has(c.id));ids.add(c.id);assert.ok(u.excerpt.includes(c.quote));assert.notEqual(HistoryModel.changeCategory(u,c),'unclassified');}}
  const august=HISTORY_DATA.updates.find(u=>u.effectiveDate==='2026-08-04');assert.equal(august.level,null);assert.match(august.presentation.notices[0],/except Boss Bandit/);assert.deepEqual(HistoryModel.detectCrossings(august,[reference('hp',220)]),[]);
  const march=HISTORY_DATA.updates.find(u=>u.effectiveDate==='2026-03-02');assert.ok(march.publishedDate>march.effectiveDate);assert.ok(march.excerpt.includes(march.effectiveDateBasis));
@@ -74,4 +74,14 @@ test('component damage cannot silently become parent damage or unrestricted matc
 });
 test('mixed numerical buffs and nerfs are grouped as a rework even inside a source buff section',()=>{
  const october=HISTORY_DATA.updates.find(u=>u.effectiveDate==='2026-10-06');const lava=october.changes.filter(c=>c.cardName==='Lava Hound');assert.equal(HistoryModel.cardCategory(october,lava),'rework');assert.equal(HistoryModel.changeCategory(october,lava.find(c=>c.stat==='Hit Speed')),'nerf');assert.equal(HistoryModel.changeCategory(october,lava.find(c=>c.stat==='Damage')),'buff');
+});
+
+test('2025 archive covers every month, separates maintenance dates and preserves explicitly scoped levels',()=>{
+ const year=HISTORY_DATA.updates.filter(u=>u.effectiveDate.startsWith('2025'));assert.equal(year.length,24);assert.equal(year.reduce((n,u)=>n+u.changes.length,0),274);assert.equal(new Set(year.map(u=>u.effectiveDate.slice(0,7))).size,12);
+ assert.equal(HISTORY_DATA.updates.length,40);assert.equal(HISTORY_DATA.updates.reduce((n,u)=>n+u.changes.length,0),570);
+ const furnace=year.find(u=>u.effectiveDate==='2025-08-06');assert.equal(furnace.changes.length,2);assert.equal(furnace.effectiveDateKnown,true);
+ const april=year.find(u=>u.effectiveDate==='2025-04-09');assert.equal(april.effectiveDateKnown,false);assert.equal(april.level,null);assert.equal(april.changes.find(c=>c.cardName==='Tornado').before,'84 × 2');
+ const january=year.find(u=>u.effectiveDate==='2025-01-30');assert.ok(january.changes.filter(c=>c.cardName==='P.E.K.K.A').every(c=>c.levelReference===11));
+ const november=year.find(u=>u.effectiveDate==='2025-11-26');assert.equal(november.changes.find(c=>c.cardName==='Tower Princess').levelReference,16);
+ const cycle=year.find(u=>u.effectiveDate==='2025-09-25');assert.match(cycle.presentation.notices[0],/only the newest/);
 });

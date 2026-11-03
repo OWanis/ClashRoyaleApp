@@ -47,7 +47,7 @@ function additionalStats(updates,formId,displayedFields={}){
  for(const update of updates)for(const change of update.changes){
   if(change.cardFormId!==formId)continue;
   const key=change.comparisonKey||change.stat;
-  const identity=JSON.stringify([key,update.level]);
+  const identity=JSON.stringify([key,change.levelReference??update.level]);
   if(!groups.has(identity))groups.set(identity,[]);
   groups.get(identity).push({change,update});
  }
