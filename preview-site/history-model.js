@@ -92,22 +92,21 @@ function affectedForms(update,change,rows,history=root.HISTORY_DATA?.updates||[u
   if(explicit){if(explicit.before===change.before&&explicit.after===change.after)forms.push(row.form.id);continue;}
   // Base core stats are shared only with a matching main-panel value and a form
   // documented by this patch date. Never project later forms or ability damage.
-  if(change.formType==='base'&&history.some(u=>u.effectiveDate<=update.effectiveDate&&u.changes.some(c=>c.cardFormId===row.form.id)))forms.push(row.form.id);
+  if(change.formType==='base'&&(!source.historical||(row.historical&&row.beforeValue===change.before&&row.referenceDate===update.effectiveDate))&&history.some(u=>u.effectiveDate<=update.effectiveDate&&u.changes.some(c=>c.cardFormId===row.form.id)))forms.push(row.form.id);
  }
  return forms;
 }
 function detectCrossings(update,rows){
- if(update.level===null)return [];
- return update.changes.filter(c=>changeKind(c)).map(change=>{
+ return update.changes.filter(c=>changeKind(c)&&(c.levelReference??update.level)!=null).map(change=>{
   const kind=changeKind(change),thresholds=[],rankings=[],hitCounts=[];
   const sharedForms=affectedForms(update,change,rows);
   const source=referenceForChange(change,rows),unmapped=!source&&rows.some(r=>r.card);
   let excludedTargets=0;
   for(const row of rows){
-   if(row.observation.displayedLevel!==update.level)continue;
+   if(row.observation.displayedLevel!==(change.levelReference??update.level))continue;
    if(source&&row.id&&row.id===source.id)continue;
    if(row.form.id===change.cardFormId&&row.field===(change.comparisonKey||change.stat))continue;
-   const beforeRelation=Math.sign(change.before-row.value),afterRelation=Math.sign(change.after-row.value);
+   const beforeRelation=Math.sign(change.before-(row.beforeValue??row.value)),afterRelation=Math.sign(change.after-row.value);
    const needsCheck=!!(row.shield||row.protected||row.unverified||/shield/i.test(change.stat));
    if(row.kind===kind){
     if(kind==='damage'&&source&&(!!source.towerDamage!==!!row.towerDamage))continue;
@@ -117,9 +116,9 @@ function detectCrossings(update,rows){
    }else{
     if(unmapped)continue;
     if(source&&root.OneShot?.targetEligibility(kind==='damage'?source:row,kind==='damage'?row:source)){excludedTargets++;continue;}
-    if(kind==='damage'&&source&&!source.aggregate&&/^(Damage|Ranged Damage|Area Damage|Melee Damage)$/i.test(source.field)&&change.before>0&&change.after>0&&!row.shield&&!row.protected){const beforeHits=Math.ceil(row.value/change.before),afterHits=Math.ceil(row.value/change.after);if(beforeHits!==afterHits)hitCounts.push({other:row,beforeHits,afterHits,needsCheck:false});}
+    if(kind==='damage'&&source&&!source.aggregate&&/^(Damage|Ranged Damage|Area Damage|Melee Damage)$/i.test(source.field)&&change.before>0&&change.after>0&&!row.shield&&!row.protected){const beforeHits=Math.ceil((row.beforeValue??row.value)/change.before),afterHits=Math.ceil(row.value/change.after);if(beforeHits!==afterHits)hitCounts.push({other:row,beforeHits,afterHits,needsCheck:false});}
     // For HP, equality is not survival; for damage, equality reaches HP.
-    const before=kind==='damage'?change.before>=row.value:change.before>row.value;
+    const before=kind==='damage'?change.before>=(row.beforeValue??row.value):change.before>(row.beforeValue??row.value);
     const after=kind==='damage'?change.after>=row.value:change.after>row.value;
     if(before!==after)thresholds.push({other:row,before,after,needsCheck});
    }
@@ -131,10 +130,11 @@ function detectCrossings(update,rows){
 function timelineGroups(items,mode,allItems=items){
  const monthName=key=>new Intl.DateTimeFormat('en-GB',{month:'long',year:'numeric',timeZone:'UTC'}).format(new Date(key+'-01T00:00:00Z'));
  const seasons=new Map(),bySource=new Map();
+ for(const season of root.RELEASE_DATA?.seasons||[])seasons.set(season.start.slice(0,7),monthName(season.start.slice(0,7))+' · Season '+season.id);
  for(const item of allItems){const label=updatePresentation(item).seasonLabel;if(label&&label.includes(' · ')){const key=item.effectiveDate.slice(0,7);seasons.set(key,label);if(item.presentation?.seasonSource)bySource.set(item.presentation.seasonSource,key);}}
  const result=new Map();
  for(const item of items){let key=item.effectiveDate.slice(0,7);
-  if(mode==='season'&&item.eventType){key=bySource.get(item.sourceUrl)||key;
+  if(mode==='season'&&item.eventType){key=item.seasonMonth||bySource.get(item.sourceUrl)||key;
    // This source explicitly announces June content in May; do not place it in May's season.
    if(item.sourceUrl.endsWith('/june-update-2026/'))key='2026-06';
   }
@@ -144,5 +144,32 @@ function timelineGroups(items,mode,allItems=items){
  return [...result.values()].sort((a,b)=>b.key.localeCompare(a.key));
 }
 
-root.HistoryModel={timelineGroups,updatePresentation,changeCategory,cardCategory,damageChanges,compare,additionalStats,changeKind,referenceForChange,affectedForms,detectCrossings};
+
+// A dated balance observation can anchor a recorded stat. No current value is a fallback.
+function historicalReferences(update,templates,history=root.HISTORY_DATA?.updates||[]){
+ const states=new Map();
+ const patches=history.filter(u=>u.effectiveDate<=update.effectiveDate).sort((a,b)=>a.effectiveDate.localeCompare(b.effectiveDate)||a.id.localeCompare(b.id));
+ const sameDay=new Map();for(const p of patches)for(const c of p.changes){if(!/damage|hitpoints|health|shield|target|type/i.test(c.stat))continue;const key=p.effectiveDate+'|'+c.cardFormId;if(!sameDay.has(key))sameDay.set(key,new Set());sameDay.get(key).add(p.id);}
+ for(const patch of patches){
+  // A base-stat edit may also affect its forms. Drop stale sibling anchors unless
+  // this same patch explicitly supplies their new values.
+  for(const change of patch.changes){if(change.formType!=='base'||!coreStat(change))continue;const base=templates.find(r=>r.form.id===change.cardFormId);if(!base)continue;for(const [id,row] of states)if(row.card===base.card&&row.form.id!==change.cardFormId&&row.panelKind==='main'&&row.kind===coreStat(change))states.delete(id);}
+  for(const change of patch.changes){
+   const matching=templates.filter(r=>r.form.id===change.cardFormId&&!r.aggregate);
+   const source=referenceForChange(change,templates),level=change.levelReference??patch.level;
+   if((sameDay.get(patch.effectiveDate+'|'+change.cardFormId)?.size||0)>1){for(const row of matching)states.delete(row.id);continue;}
+   if(!source||!Number.isFinite(change.after)||level!==11||patch.effectiveDateKnown===false){
+    // Unknown-level, uncertain-date or unparsed combat edits invalidate earlier anchors.
+    if(/damage|hitpoints|health|shield|target|type/i.test(change.stat))for(const row of matching)states.delete(row.id);
+    continue;
+   }
+   const before=patch.id===update.id?change.before:change.after;
+   states.set(source.id,{...source,value:change.after,beforeValue:before,historical:true,referenceDate:patch.effectiveDate,referenceSource:patch.sourceUrl,raw:String(change.after)});
+  }
+ }
+ for(const patch of patches.filter(p=>p.effectiveDate===update.effectiveDate&&p.id!==update.id))for(const change of patch.changes){if(/damage|hitpoints|health|shield|target|type/i.test(change.stat))for(const [id,row] of states)if(row.form.id===change.cardFormId)states.delete(id);}
+ return [...states.values()];
+}
+
+root.HistoryModel={historicalReferences,timelineGroups,updatePresentation,changeCategory,cardCategory,damageChanges,compare,additionalStats,changeKind,referenceForChange,affectedForms,detectCrossings};
 })(globalThis);
