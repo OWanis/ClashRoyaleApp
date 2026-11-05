@@ -56,7 +56,15 @@ function additionalStats(updates,formId,displayedFields={}){
   const latest=history[0],peers=history.filter(h=>h.update.effectiveDate===latest.update.effectiveDate);
   const conflict=peers.some(h=>h.change.after!==latest.change.after||h.change.unit!==latest.change.unit);
   return {...latest,history,conflict,peers};
- }).filter(fact=>fact.conflict||String(displayedFields[fact.change.comparisonKey||fact.change.stat])!==String(fact.change.after)).sort((a,b)=>a.change.stat.localeCompare(b.change.stat));
+ }).filter(fact=>level11Values(fact.update,fact.change)).filter(fact=>fact.conflict||String(displayedFields[fact.change.comparisonKey||fact.change.stat])!==String(fact.change.after)).sort((a,b)=>a.change.stat.localeCompare(b.change.stat));
+}
+// Level 11 is the only displayed/comparable combat-stat level. Mechanics such
+// as range, time, counts and percentages are independent of card level.
+function level11Values(update,change){
+ if((change.levelReference??update.level)===11)return true;
+ if(['seconds','tiles','percent','elixir','multiplier'].includes(change.unit))return true;
+ if(/radius|range|duration|time|speed|count|cycles|mass|multiplier|reduction|spawn interval/i.test(change.stat))return true;
+ return !(['damage','hp','hitpoints','healing'].includes(change.unit)||/damage|\bHP\b|hitpoints|hit points|health|healing|DPS|\bDMG\b|Crown Tower(?::|$)/i.test(change.stat));
 }
 function changeKind(change){
  if(!Number.isFinite(change.before)||!Number.isFinite(change.after))return null;
@@ -97,7 +105,7 @@ function affectedForms(update,change,rows,history=root.HISTORY_DATA?.updates||[u
  return forms;
 }
 function detectCrossings(update,rows){
- return update.changes.filter(c=>changeKind(c)&&(c.levelReference??update.level)!=null).map(change=>{
+ return update.changes.filter(c=>changeKind(c)&&(c.levelReference??update.level)===11).map(change=>{
   const kind=changeKind(change),thresholds=[],rankings=[],hitCounts=[];
   const sharedForms=affectedForms(update,change,rows);
   const source=referenceForChange(change,rows),unmapped=!source&&rows.some(r=>r.card);
@@ -147,6 +155,7 @@ function timelineGroups(items,mode,allItems=items){
 
 // A dated balance observation can anchor a recorded stat. No current value is a fallback.
 function historicalReferences(update,templates,history=root.HISTORY_DATA?.updates||[]){
+ if(update.effectiveDateKnown===false)return [];
  const states=new Map();
  const patches=history.filter(u=>u.effectiveDate<=update.effectiveDate).sort((a,b)=>a.effectiveDate.localeCompare(b.effectiveDate)||a.id.localeCompare(b.id));
  const sameDay=new Map();for(const p of patches)for(const c of p.changes){if(!/damage|hitpoints|health|shield|target|type/i.test(c.stat))continue;const key=p.effectiveDate+'|'+c.cardFormId;if(!sameDay.has(key))sameDay.set(key,new Set());sameDay.get(key).add(p.id);}
@@ -171,5 +180,5 @@ function historicalReferences(update,templates,history=root.HISTORY_DATA?.update
  return [...states.values()];
 }
 
-root.HistoryModel={historicalReferences,timelineGroups,updatePresentation,changeCategory,cardCategory,damageChanges,compare,additionalStats,changeKind,referenceForChange,affectedForms,detectCrossings};
+root.HistoryModel={level11Values,historicalReferences,timelineGroups,updatePresentation,changeCategory,cardCategory,damageChanges,compare,additionalStats,changeKind,referenceForChange,affectedForms,detectCrossings};
 })(globalThis);

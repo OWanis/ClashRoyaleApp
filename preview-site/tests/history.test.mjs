@@ -78,7 +78,7 @@ test('mixed numerical buffs and nerfs are grouped as a rework even inside a sour
 
 test('2025 archive covers every month, separates maintenance dates and preserves explicitly scoped levels',()=>{
  const year=HISTORY_DATA.updates.filter(u=>u.effectiveDate.startsWith('2025'));assert.equal(year.length,24);assert.equal(year.reduce((n,u)=>n+u.changes.length,0),274);assert.equal(new Set(year.map(u=>u.effectiveDate.slice(0,7))).size,12);
- assert.equal(HISTORY_DATA.updates.length,54);assert.equal(HISTORY_DATA.updates.reduce((n,u)=>n+u.changes.length,0),728);
+ assert.equal(HISTORY_DATA.updates.length,91);assert.equal(HISTORY_DATA.updates.reduce((n,u)=>n+u.changes.length,0),1127);
  const furnace=year.find(u=>u.effectiveDate==='2025-08-06');assert.equal(furnace.changes.length,2);assert.equal(furnace.effectiveDateKnown,true);
  const april=year.find(u=>u.effectiveDate==='2025-04-09');assert.equal(april.effectiveDateKnown,false);assert.equal(april.level,null);assert.equal(april.changes.find(c=>c.cardName==='Tornado').before,'84 × 2');
  const january=year.find(u=>u.effectiveDate==='2025-01-30');assert.ok(january.changes.filter(c=>c.cardName==='P.E.K.K.A').every(c=>c.levelReference===11));

@@ -9,7 +9,7 @@ test('Void has separate cumulative hits for all six troop and tower tiers',()=>{
  const normal=list.find(r=>!r.towerDamage&&!r.aggregate),crown=list.find(r=>r.towerDamage&&!r.aggregate),tower=rows.find(r=>r.towerHP),building=rows.find(r=>r.kind==='hp'&&r.card.cardType==='building'&&r.panelKind==='main');assert.ok(OneShot.targetEligibility(normal,tower));assert.equal(OneShot.targetEligibility(normal,building),null);assert.ok(OneShot.targetEligibility(crown,building));assert.equal(OneShot.targetEligibility(crown,tower),null);
 });
 test('Minion Giant ranking excludes reduced Crown Tower spell damage',()=>{const p=HISTORY_DATA.updates.find(u=>u.effectiveDate==='2026-10-19'),r=HistoryModel.detectCrossings(p,rows).find(r=>r.change.cardName==='Minion Giant');assert.ok(r.rankings.every(x=>!x.other.towerDamage));assert.ok(r.rankings.some(x=>x.other.card.name==='Void'&&x.other.value===153&&!x.other.aggregate));});
-test('releases link canonical forms, source quotes and distinct availability dates',()=>{assert.equal(RELEASE_DATA.updates.length,79);const ids=new Set();for(const u of RELEASE_DATA.updates){assert.ok(!ids.has(u.id));ids.add(u.id);assert.equal(u.changes.length,0);assert.equal(u.level,null);assert.match(u.sourceHash,/^[a-f0-9]{64}$/);assert.equal(u.effectiveDate,u.releaseDate||u.publishedDate);if(u.releaseDate)assert.ok(u.excerpt.includes(u.dateBasis)||(u.dateEvidence||[]).some(e=>e.quote===u.dateBasis));for(const r of u.releases){assert.ok(cards.some(c=>c.forms.some(f=>f.id===r.cardFormId&&f.formType===r.formType)));assert.ok(u.excerpt.includes(r.quote));}}
+test('releases link canonical forms, source quotes and distinct availability dates',()=>{assert.equal(RELEASE_DATA.updates.length,80);const ids=new Set();for(const u of RELEASE_DATA.updates){assert.ok(!ids.has(u.id));ids.add(u.id);assert.equal(u.changes.length,0);assert.equal(u.level,null);assert.match(u.sourceHash,/^[a-f0-9]{64}$/);assert.equal(u.effectiveDate,u.releaseDate||u.publishedDate);if(u.releaseDate)assert.ok(u.excerpt.includes(u.dateBasis)||(u.dateEvidence||[]).some(e=>e.quote===u.dateBasis));for(const r of u.releases){assert.ok(cards.some(c=>c.forms.some(f=>f.id===r.cardFormId&&f.formType===r.formType)));assert.ok(u.excerpt.includes(r.quote));}}
  const hero=RELEASE_DATA.updates.find(u=>u.mechanic==='Heroes');assert.equal(hero.releases.length,4);assert.equal(hero.mechanicEvidence.announcedOn,'2025-11-21');const mega=RELEASE_DATA.updates.find(u=>u.releases.some(r=>r.cardName==='Mega Minion'));assert.equal(mega.releaseDate,'2026-02-13');assert.equal(mega.generalAvailabilityDate,'2026-03-02');});
 test('month and season group all events once, keeping announced June content in June season',()=>{
  const all=[...HISTORY_DATA.updates,...RELEASE_DATA.updates];for(const mode of ['month','season']){const groups=HistoryModel.timelineGroups(all,mode,all);assert.equal(groups.flatMap(g=>g.items).length,all.length);assert.equal(new Set(groups.flatMap(g=>g.items.map(i=>i.id))).size,all.length);}
@@ -18,7 +18,7 @@ test('month and season group all events once, keeping announced June content in 
  const releases=HistoryModel.timelineGroups(RELEASE_DATA.updates,'season',all);assert.match(releases.find(g=>g.key==='2026-10').label,/Season 88/);
 });
 test('release audit covers every catalog Evolution/Hero and keeps previews and date conflicts explicit',()=>{
- const released=new Set(RELEASE_DATA.updates.flatMap(u=>u.releases.map(r=>r.cardFormId)));assert.equal(released.size,95);for(const card of cards)for(const form of card.forms)if(form.formType!=='base')assert.ok(released.has(form.id),form.name);
+ const released=new Set(RELEASE_DATA.updates.flatMap(u=>u.releases.map(r=>r.cardFormId)));assert.equal(released.size,96);for(const card of cards)for(const form of card.forms)if(form.formType!=='base')assert.ok(released.has(form.id),form.name);
  assert.equal(RELEASE_DATA.audit.formsTotal,188);assert.equal(RELEASE_DATA.audit.dateConflicts.length,2);
  const hogs=RELEASE_DATA.updates.find(u=>u.releases.some(r=>r.cardName==='Royal Hogs'));assert.equal(hogs.releaseDate,'2025-11-03');assert.ok(hogs.dateEvidence.some(e=>e.quote.includes('November 3rd')));
  for(const u of RELEASE_DATA.updates)for(const item of u.releases)for(const stat of item.launchStats){assert.equal(stat.status,'preview');assert.ok(stat.sourceUrl&&stat.quote&&stat.sourceHash);if(stat.level!==null)assert.ok(stat.levelQuote);}
@@ -34,10 +34,10 @@ test('documented availability resolves previews without dating unrelated forms',
  assert.ok(RELEASE_DATA.audit.dateConflicts.every(c=>c.status==='resolved-availability'&&c.resolvedDate));
 });
 test('older introductions preserve uncertain dates and preview scopes',()=>{
- const old=RELEASE_DATA.updates.filter(u=>u.id.startsWith('release-older-'));assert.equal(old.length,12);assert.equal(old.flatMap(u=>u.releases).length,15);
+ const old=RELEASE_DATA.updates.filter(u=>u.id.startsWith('release-older-'));assert.equal(old.length,13);assert.equal(old.flatMap(u=>u.releases).length,16);
  const heal=old.find(u=>u.releases.some(r=>r.cardName==='Heal Spirit'));assert.equal(heal.releaseDate,'2020-04-02');assert.match(heal.dateBasis,/April 2nd/);
  const champions=old.find(u=>u.mechanic==='Champions');assert.equal(champions.releaseDate,null);assert.equal(champions.releases.length,3);assert.match(champions.excerpt,/We can’t tell you when the update/);
- assert.ok(old.filter(u=>u!==heal).every(u=>u.releaseDate===null&&!u.effectiveDateKnown));
+ assert.ok(old.filter(u=>!['release-older-season7','release-older-season12-skeleton-dragons',heal.id].includes(u.id)).every(u=>u.releaseDate===null&&!u.effectiveDateKnown));
  const drill=old.flatMap(u=>u.releases).find(r=>r.cardName==='Goblin Drill');assert.equal(drill.launchStats.find(s=>s.label==='Hitpoints').value,'1440');assert.ok(drill.launchStats.every(s=>s.level===11&&s.status==='preview'));
- assert.equal(RELEASE_DATA.audit.missingForms.length,93);
+ assert.equal(RELEASE_DATA.audit.missingForms.length,92);
 });
