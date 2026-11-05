@@ -81,4 +81,4 @@ function openCard(c,formId){showCard(c,formId||baseForm(c).id);$('detail').showM
 $('close').addEventListener('click',()=>$('detail').close());$('detail').addEventListener('click',e=>{if(e.target===$('detail')){const r=$('detail').getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)$('detail').close()}});
 for(const id of ['search','type','form','cost'])$(id).addEventListener(id==='search'?'input':'change',render);
 $('reset').addEventListener('click',()=>{for(const id of ['search','type','form','cost'])$(id).value='';render()});render();
-</script><script src="one-shot-model.js"></script><script src="one-shot-ui.js"></script><script src="history-data.js"></script><script src="release-data.js"></script><script src="history-model.js"></script><script src="history-ui.js"></script></body></html>
+</script><script src="one-shot-model.js"></script><script src="one-shot-ui.js"></script><script src="history-data.js"></script><script src="release-data.js"></script><script src="history-verifications.js"></script><script src="history-model.js"></script><script src="history-ui.js"></script></body></html>

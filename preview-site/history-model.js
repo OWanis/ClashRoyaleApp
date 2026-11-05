@@ -23,6 +23,23 @@ const presentation={
     }
   }
 };
+function verifiedUpdate(update){
+ const proofs=root.HISTORY_VERIFICATIONS?.changes||{};
+ return {...update,changes:update.changes.map(c=>{const proof=proofs[c.id];
+  if(!proof||proof.level!==11||proof.effectiveDate!==update.effectiveDate||proof.cardFormId!==c.cardFormId||proof.stat!==c.stat||proof.before!==c.before||proof.after!==c.after)return c;
+  return {...c,levelReference:11,levelVerification:proof};
+ })};
+}
+function snapshotPatches(update){
+ const groups=new Map(),data=root.HISTORY_VERIFICATIONS;
+ for(const o of data?.observations||[]){
+  // Same-day snapshots cannot establish what was true before the selected patch.
+  if(o.level!==11||o.date<HISTORY_START||o.date>=update.effectiveDate)continue;
+  if(!groups.has(o.date))groups.set(o.date,{id:'snapshot-'+o.date,effectiveDate:o.date,effectiveDateKnown:true,referenceSnapshot:true,level:11,changes:[]});
+  groups.get(o.date).changes.push({id:o.id,cardName:o.cardName,cardFormId:o.cardFormId,formType:'base',stat:o.field,comparisonKey:o.field,unit:o.kind==='hp'?'hp':'damage',before:o.value,after:o.value,referenceId:o.templateId,referenceSource:data.sources[o.evidence.source].url});
+ }
+ return [...groups.values()];
+}
 function updatePresentation(update){return update.presentation||presentation[update.id]||{seasonLabel:null,changes:{}};}
 function changeCategory(update,change){
  const category=change.classification||updatePresentation(update).changes?.[change.id]||'unclassified';
@@ -46,7 +63,7 @@ function compare(change,hp){
 }
 function additionalStats(updates,formId,displayedFields={}){
  const groups=new Map();
- for(const update of updates)for(const change of update.changes){
+ for(const update of updates.map(verifiedUpdate))for(const change of update.changes){
   if(!inScope(update)||change.cardFormId!==formId)continue;
   const key=change.comparisonKey||change.stat;
   const identity=JSON.stringify([key,change.levelReference??update.level]);
@@ -107,6 +124,7 @@ function affectedForms(update,change,rows,history=root.HISTORY_DATA?.updates||[u
  return forms;
 }
 function detectCrossings(update,rows){
+ update=verifiedUpdate(update);
  return update.changes.filter(c=>changeKind(c)&&(c.levelReference??update.level)===11).map(change=>{
   const kind=changeKind(change),thresholds=[],rankings=[],hitCounts=[];
   const sharedForms=affectedForms(update,change,rows);
@@ -159,15 +177,15 @@ function timelineGroups(items,mode,allItems=items){
 function historicalReferences(update,templates,history=root.HISTORY_DATA?.updates||[]){
  if(update.effectiveDateKnown===false)return [];
  const states=new Map();
- const patches=history.filter(u=>inScope(u)&&u.effectiveDate<=update.effectiveDate).sort((a,b)=>a.effectiveDate.localeCompare(b.effectiveDate)||a.id.localeCompare(b.id));
- const sameDay=new Map();for(const p of patches)for(const c of p.changes){if(!/damage|hitpoints|health|shield|target|type/i.test(c.stat))continue;const key=p.effectiveDate+'|'+c.cardFormId;if(!sameDay.has(key))sameDay.set(key,new Set());sameDay.get(key).add(p.id);}
+ const patches=[...history.map(verifiedUpdate),...snapshotPatches(update)].filter(u=>inScope(u)&&u.effectiveDate<=update.effectiveDate).sort((a,b)=>a.effectiveDate.localeCompare(b.effectiveDate)||Number(!!a.referenceSnapshot)-Number(!!b.referenceSnapshot)||a.id.localeCompare(b.id));
+ const sameDay=new Map();for(const p of patches.filter(p=>!p.referenceSnapshot))for(const c of p.changes){if(!/damage|hitpoints|health|shield|target|type/i.test(c.stat))continue;const key=p.effectiveDate+'|'+c.cardFormId;if(!sameDay.has(key))sameDay.set(key,new Set());sameDay.get(key).add(p.id);}
  for(const patch of patches){
   // A base-stat edit may also affect its forms. Drop stale sibling anchors unless
   // this same patch explicitly supplies their new values.
   for(const change of patch.changes){if(change.formType!=='base'||!coreStat(change))continue;const base=templates.find(r=>r.form.id===change.cardFormId);if(!base)continue;for(const [id,row] of states)if(row.card===base.card&&row.form.id!==change.cardFormId&&row.panelKind==='main'&&row.kind===coreStat(change))states.delete(id);}
   for(const change of patch.changes){
    const matching=templates.filter(r=>r.form.id===change.cardFormId&&!r.aggregate);
-   const source=referenceForChange(change,templates),level=change.levelReference??patch.level;
+   const source=patch.referenceSnapshot?templates.find(r=>r.id===change.referenceId&&r.form.id===change.cardFormId&&r.field===change.stat):referenceForChange(change,templates),level=change.levelReference??patch.level;
    if((sameDay.get(patch.effectiveDate+'|'+change.cardFormId)?.size||0)>1){for(const row of matching)states.delete(row.id);continue;}
    if(!source||!Number.isFinite(change.after)||level!==11||patch.effectiveDateKnown===false){
     // Unknown-level, uncertain-date or unparsed combat edits invalidate earlier anchors.
@@ -175,12 +193,12 @@ function historicalReferences(update,templates,history=root.HISTORY_DATA?.update
     continue;
    }
    const before=patch.id===update.id?change.before:change.after;
-   states.set(source.id,{...source,value:change.after,beforeValue:before,historical:true,referenceDate:patch.effectiveDate,referenceSource:patch.sourceUrl,raw:String(change.after)});
+   states.set(source.id,{...source,value:change.after,beforeValue:before,historical:true,referenceDate:patch.effectiveDate,referenceSource:change.referenceSource||patch.sourceUrl,raw:String(change.after)});
   }
  }
  for(const patch of patches.filter(p=>p.effectiveDate===update.effectiveDate&&p.id!==update.id))for(const change of patch.changes){if(/damage|hitpoints|health|shield|target|type/i.test(change.stat))for(const [id,row] of states)if(row.form.id===change.cardFormId)states.delete(id);}
  return [...states.values()];
 }
 
-root.HistoryModel={HISTORY_START,inScope,level11Values,historicalReferences,timelineGroups,updatePresentation,changeCategory,cardCategory,damageChanges,compare,additionalStats,changeKind,referenceForChange,affectedForms,detectCrossings};
+root.HistoryModel={verifiedUpdate,HISTORY_START,inScope,level11Values,historicalReferences,timelineGroups,updatePresentation,changeCategory,cardCategory,damageChanges,compare,additionalStats,changeKind,referenceForChange,affectedForms,detectCrossings};
 })(globalThis);
