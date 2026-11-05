@@ -1,6 +1,6 @@
 (function(){
 'use strict';
-const allUpdates=[...HISTORY_DATA.updates,...(globalThis.RELEASE_DATA?.updates||[])].filter(u=>u.effectiveDate>='2020-01-01').sort((a,b)=>b.effectiveDate.localeCompare(a.effectiveDate)||a.id.localeCompare(b.id));let updates=allUpdates,update=updates[0],groupMode='date',groupKey=null,referenceMode='historical';const referenceRows=OneShot.build(DATA.cards).rows,hpRows=referenceRows.filter(r=>r.kind==='hp').sort((a,b)=>a.card.name.localeCompare(b.card.name)||a.form.formType.localeCompare(b.form.formType)||a.label.localeCompare(b.label));
+const allUpdates=[...HISTORY_DATA.updates,...(globalThis.RELEASE_DATA?.updates||[])].filter(HistoryModel.inScope).sort((a,b)=>b.effectiveDate.localeCompare(a.effectiveDate)||a.id.localeCompare(b.id));let updates=allUpdates,update=updates[0],groupMode='date',groupKey=null,referenceMode='historical';const referenceRows=OneShot.build(DATA.cards).rows,hpRows=referenceRows.filter(r=>r.kind==='hp').sort((a,b)=>a.card.name.localeCompare(b.card.name)||a.form.formType.localeCompare(b.form.formType)||a.label.localeCompare(b.label));
 function date(s){return new Intl.DateTimeFormat('en-GB',{year:'numeric',month:'long',day:'numeric',timeZone:'UTC'}).format(new Date(s+'T00:00:00Z'));}
 const picker=el('select');picker.id='history-update';picker.hidden=true;picker.setAttribute('aria-label','Balance update');
 for(const item of updates){const option=el('option','',item.title);option.value=item.id;picker.append(option);}

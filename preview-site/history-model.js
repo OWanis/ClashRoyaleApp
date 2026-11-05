@@ -1,5 +1,7 @@
 (function(root){
 'use strict';
+const HISTORY_START='2021-10-27';
+function inScope(update){return update.effectiveDate>=HISTORY_START;}
 const presentation={
   "ea043182-2e45-515c-9e6e-7f0aa4a171a5": {
     "seasonLabel": "October 2026 \u00b7 Season 88",
@@ -45,7 +47,7 @@ function compare(change,hp){
 function additionalStats(updates,formId,displayedFields={}){
  const groups=new Map();
  for(const update of updates)for(const change of update.changes){
-  if(change.cardFormId!==formId)continue;
+  if(!inScope(update)||change.cardFormId!==formId)continue;
   const key=change.comparisonKey||change.stat;
   const identity=JSON.stringify([key,change.levelReference??update.level]);
   if(!groups.has(identity))groups.set(identity,[]);
@@ -157,7 +159,7 @@ function timelineGroups(items,mode,allItems=items){
 function historicalReferences(update,templates,history=root.HISTORY_DATA?.updates||[]){
  if(update.effectiveDateKnown===false)return [];
  const states=new Map();
- const patches=history.filter(u=>u.effectiveDate<=update.effectiveDate).sort((a,b)=>a.effectiveDate.localeCompare(b.effectiveDate)||a.id.localeCompare(b.id));
+ const patches=history.filter(u=>inScope(u)&&u.effectiveDate<=update.effectiveDate).sort((a,b)=>a.effectiveDate.localeCompare(b.effectiveDate)||a.id.localeCompare(b.id));
  const sameDay=new Map();for(const p of patches)for(const c of p.changes){if(!/damage|hitpoints|health|shield|target|type/i.test(c.stat))continue;const key=p.effectiveDate+'|'+c.cardFormId;if(!sameDay.has(key))sameDay.set(key,new Set());sameDay.get(key).add(p.id);}
  for(const patch of patches){
   // A base-stat edit may also affect its forms. Drop stale sibling anchors unless
@@ -180,5 +182,5 @@ function historicalReferences(update,templates,history=root.HISTORY_DATA?.update
  return [...states.values()];
 }
 
-root.HistoryModel={level11Values,historicalReferences,timelineGroups,updatePresentation,changeCategory,cardCategory,damageChanges,compare,additionalStats,changeKind,referenceForChange,affectedForms,detectCrossings};
+root.HistoryModel={HISTORY_START,inScope,level11Values,historicalReferences,timelineGroups,updatePresentation,changeCategory,cardCategory,damageChanges,compare,additionalStats,changeKind,referenceForChange,affectedForms,detectCrossings};
 })(globalThis);

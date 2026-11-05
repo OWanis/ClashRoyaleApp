@@ -113,3 +113,7 @@ The user-facing timeline starts at 2020. Only Level 11 HP/damage/healing values 
 The source headers for February/April 2022 contradict their deployment sentence's year. The report year and stated weekday support 2022, and the correction is retained as a notice. April 2023's report header incorrectly says 2022; its internal dated schedule establishes the 2023 publication placement, without guessing an effective day. November 17, 2023 retains the written date and notes the incorrect Wednesday label. Deferred Rage changes are placed with the December 12 client update rather than December 7's patch. The Heal-to-Heal-Spirit replacement is not imported as an April 7 stat change. Phoenix egg/reborn and Elixir Golem component stats remain separate from the main unit.
 
 Release evidence now covers 96 forms in 80 records. Firecracker's January 6, 2020 unlock challenge is explicitly dated. Skeleton Dragons' June 5, 2020 date is labeled **Scheduled release**, matching the preview's wording rather than claiming post-release verification. The historical release ledger is separate from the canonical balance imports.
+
+### Visible history boundary
+
+At the owner's request, visible history now starts October 27, 2021, with the Level 11 tournament-standard era. The boundary applies to timeline navigation, date/month/season groups, additional historical stats and combat-reference construction. Earlier balance and release evidence remains stored internally and is not deleted. Level 11-only value restrictions still apply within the visible period.

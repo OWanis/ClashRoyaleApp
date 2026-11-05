@@ -26,3 +26,11 @@ test('historical components and spell reductions cannot become parent attacks',(
  const rage=old.find(u=>u.effectiveDate==='2022-12-12');assert.equal(rage.changes.find(c=>c.stat==='Damage').after,192);
  const feb=old.find(u=>u.effectiveDate==='2023-02-07');assert.ok(feb.changes.some(c=>c.stat==='Reborn Damage'&&c.after===174));
 });
+test('visible history begins with the Level 11 tournament era',()=>{
+ assert.equal(HistoryModel.HISTORY_START,'2021-10-27');
+ assert.equal(HistoryModel.inScope({effectiveDate:'2021-10-26'}),false);
+ assert.equal(HistoryModel.inScope({effectiveDate:'2021-10-27'}),true);
+ const visible=HISTORY_DATA.updates.filter(HistoryModel.inScope);assert.ok(visible.length>0);assert.ok(visible.every(u=>u.effectiveDate>='2021-10-27'));
+ const old={effectiveDate:'2020-01-07',level:11,changes:[{cardFormId:'test',stat:'Mass',before:3,after:6,unit:'value'}]};assert.deepEqual(HistoryModel.additionalStats([old],'test'),[]);
+ assert.ok(HISTORY_DATA.updates.some(u=>u.effectiveDate.startsWith('2020')),'older evidence retained');
+});
