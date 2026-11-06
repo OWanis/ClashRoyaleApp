@@ -63,11 +63,11 @@ function changePresentation(update,change){
   const match=following.match(/^\s*((?:First )?Hit Speed)\s+([+-]\d+(?:\.\d+)?%)\s*(?:\(Faster\))?\s*\n(1\/[\d.]+)\s*\n(1\/[\d.]+)/);
   if(match&&Number(match[3].slice(2))===change.before&&Number(match[4].slice(2))===change.after)rate={label:match[1],percent:match[2],before:match[3],after:match[4]};
  }
- if(change.unit==='seconds'){const timingNote=change.quote?.match(/(\d+(?:\.\d+)?) sec (faster|slower)/);if(timingNote)note=timingNote[1]+' s '+timingNote[2];}
+ if(change.unit==='seconds'){const timingNote=change.quote?.match(/(\d+(?:\.\d+)?) sec (faster|slower|sooner)/);if(timingNote)note=timingNote[1]+' s '+timingNote[2];}
  const symbolic=/DPS$/.test(change.stat)&&/^DMG \/ \d+(?:\.\d+)?$/.test(change.before)&&/^DMG \/ \d+(?:\.\d+)?$/.test(change.after);
  if(update.id==='22d81425-fd9a-5c9b-9aa4-fcdc21347b01'&&change.cardName==='Rocket'&&change.stat==='Crown Tower Damage'&&/30%[\s\S]*25%/.test(update.excerpt))rate={label:'Crown Tower multiplier',before:'30%',after:'25%',percent:'-17%',unit:'of normal damage'};
  const season40Label=update.id==='8d353b91-7619-5f5e-9d1c-fd83be53fa1d'?({'Goblin Gang|Count':'Spear Goblin Count','Elixir Golem|EGolem 1 Hit Time':'Elixir Golem · Hit Time','Elixir Golem|EGolem 2 Hit Time':'Elixir Golemite · Hit Time','Elixir Golem|EGolem 3 Hit Time':'Elixir Blob · Hit Time','Cannon Cart|Destroyed HP':'Stationary Cannon · Hitpoints'}[change.cardName+'|'+change.stat]):null;
- return {symbolic,label:(change.cardName==='Phoenix'&&change.stat==='Egg Hit Points'?'Egg Hitpoints':null)||season40Label||(timing&&change.stat==='Hit Speed'?change.quote.match(/^(?:First )?Hit Time/)[0]:change.stat.replace(/\s+[+-](?:\s+\d+(?:\.\d+)?\s*sec)?$/, '')),rate,single,before:format(change.before),after:signed?signed[1].replace(/\s/g,'')+'%':format(change.after),note,percent:single&&change.unit==='percent'?null:percent};
+ return {symbolic,label:(change.cardName==='Phoenix'&&change.stat==='Egg Hit Points'?'Egg Hitpoints':null)||season40Label||(timing&&/^(Hit Speed|Hit Time)/.test(change.stat)?change.quote.match(/^(?:First )?Hit Time/)[0]:change.stat.replace(/\s+[+-](?:\s+\d+(?:\.\d+)?\s*sec)?$/, '')),rate,single,before:format(change.before),after:signed?signed[1].replace(/\s/g,'')+'%':format(change.after),note,percent:single&&change.unit==='percent'?null:percent};
 }
 function elixirStages(update,changes){
  if(update.id!=='f9672f7f-6950-58dc-ab65-0d896a696675'||!changes.every(c=>c.cardName==='Elixir Golem'))return [];
@@ -75,7 +75,11 @@ function elixirStages(update,changes){
  const stages=[['Elixir Golem',1,'Hitpoints'],['Elixir Golemites',2,'Elixir Golemite Hitpoints'],['Elixir Blobs',4,null]].map(([name,count,hp],i)=>({name,count,release:find('Blob '+(i+1)+' Elixir Release'),total:find('x'+count),hp:find(hp)}));
  return stages.every(s=>s.release&&s.total)?stages:[];
 }
+function displayChanges(changes){
+ const seen=new Set();return changes.filter(c=>{if(c.unit!=='seconds'||!/^Hit Time\b/.test(c.quote||''))return true;const key=[c.cardFormId,c.before,c.after].join('|');if(seen.has(key))return false;seen.add(key);return true;});
+}
 function relatedCards(update,change){
+ if(update.id==='a669ce0a-8011-536b-b93a-5b3b2700f954'&&change.cardName==='Spear Goblins'&&change.stat==='Attack Range')return ['Spear Goblins','Goblin Hut','Goblin Gang','Goblin Giant'].map(name=>({name,component:name==='Goblin Giant'?'Spawned Spear Goblins · Attack Range':'Spear Goblins · Attack Range'}));
  if(update.id==='09a06b2b-1ba6-5f25-b791-adcd9f00a59c'&&['Minions','Minion Horde'].includes(change.cardName)&&change.stat==='Damage')return [{name:'Minions',component:'Damage'},{name:'Minion Horde',component:'Minion · Damage'}];
  if(update.id==='fd6b2a80-dd1d-5906-9213-1fbe80a72b1c'&&change.cardName==='Rage')return [{name:'Rage',component:change.stat},{name:'Lumberjack',component:'Dropped Rage · '+change.stat}];
  if(update.id==='e7d42138-c3d1-50cb-b666-61e56b35b3fe'&&/First Hit Time/.test(change.stat))return update.changes.filter(c=>/First Hit Time/.test(c.stat)).map(c=>({name:c.cardName,component:'Goblin · First Hit Time'}));
@@ -94,7 +98,7 @@ function changeCategory(update,change){
  // explicitly labeled reworks/fixes retain the source classification.
  if(['buff','nerf','rework'].includes(category)&&Number.isFinite(change.before)&&Number.isFinite(change.after)&&change.before!==change.after){
   if(['damage','hp','healing'].includes(change.unit))return change.after>change.before?'buff':'nerf';
-  if(change.unit==='seconds'&&/hit speed|hit frequency|first hit|first attack|deploy time|cooldown|cast time|cooking time|production speed|spawn rate|spawn pause|spawn time|spawn frequency|spawn interval|elixir generation/i.test(change.stat))return change.after<change.before?'buff':'nerf';
+  if(change.unit==='seconds'&&/hit speed|hit frequency|first hit|first attack|deploy time|cooldown|cast time|cooking time|production speed|spawn rate|spawn pause|spawn time|spawn delay|spawn frequency|spawn interval|elixir generation/i.test(change.stat))return change.after<change.before?'buff':'nerf';
   if(change.unit==='seconds'&&/^life\s*time$/i.test(change.stat))return change.after>change.before?'buff':'nerf';
   if(/^(death spawn|spawns per wave|spawn count(?: per wave)?|total spawned|count)$/i.test(change.stat))return change.after>change.before?'buff':'nerf';
   if(change.unit==='elixir')return /destruction|generation|production|produced/i.test(change.stat)?(change.after>change.before?'buff':'nerf'):(change.after<change.before?'buff':'nerf');
@@ -248,5 +252,5 @@ function historicalReferences(update,templates,history=root.HISTORY_DATA?.update
  return [...states.values()];
 }
 
-root.HistoryModel={elixirStages,relatedCards,changePresentation,verifiedUpdate,HISTORY_START,inScope,level11Values,historicalReferences,timelineGroups,updatePresentation,changeCategory,cardCategory,damageChanges,compare,additionalStats,changeKind,referenceForChange,affectedForms,detectCrossings};
+root.HistoryModel={displayChanges,elixirStages,relatedCards,changePresentation,verifiedUpdate,HISTORY_START,inScope,level11Values,historicalReferences,timelineGroups,updatePresentation,changeCategory,cardCategory,damageChanges,compare,additionalStats,changeKind,referenceForChange,affectedForms,detectCrossings};
 })(globalThis);

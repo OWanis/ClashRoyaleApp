@@ -80,3 +80,9 @@ test('Season 44 displays source DPS formulas and Rocket crown tower multiplier s
  const rocket=HistoryModel.changePresentation(u,u.changes.find(c=>c.cardName==='Rocket'));assert.deepEqual([rocket.before,rocket.after],['446','371']);assert.deepEqual(rocket.rate,{label:'Crown Tower multiplier',before:'30%',after:'25%',percent:'-17%',unit:'of normal damage'});
  const monk=HistoryModel.changePresentation(u,u.changes.find(c=>c.cardName==='Monk'&&c.unit==='seconds'));assert.equal(monk.note,'0.1 s faster');assert.equal(monk.label,'Hit Time');
 });
+test('Season 46 Mega Minion formula and related Spear Goblins are explicit',()=>{
+ const u=HISTORY_DATA.updates.find(u=>u.id==='a669ce0a-8011-536b-b93a-5b3b2700f954'),changes=HistoryModel.displayChanges(u.changes);
+ const mega=changes.filter(c=>c.cardName==='Mega Minion');assert.equal(mega.length,2);const d=HistoryModel.changePresentation(u,mega.find(c=>c.stat==='DPS'));assert.deepEqual([d.symbolic,d.before,d.after,d.percent],[true,'DMG / 1.6','DMG / 1.5','+7%']);
+ const spear=u.changes.find(c=>c.cardName==='Spear Goblins');assert.deepEqual(HistoryModel.relatedCards(u,spear).map(r=>r.name),['Spear Goblins','Goblin Hut','Goblin Gang','Goblin Giant']);assert.match(HistoryModel.relatedCards(u,spear)[3].component,/Spawned/);
+ assert.deepEqual(u.changes.filter(c=>c.cardName==='Furnace').map(c=>HistoryModel.changeCategory(u,c)),['buff','nerf']);
+});

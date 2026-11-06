@@ -90,7 +90,7 @@ function render(){
  const renderedUpdate=update;
  if(update.eventType){renderRelease();return;}
  const query=$('history-search').value.trim().toLowerCase(),families=new Map();
- for(const c of update.changes){if(!(c.cardName+' '+c.formType+' '+c.stat+' '+HistoryModel.relatedCards(update,c).map(r=>r.name).join(' ')).toLowerCase().includes(query))continue;const card=DATA.cards.find(card=>card.forms.some(f=>f.id===c.cardFormId)),key=baseForm(card).id;if(!families.has(key))families.set(key,{card,changes:[]});families.get(key).changes.push(c);}
+ for(const c of HistoryModel.displayChanges(update.changes)){if(!(c.cardName+' '+c.formType+' '+c.stat+' '+HistoryModel.relatedCards(update,c).map(r=>r.name).join(' ')).toLowerCase().includes(query))continue;const card=DATA.cards.find(card=>card.forms.some(f=>f.id===c.cardFormId)),key=baseForm(card).id;if(!families.has(key))families.set(key,{card,changes:[]});families.get(key).changes.push(c);}
  const matched=[...families.values()].reduce((n,f)=>n+f.changes.length,0);$('history-count').textContent=families.size+' cards · '+matched+' changes';$('history-changes').replaceChildren();
  for(const {card,changes}of families.values()){
   const category=HistoryModel.cardCategory(update,changes),box=el('article','history-change balance-'+category),head=el('div','history-card-heading');const firstForm=card.forms.find(f=>f.id===changes[0].cardFormId);head.append(historyImage(card,firstForm),el('h3','',card.name));box.append(head,categoryBadge(category));
