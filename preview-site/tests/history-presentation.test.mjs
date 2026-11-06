@@ -63,3 +63,8 @@ test('November emergency updates retain source dates, percentages and nerf direc
  assert.deepEqual(first.changes.map(c=>HistoryModel.changePresentation(first,c).percent),['-10%','+7.5%','+13%']);assert.ok(first.changes.every(c=>HistoryModel.changeCategory(first,c)==='nerf'));
  const egg=HistoryModel.changePresentation(second,second.changes[0]);assert.deepEqual([egg.label,egg.before,egg.after,egg.percent],['Egg Hitpoints','363','239','-34%']);
 });
+test('December groups run earliest first and Mighty Miner reversal is a mixed rework',()=>{
+ const items=HISTORY_DATA.updates.filter(u=>u.effectiveDate.startsWith('2022-12'));for(const mode of ['month','season']){const group=HistoryModel.timelineGroups(items,mode).find(g=>g.items.length===3);assert.deepEqual(group.items.map(u=>u.effectiveDate),['2022-12-07','2022-12-12','2022-12-22']);}
+ const last=items.find(u=>u.effectiveDate==='2022-12-22');assert.equal(last.sourceUrl,'https://royaleapi.com/blog/season43');assert.equal(HistoryModel.cardCategory(last,last.changes),'rework');assert.deepEqual(last.changes.map(c=>HistoryModel.changeCategory(last,c)),['nerf','buff']);assert.equal(HistoryModel.changePresentation(last,last.changes[0]).percent,'-33.3%');
+ const first=items.find(u=>u.effectiveDate==='2022-12-07');assert.equal(HistoryModel.changePresentation(first,first.changes.find(c=>c.cardName==='Mighty Miner')).percent,'+50%');
+});

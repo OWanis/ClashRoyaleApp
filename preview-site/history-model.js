@@ -52,6 +52,7 @@ function changePresentation(update,change){
  let percent=quotedPercent?quotedPercent[1].replace(/\s/g,'')+'%':null;
  const novemberPercent={'3ba1c0e4-a30a-53a3-b5b5-946b001bd3ce':['Damage\n                    -10%','-10%'],'5a5ef8bf-a5e6-5e30-8354-0684cef4b84b':['Egg Hit Points (HP)\n                    -34%','-34%']}[change.id];
  if(novemberPercent&&update.excerpt?.includes(novemberPercent[0]))percent=novemberPercent[1];
+ if(!percent&&change.stat==='Movement Speed'){const a=String(change.before).match(/\((\d+)\)/),b=String(change.after).match(/\((\d+)\)/);if(a&&b&&Number(a[1])>0){const delta=Number(((Number(b[1])/Number(a[1])-1)*100).toFixed(1));percent=(delta>0?'+':'')+delta+'%';}}
  if(!percent&&level11Values(update,change)&&Number.isFinite(change.before)&&Number.isFinite(change.after)&&change.before!==0&&change.before!==change.after){const delta=(change.after-change.before)/Math.abs(change.before)*100;const rounded=Number(delta.toFixed(1));percent=(rounded>0?'+':'')+rounded+'%';}
  // Preserve the source's distinction between seconds per hit and hits per second.
  let rate=null;
@@ -72,6 +73,8 @@ function elixirStages(update,changes){
  return stages.every(s=>s.release&&s.total)?stages:[];
 }
 function relatedCards(update,change){
+ if(update.id==='09a06b2b-1ba6-5f25-b791-adcd9f00a59c'&&['Minions','Minion Horde'].includes(change.cardName)&&change.stat==='Damage')return [{name:'Minions',component:'Damage'},{name:'Minion Horde',component:'Minion · Damage'}];
+ if(update.id==='fd6b2a80-dd1d-5906-9213-1fbe80a72b1c'&&change.cardName==='Rage')return [{name:'Rage',component:change.stat},{name:'Lumberjack',component:'Dropped Rage · '+change.stat}];
  if(update.id==='e7d42138-c3d1-50cb-b666-61e56b35b3fe'&&/First Hit Time/.test(change.stat))return update.changes.filter(c=>/First Hit Time/.test(c.stat)).map(c=>({name:c.cardName,component:'Goblin · First Hit Time'}));
  if(update.id==='f9672f7f-6950-58dc-ab65-0d896a696675'&&change.cardName==='Fire Spirit'&&change.stat==='Damage'&&update.excerpt.includes('toning down\nFurnace'))return [{name:'Fire Spirit',component:'Damage'},{name:'Furnace',component:'Spawned Fire Spirit · Damage'}];
  // Explicit source relationships only: a spawned unit's buff is not its parent's attack.
@@ -80,6 +83,7 @@ function relatedCards(update,change){
  return [];
 }
 function changeCategory(update,change){
+ if(update.id==='80fa387d-c2eb-530a-a766-f1fcdb675eda'&&change.cardName==='Mighty Miner')return change.stat==='Hitpoints'?'buff':change.stat==='Movement Speed'?'nerf':'rework';
  if(update.id==='5bd1ac7d-925a-5bd4-9934-a00a1b78d683'&&change.cardName==='Barbarian Barrel'&&change.stat==='Distance'&&update.excerpt.includes('distance nerf'))return 'nerf';
  const category=change.classification||updatePresentation(update).changes?.[change.id]||'unclassified';
  // Some source sections group mixed changes under one heading. Only reverse a
@@ -87,9 +91,9 @@ function changeCategory(update,change){
  // explicitly labeled reworks/fixes retain the source classification.
  if(['buff','nerf','rework'].includes(category)&&Number.isFinite(change.before)&&Number.isFinite(change.after)&&change.before!==change.after){
   if(['damage','hp','healing'].includes(change.unit))return change.after>change.before?'buff':'nerf';
-  if(change.unit==='seconds'&&/hit speed|hit frequency|first hit|first attack|deploy time|cooldown|cast time|cooking time|production speed|spawn rate|spawn pause|spawn time|elixir generation/i.test(change.stat))return change.after<change.before?'buff':'nerf';
+  if(change.unit==='seconds'&&/hit speed|hit frequency|first hit|first attack|deploy time|cooldown|cast time|cooking time|production speed|spawn rate|spawn pause|spawn time|spawn frequency|spawn interval|elixir generation/i.test(change.stat))return change.after<change.before?'buff':'nerf';
   if(change.unit==='seconds'&&/^life\s*time$/i.test(change.stat))return change.after>change.before?'buff':'nerf';
-  if(/^(death spawn|spawns per wave|spawn count|total spawned|count)$/i.test(change.stat))return change.after>change.before?'buff':'nerf';
+  if(/^(death spawn|spawns per wave|spawn count(?: per wave)?|total spawned|count)$/i.test(change.stat))return change.after>change.before?'buff':'nerf';
   if(change.unit==='elixir')return /destruction|generation|production|produced/i.test(change.stat)?(change.after>change.before?'buff':'nerf'):(change.after<change.before?'buff':'nerf');
  }
  return category;
@@ -210,7 +214,7 @@ function timelineGroups(items,mode,allItems=items){
   const label=mode==='season'?(seasons.get(key)||monthName(key)+' · Season unspecified'):monthName(key);
   if(!result.has(key))result.set(key,{key,label,items:[]});result.get(key).items.push(item);
  }
- return [...result.values()].sort((a,b)=>b.key.localeCompare(a.key));
+ return [...result.values()].map(group=>({...group,items:[...group.items].sort((a,b)=>a.effectiveDate.localeCompare(b.effectiveDate)||a.id.localeCompare(b.id))})).sort((a,b)=>b.key.localeCompare(a.key));
 }
 
 
