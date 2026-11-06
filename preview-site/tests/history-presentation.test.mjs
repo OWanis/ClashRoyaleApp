@@ -74,3 +74,9 @@ test('Valkyrie Evolution stays in January 2024 Season 55 despite the source titl
  const groups=HistoryModel.timelineGroups([...HISTORY_DATA.updates,...RELEASE_DATA.updates],'season');assert.equal(groups.find(g=>g.items.some(i=>i.id===u.id)).key,'2024-01');
  for(const group of groups)for(const item of group.items)assert.equal(group.key.slice(0,4),item.effectiveDate.slice(0,4),'Cross-year season assignment requires explicit review: '+item.id);
 });
+test('Season 44 displays source DPS formulas and Rocket crown tower multiplier separately',()=>{
+ const u=HISTORY_DATA.updates.find(u=>u.effectiveDate==='2023-02-07');
+ for(const [name,pct]of [['Monk','+13%'],['Archers','+22%'],['Goblin Giant','+13%']]){const c=u.changes.find(c=>c.cardName===name&&/DPS$/.test(c.stat)),d=HistoryModel.changePresentation(u,c);assert.equal(d.symbolic,true);assert.equal(d.percent,pct);assert.equal(HistoryModel.changeKind(c),null);}
+ const rocket=HistoryModel.changePresentation(u,u.changes.find(c=>c.cardName==='Rocket'));assert.deepEqual([rocket.before,rocket.after],['446','371']);assert.deepEqual(rocket.rate,{label:'Crown Tower multiplier',before:'30%',after:'25%',percent:'-17%',unit:'of normal damage'});
+ const monk=HistoryModel.changePresentation(u,u.changes.find(c=>c.cardName==='Monk'&&c.unit==='seconds'));assert.equal(monk.note,'0.1 s faster');assert.equal(monk.label,'Hit Time');
+});

@@ -47,7 +47,7 @@ function changePresentation(update,change){
  const sourceLines=(change.quote||'').split('\n').map(s=>s.trim());
  const format=value=>{const signedValue=typeof value==='number'&&value>=0&&sourceLines.slice(1).some(line=>line==='+'+value+(change.unit==='percent'?'%':''));return typeof value==='number'?(signedValue?'+':'')+String(value)+unit:String(value??'').replace(/^([+-])\s+(?=\d)/,'$1');};
  const signed=single&&change.unit==='percent'?change.quote?.match(/([+-]\s*\d+(?:\.\d+)?)%/):null;
- const note=update.id==='08fc975e-b81d-5767-a1e3-83e716be6662'&&change.cardName==='Skeleton King'&&change.stat==='Pushback'&&update.excerpt.includes('immunity doesn’t work against The Log')?'Except The Log':null;
+ let note=update.id==='08fc975e-b81d-5767-a1e3-83e716be6662'&&change.cardName==='Skeleton King'&&change.stat==='Pushback'&&update.excerpt.includes('immunity doesn’t work against The Log')?'Except The Log':null;
  const quotedPercent=(single?change.quote:sourceLines.slice(0,Math.max(1,sourceLines.length-2)).join(' '))?.match(/([+-]\s*\d+(?:\.\d+)?)%/);
  let percent=quotedPercent?quotedPercent[1].replace(/\s/g,'')+'%':null;
  const novemberPercent={'3ba1c0e4-a30a-53a3-b5b5-946b001bd3ce':['Damage\n                    -10%','-10%'],'5a5ef8bf-a5e6-5e30-8354-0684cef4b84b':['Egg Hit Points (HP)\n                    -34%','-34%']}[change.id];
@@ -63,8 +63,11 @@ function changePresentation(update,change){
   const match=following.match(/^\s*((?:First )?Hit Speed)\s+([+-]\d+(?:\.\d+)?%)\s*(?:\(Faster\))?\s*\n(1\/[\d.]+)\s*\n(1\/[\d.]+)/);
   if(match&&Number(match[3].slice(2))===change.before&&Number(match[4].slice(2))===change.after)rate={label:match[1],percent:match[2],before:match[3],after:match[4]};
  }
+ if(change.unit==='seconds'){const timingNote=change.quote?.match(/(\d+(?:\.\d+)?) sec (faster|slower)/);if(timingNote)note=timingNote[1]+' s '+timingNote[2];}
+ const symbolic=/DPS$/.test(change.stat)&&/^DMG \/ \d+(?:\.\d+)?$/.test(change.before)&&/^DMG \/ \d+(?:\.\d+)?$/.test(change.after);
+ if(update.id==='22d81425-fd9a-5c9b-9aa4-fcdc21347b01'&&change.cardName==='Rocket'&&change.stat==='Crown Tower Damage'&&/30%[\s\S]*25%/.test(update.excerpt))rate={label:'Crown Tower multiplier',before:'30%',after:'25%',percent:'-17%',unit:'of normal damage'};
  const season40Label=update.id==='8d353b91-7619-5f5e-9d1c-fd83be53fa1d'?({'Goblin Gang|Count':'Spear Goblin Count','Elixir Golem|EGolem 1 Hit Time':'Elixir Golem · Hit Time','Elixir Golem|EGolem 2 Hit Time':'Elixir Golemite · Hit Time','Elixir Golem|EGolem 3 Hit Time':'Elixir Blob · Hit Time','Cannon Cart|Destroyed HP':'Stationary Cannon · Hitpoints'}[change.cardName+'|'+change.stat]):null;
- return {label:(change.cardName==='Phoenix'&&change.stat==='Egg Hit Points'?'Egg Hitpoints':null)||season40Label||(timing&&change.stat==='Hit Speed'?change.quote.match(/^(?:First )?Hit Time/)[0]:change.stat.replace(/\s+[+-](?:\s+\d+(?:\.\d+)?\s*sec)?$/, '')),rate,single,before:format(change.before),after:signed?signed[1].replace(/\s/g,'')+'%':format(change.after),note,percent:single&&change.unit==='percent'?null:percent};
+ return {symbolic,label:(change.cardName==='Phoenix'&&change.stat==='Egg Hit Points'?'Egg Hitpoints':null)||season40Label||(timing&&change.stat==='Hit Speed'?change.quote.match(/^(?:First )?Hit Time/)[0]:change.stat.replace(/\s+[+-](?:\s+\d+(?:\.\d+)?\s*sec)?$/, '')),rate,single,before:format(change.before),after:signed?signed[1].replace(/\s/g,'')+'%':format(change.after),note,percent:single&&change.unit==='percent'?null:percent};
 }
 function elixirStages(update,changes){
  if(update.id!=='f9672f7f-6950-58dc-ab65-0d896a696675'||!changes.every(c=>c.cardName==='Elixir Golem'))return [];
