@@ -40,7 +40,7 @@ function snapshotPatches(update){
  }
  return [...groups.values()];
 }
-function updatePresentation(update){if(update.id==='e7d42138-c3d1-50cb-b666-61e56b35b3fe')return {...update.presentation,seasonLabel:'October 2022 · Q3'};const result=update.presentation||presentation[update.id]||{seasonLabel:null,changes:{}};return update.id==='08fc975e-b81d-5767-a1e3-83e716be6662'?{...result,seasonLabel:'November 2021 · Season 29'}:result;}
+function updatePresentation(update){if(update.id==='80fa387d-c2eb-530a-a766-f1fcdb675eda')return {...update.presentation,seasonLabel:'December 2022 · Season 42'};if(update.id==='e7d42138-c3d1-50cb-b666-61e56b35b3fe')return {...update.presentation,seasonLabel:'October 2022 · Q3'};const result=update.presentation||presentation[update.id]||{seasonLabel:null,changes:{}};return update.id==='08fc975e-b81d-5767-a1e3-83e716be6662'?{...result,seasonLabel:'November 2021 · Season 29'}:result;}
 function changePresentation(update,change){
  const single=change.before==null||['','—','-'].includes(change.before);
  const unit=change.unit==='value'&&/\n[\d.]+ tiles\n[\d.]+ tiles?$/.test(change.quote||'')?' tiles':change.unit==='seconds'?' s':change.unit==='tiles'?' tiles':change.unit==='percent'?'%':change.unit==='elixir'?' elixir':'';
@@ -52,6 +52,7 @@ function changePresentation(update,change){
  let percent=quotedPercent?quotedPercent[1].replace(/\s/g,'')+'%':null;
  const novemberPercent={'3ba1c0e4-a30a-53a3-b5b5-946b001bd3ce':['Damage\n                    -10%','-10%'],'5a5ef8bf-a5e6-5e30-8354-0684cef4b84b':['Egg Hit Points (HP)\n                    -34%','-34%']}[change.id];
  if(novemberPercent&&update.excerpt?.includes(novemberPercent[0]))percent=novemberPercent[1];
+ if(change.id==='bd4dd330-d566-5640-aec4-16ba6d8d3089')percent='-7.6%';
  if(change.id==='b783f089-5aec-5dea-b3d1-66deb6c6c5d8')percent=null;
  if(!percent&&change.stat==='Movement Speed'){const a=String(change.before).match(/\((\d+)\)/),b=String(change.after).match(/\((\d+)\)/);if(a&&b&&Number(a[1])>0){const delta=Number(((Number(b[1])/Number(a[1])-1)*100).toFixed(1));percent=(delta>0?'+':'')+delta+'%';}}
  if(!percent&&level11Values(update,change)&&Number.isFinite(change.before)&&Number.isFinite(change.after)&&change.before!==0&&change.before!==change.after){const delta=(change.after-change.before)/Math.abs(change.before)*100;const rounded=Number(delta.toFixed(1));percent=(rounded>0?'+':'')+rounded+'%';}
@@ -163,6 +164,7 @@ function coreStat(change){
  return null;
 }
 function affectedForms(update,change,rows,history=root.HISTORY_DATA?.updates||[update]){
+ if(update.id==='cee95369-b297-546b-8735-813c2d076d67'&&change.cardName==='Firecracker'&&/^First Hit/.test(change.stat)){const card=rows.find(r=>r.card.name==='Firecracker')?.card;return card?card.forms.filter(f=>['base','evolution'].includes(f.formType)).map(f=>f.id):[change.cardFormId];}
  const source=referenceForChange(change,rows),forms=[change.cardFormId],kind=coreStat(change);
  if(!kind||source?.panelKind!=='main')return forms;
  for(const c of update.changes)if(c.cardFormId!==change.cardFormId&&source.card.forms?.some(f=>f.id===c.cardFormId)&&coreStat(c)===kind&&c.before===change.before&&c.after===change.after)forms.push(c.cardFormId);
@@ -210,12 +212,13 @@ function detectCrossings(update,rows){
 }
 
 function timelineGroups(items,mode,allItems=items){
+ const seasonKey=item=>{const label=updatePresentation(item).seasonLabel||'',m=label.match(/^(January|February|March|April|May|June|July|August|September|October|November|December) (\d{4}) · /);return m?m[2]+'-'+String(['January','February','March','April','May','June','July','August','September','October','November','December'].indexOf(m[1])+1).padStart(2,'0'):item.effectiveDate.slice(0,7);};
  const monthName=key=>new Intl.DateTimeFormat('en-GB',{month:'long',year:'numeric',timeZone:'UTC'}).format(new Date(key+'-01T00:00:00Z'));
  const seasons=new Map(),bySource=new Map();
  for(const season of root.RELEASE_DATA?.seasons||[])seasons.set(season.start.slice(0,7),monthName(season.start.slice(0,7))+' · Season '+season.id);
- for(const item of allItems){const label=updatePresentation(item).seasonLabel;if(label&&label.includes(' · ')){const key=item.effectiveDate.slice(0,7);seasons.set(key,label);if(item.presentation?.seasonSource)bySource.set(item.presentation.seasonSource,key);}}
+ for(const item of allItems){const label=updatePresentation(item).seasonLabel;if(label&&label.includes(' · ')){const key=seasonKey(item);seasons.set(key,label);if(item.presentation?.seasonSource)bySource.set(item.presentation.seasonSource,key);}}
  const result=new Map();
- for(const item of items){let key=item.effectiveDate.slice(0,7);
+ for(const item of items){let key=mode==='season'?seasonKey(item):item.effectiveDate.slice(0,7);
   if(mode==='season'&&item.eventType){key=item.seasonMonth||bySource.get(item.sourceUrl)||key;
    // This source explicitly announces June content in May; do not place it in May's season.
    if(item.sourceUrl.endsWith('/june-update-2026/'))key='2026-06';

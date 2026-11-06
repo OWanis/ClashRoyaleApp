@@ -90,3 +90,9 @@ test('Season 48 displays unit exponents and Phoenix DPS without inventing absolu
  const u=HISTORY_DATA.updates.find(u=>u.id==='e6f01b25-e110-5aa4-bb9b-c6b8fa7b1d79');const display=stat=>HistoryModel.changePresentation(u,u.changes.find(c=>c.stat===stat));
  assert.deepEqual([display('Deploy Delay Speed').before,display('Deploy Delay Speed').after],['1/0.1 sec⁻¹','1/0.2 sec⁻¹']);assert.equal(display('Spawn Attack Area').after,'28.3 tiles²');assert.equal(display('DPS').symbolic,true);assert.equal(display('DPS').percent,'-10%');assert.equal(display('Freeze Duration').percent,'-7.7%');
 });
+test('Season 49 belongs to July while retaining its June 30 date and signed bonuses',()=>{
+ const u=HISTORY_DATA.updates.find(u=>u.effectiveDate==='2023-06-30');assert.equal(HistoryModel.timelineGroups([u],'season')[0].key,'2023-07');assert.equal(HistoryModel.timelineGroups([u],'month')[0].key,'2023-06');
+ const bonus=HistoryModel.changePresentation(u,u.changes.find(c=>c.stat==='HP Buff'));assert.deepEqual([bonus.before,bonus.after],['+30%','+20%']);
+ const c=u.changes.find(c=>c.stat==='First Hit Speed'),d=HistoryModel.changePresentation(u,c);assert.deepEqual([d.before,d.after,d.percent],['1/0.6 sec⁻¹','1/0.65 sec⁻¹','-7.6%']);
+ const card={name:'Firecracker',forms:[{id:'b',formType:'base'},{id:'e',formType:'evolution'},{id:'h',formType:'hero'}]};assert.deepEqual(HistoryModel.affectedForms(u,c,[{card}]),['b','e']);
+});
