@@ -1,0 +1,20 @@
+[
+  {
+    "cardName": "Furnace",
+    "filename": "furnace.png",
+    "before": "2025-08-04",
+    "sourceUrl": "https://raw.githubusercontent.com/RoyaleAPI/cr-api-assets/1ab2c975cb9156af9f32205fa38d9362d28490e5/cards/furnace.png",
+    "sha256": "cbaedd6781c62c33246fe278e1801d9e08d533fe21d4ac27d510f9d4f4b749e0",
+    "bytes": 129217,
+    "reworkSource": "https://royaleapi.com/blog/season-74-balance-final-august-2025"
+  },
+  {
+    "cardName": "Goblin Hut",
+    "filename": "goblin-hut.png",
+    "before": "2025-05-05",
+    "sourceUrl": "https://raw.githubusercontent.com/RoyaleAPI/cr-api-assets/1ab2c975cb9156af9f32205fa38d9362d28490e5/cards/goblin-hut.png",
+    "sha256": "d6ae21abe76d652ad2a3daf1c602f9a2353c151997a1631dfa0035dc838ab9ef",
+    "bytes": 155333,
+    "reworkSource": "https://royaleapi.com/blog/season-71-balance-2025-may"
+  }
+]

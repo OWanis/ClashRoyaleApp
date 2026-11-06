@@ -30,3 +30,12 @@ for(const a of abilityIcons){
 console.log('Copied '+abilityIcons.length+' verified screenshot ability icons.');
 for(const file of ['one-shot-model.js','one-shot-ui.js','one-shot.css'])await copyFile(file,'public/'+file);
 for(const file of ['history-data.js','history-verifications.js','release-data.js','history-model.js','history-ui.js','history.css'])await copyFile(file,'public/'+file);
+
+const historicalArt=JSON.parse(await readFile('historical-art.json','utf8'));
+await mkdir('public/historical-art',{recursive:true});
+for(const a of historicalArt){
+ if(!/^[a-z-]+\.png$/.test(a.filename))throw Error('Invalid historical artwork path');
+ const bytes=await readFile('historical-art/'+a.filename);
+ if(bytes.length!==a.bytes||createHash('sha256').update(bytes).digest('hex')!==a.sha256)throw Error('Historical artwork checksum mismatch');
+ await writeFile('public/historical-art/'+a.filename,bytes);
+}
