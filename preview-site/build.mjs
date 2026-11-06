@@ -41,4 +41,4 @@ for(const a of historicalArt){
 }
 
 await mkdir('public/fonts',{recursive:true});
-for(const file of ['BarlowCondensed-ExtraBold.ttf','OFL.txt'])await copyFile('fonts/'+file,'public/fonts/'+file);
+for(const file of ['BarlowCondensed-ExtraBold.ttf','BarlowCondensed-SemiBold.ttf','OFL.txt'])await copyFile('fonts/'+file,'public/fonts/'+file);
