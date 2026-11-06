@@ -40,7 +40,7 @@ function snapshotPatches(update){
  }
  return [...groups.values()];
 }
-function updatePresentation(update){const result=update.presentation||presentation[update.id]||{seasonLabel:null,changes:{}};return update.id==='08fc975e-b81d-5767-a1e3-83e716be6662'?{...result,seasonLabel:'November 2021 · Season 29'}:result;}
+function updatePresentation(update){if(update.id==='e7d42138-c3d1-50cb-b666-61e56b35b3fe')return {...update.presentation,seasonLabel:'October 2022 · Q3'};const result=update.presentation||presentation[update.id]||{seasonLabel:null,changes:{}};return update.id==='08fc975e-b81d-5767-a1e3-83e716be6662'?{...result,seasonLabel:'November 2021 · Season 29'}:result;}
 function changePresentation(update,change){
  const single=change.before==null||['','—','-'].includes(change.before);
  const unit=change.unit==='value'&&/\n[\d.]+ tiles\n[\d.]+ tiles?$/.test(change.quote||'')?' tiles':change.unit==='seconds'?' s':change.unit==='tiles'?' tiles':change.unit==='percent'?'%':change.unit==='elixir'?' elixir':'';
@@ -61,7 +61,7 @@ function changePresentation(update,change){
   if(match&&Number(match[3].slice(2))===change.before&&Number(match[4].slice(2))===change.after)rate={label:match[1],percent:match[2],before:match[3],after:match[4]};
  }
  const season40Label=update.id==='8d353b91-7619-5f5e-9d1c-fd83be53fa1d'?({'Goblin Gang|Count':'Spear Goblin Count','Elixir Golem|EGolem 1 Hit Time':'Elixir Golem · Hit Time','Elixir Golem|EGolem 2 Hit Time':'Elixir Golemite · Hit Time','Elixir Golem|EGolem 3 Hit Time':'Elixir Blob · Hit Time','Cannon Cart|Destroyed HP':'Stationary Cannon · Hitpoints'}[change.cardName+'|'+change.stat]):null;
- return {label:season40Label||(timing?change.quote.match(/^(?:First )?Hit Time/)[0]:change.stat.replace(/\s+[+-](?:\s+\d+(?:\.\d+)?\s*sec)?$/, '')),rate,single,before:format(change.before),after:signed?signed[1].replace(/\s/g,'')+'%':format(change.after),note,percent:single&&change.unit==='percent'?null:percent};
+ return {label:season40Label||(timing&&change.stat==='Hit Speed'?change.quote.match(/^(?:First )?Hit Time/)[0]:change.stat.replace(/\s+[+-](?:\s+\d+(?:\.\d+)?\s*sec)?$/, '')),rate,single,before:format(change.before),after:signed?signed[1].replace(/\s/g,'')+'%':format(change.after),note,percent:single&&change.unit==='percent'?null:percent};
 }
 function elixirStages(update,changes){
  if(update.id!=='f9672f7f-6950-58dc-ab65-0d896a696675'||!changes.every(c=>c.cardName==='Elixir Golem'))return [];
@@ -70,6 +70,7 @@ function elixirStages(update,changes){
  return stages.every(s=>s.release&&s.total)?stages:[];
 }
 function relatedCards(update,change){
+ if(update.id==='e7d42138-c3d1-50cb-b666-61e56b35b3fe'&&/First Hit Time/.test(change.stat))return update.changes.filter(c=>/First Hit Time/.test(c.stat)).map(c=>({name:c.cardName,component:'Goblin · First Hit Time'}));
  if(update.id==='f9672f7f-6950-58dc-ab65-0d896a696675'&&change.cardName==='Fire Spirit'&&change.stat==='Damage'&&update.excerpt.includes('toning down\nFurnace'))return [{name:'Fire Spirit',component:'Damage'},{name:'Furnace',component:'Spawned Fire Spirit · Damage'}];
  // Explicit source relationships only: a spawned unit's buff is not its parent's attack.
  if(update.id==='5bd1ac7d-925a-5bd4-9934-a00a1b78d683'&&['Barbarians','Barbarian Barrel'].includes(change.cardName)&&change.stat==='Hit Speed'&&update.excerpt.includes('Barbarians, Battle Ram and Barbarian Hut')&&update.excerpt.includes('will also be getting this buff'))return ['Barbarians','Barbarian Barrel','Battle Ram','Barbarian Hut'].map(name=>({name,component:name==='Barbarians'?'Hit Time':'Spawned Barbarian · Hit Time'}));
@@ -86,7 +87,7 @@ function changeCategory(update,change){
   if(['damage','hp','healing'].includes(change.unit))return change.after>change.before?'buff':'nerf';
   if(change.unit==='seconds'&&/hit speed|hit frequency|first hit|first attack|deploy time|cooldown|cast time|cooking time|production speed|spawn rate|spawn pause|spawn time|elixir generation/i.test(change.stat))return change.after<change.before?'buff':'nerf';
   if(change.unit==='seconds'&&/^life\s*time$/i.test(change.stat))return change.after>change.before?'buff':'nerf';
-  if(/^(death spawn|spawns per wave|spawn count|total spawned)$/i.test(change.stat))return change.after>change.before?'buff':'nerf';
+  if(/^(death spawn|spawns per wave|spawn count|total spawned|count)$/i.test(change.stat))return change.after>change.before?'buff':'nerf';
   if(change.unit==='elixir')return /destruction|generation|production|produced/i.test(change.stat)?(change.after>change.before?'buff':'nerf'):(change.after<change.before?'buff':'nerf');
  }
  return category;

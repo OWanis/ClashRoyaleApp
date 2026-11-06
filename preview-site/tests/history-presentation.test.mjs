@@ -53,3 +53,8 @@ test('Season 40 names the affected component and colors individual Hut changes',
  for(const [stat,category]of [['Elixir Cost','buff'],['Spawn Time','nerf'],['Spawn Count','buff'],['Life Time','nerf'],['Death Spawn','nerf'],['Total Spawned','nerf']])assert.equal(HistoryModel.changeCategory(u,u.changes.find(c=>c.cardName==='Barbarian Hut'&&c.stat===stat)),category);
  assert.equal(HistoryModel.changePresentation(u,u.changes.find(c=>c.cardName==='Cannon Cart')).label,'Stationary Cannon · Hitpoints');
 });
+test('October Q3 label and Goblin shared first-hit changes remain explicit',()=>{
+ const u=HISTORY_DATA.updates.find(u=>u.effectiveDate==='2022-10-25');assert.equal(HistoryModel.updatePresentation(u).seasonLabel,'October 2022 · Q3');assert.equal(HistoryModel.timelineGroups([u],'season')[0].label,'October 2022 · Q3');
+ const count=u.changes.find(c=>c.stat==='Count');assert.equal(HistoryModel.changeCategory(u,count),'buff');
+ const gang=u.changes.find(c=>c.cardName==='Goblin Gang');assert.equal(HistoryModel.changePresentation(u,gang).label,'Goblin · First Hit Time');assert.equal(HistoryModel.changePresentation(u,gang).percent,'+100%');assert.equal(HistoryModel.relatedCards(u,gang).length,4);
+});

@@ -16,10 +16,10 @@ const older=iconButton('history-older','‹','Previous update'),newer=iconButton
 const banner=el('section','history-banner');banner.setAttribute('aria-label','Selected update');nav.before(banner);
 function renderBanner(label,items){
  banner.replaceChildren();const grouped=groupMode!=='date',first=items[0];
- const heading=grouped?(groupMode==='season'?'Season recap':'Monthly recap'):first.id==='08fc975e-b81d-5767-a1e3-83e716be6662'?'Champion balance':first.eventType==='release'?'New releases':first.eventType==='mechanic'?'Game update':'Balance update';
+ const heading=grouped?(groupMode==='season'?(/· Q3$/.test(label||'')?'Quarter recap':'Season recap'):'Monthly recap'):first.id==='08fc975e-b81d-5767-a1e3-83e716be6662'?'Champion balance':first.eventType==='release'?'New releases':first.eventType==='mechanic'?'Game update':'Balance update';
  const copy=el('div','history-banner-copy');copy.append(el('p','history-banner-eyebrow','Clash Royale · Level 11'),el('h1','',heading));
  const meta=el('div','history-banner-meta');if(!grouped){const time=el('time','history-banner-date',new Intl.DateTimeFormat('en-GB',{day:'numeric',month:'short',year:'numeric',timeZone:'UTC'}).format(new Date(first.effectiveDate+'T00:00:00Z')));time.dateTime=first.effectiveDate;meta.append(time);}
- const season=label?.match(/Season\s+\d+/i)?.[0];meta.append(el('span','history-banner-season',grouped?label:(first.effectiveDateKnown===false?'Reported':'Update')+(season?' · '+season:'')));copy.append(meta);banner.append(copy);
+ const season=label?.match(/Season\s+\d+|Q[1-4]/i)?.[0];meta.append(el('span','history-banner-season',grouped?label:(first.effectiveDateKnown===false?'Reported':'Update')+(season?' · '+season:'')));copy.append(meta);banner.append(copy);
  const art=el('div','history-banner-art');art.setAttribute('aria-hidden','true');const seen=new Set();for(const item of items){for(const c of item.releases||item.changes){if(seen.has(c.cardName))continue;const card=DATA.cards.find(card=>card.forms.some(f=>f.id===c.cardFormId));const img=historyImage(card,card.forms.find(f=>f.id===c.cardFormId),item);img.alt='';img.loading='eager';art.append(img);seen.add(c.cardName);if(seen.size===2)break;}if(seen.size===2)break;}banner.append(art);
 }
 const dialog=el('dialog','history-picker');dialog.id='history-picker';dialog.setAttribute('aria-labelledby','history-picker-title');
