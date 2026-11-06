@@ -32,3 +32,11 @@ test('April preserves signed boosts, cleans relative buffs, and classifies produ
  const mirror=HistoryModel.changePresentation(u,find('Mirror','Level'));assert.deepEqual([mirror.before,mirror.after],['+1','+2']);
  for(const [stat,category]of [['Elixir at Destruction','buff'],['Lifetime','nerf'],['Elixir Generation','nerf']])assert.equal(HistoryModel.changeCategory(u,find('Elixir Collector',stat)),category);
 });
+test('June shared Barbarian changes include source-confirmed parent cards and reciprocal rates',()=>{
+ const u=HISTORY_DATA.updates.find(u=>u.id==='5bd1ac7d-925a-5bd4-9934-a00a1b78d683'),c=u.changes.find(c=>c.cardName==='Barbarians');
+ assert.deepEqual(HistoryModel.relatedCards(u,c).map(r=>r.name),['Barbarians','Barbarian Barrel','Battle Ram','Barbarian Hut']);assert.ok(HistoryModel.relatedCards(u,c).slice(1).every(r=>r.component.includes('Spawned Barbarian')));
+ assert.deepEqual(HistoryModel.changePresentation(u,c).rate,{label:'Hit Speed',percent:'+8%',before:'1/1.4',after:'1/1.3'});
+ assert.deepEqual(HistoryModel.relatedCards(u,u.changes.find(c=>c.stat==='Distance')),[]);
+ assert.deepEqual(HistoryModel.relatedCards({...u,id:'other'},c),[]);
+ const mother=u.changes.find(c=>c.cardName==='Mother Witch'&&c.stat==='Hit Speed');assert.equal(HistoryModel.changePresentation(u,mother).rate.percent,'+10%');
+});

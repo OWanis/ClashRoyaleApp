@@ -56,13 +56,20 @@ function changePresentation(update,change){
  const timing=change.unit==='seconds'&&/^(First )?Hit Time\b/.test(change.quote||'');
  if(timing&&change.before>0&&change.after>0){
   const at=(update.excerpt||'').indexOf(change.quote);
-  const following=at<0?'':update.excerpt.slice(at+change.quote.length,at+change.quote.length+120);
+  const following=at<0?'':update.excerpt.slice(at+change.quote.length,at+change.quote.length+180).replace(/ sec\s*\n-1/g,'');
   const match=following.match(/^\s*((?:First )?Hit Speed)\s+([+-]\d+(?:\.\d+)?%)\s*(?:\(Faster\))?\s*\n(1\/[\d.]+)\s*\n(1\/[\d.]+)/);
   if(match&&Number(match[3].slice(2))===change.before&&Number(match[4].slice(2))===change.after)rate={label:match[1],percent:match[2],before:match[3],after:match[4]};
  }
  return {label:timing?change.quote.match(/^(?:First )?Hit Time/)[0]:change.stat.replace(/\s+[+-](?:\s+\d+(?:\.\d+)?\s*sec)?$/, ''),rate,single,before:format(change.before),after:signed?signed[1].replace(/\s/g,'')+'%':format(change.after),note,percent:single&&change.unit==='percent'?null:percent};
 }
+function relatedCards(update,change){
+ // Explicit source relationships only: a spawned unit's buff is not its parent's attack.
+ if(update.id==='5bd1ac7d-925a-5bd4-9934-a00a1b78d683'&&['Barbarians','Barbarian Barrel'].includes(change.cardName)&&change.stat==='Hit Speed'&&update.excerpt.includes('Barbarians, Battle Ram and Barbarian Hut')&&update.excerpt.includes('will also be getting this buff'))return ['Barbarians','Barbarian Barrel','Battle Ram','Barbarian Hut'].map(name=>({name,component:name==='Barbarians'?'Hit Time':'Spawned Barbarian · Hit Time'}));
+ if(update.effectiveDate==='2022-02-03'&&change.cardName==='Musketeer'&&change.stat==='Hit Speed'&&update.excerpt.includes('Three Musketeers are also buffed because of this buff.'))return [{name:'Musketeer',component:'Hit Time'},{name:'Three Musketeers',component:'Musketeer · Hit Time'}];
+ return [];
+}
 function changeCategory(update,change){
+ if(update.id==='5bd1ac7d-925a-5bd4-9934-a00a1b78d683'&&change.cardName==='Barbarian Barrel'&&change.stat==='Distance'&&update.excerpt.includes('distance nerf'))return 'nerf';
  const category=change.classification||updatePresentation(update).changes?.[change.id]||'unclassified';
  // Some source sections group mixed changes under one heading. Only reverse a
  // heading for a stat whose benefit direction is unambiguous; mass/range and
@@ -223,5 +230,5 @@ function historicalReferences(update,templates,history=root.HISTORY_DATA?.update
  return [...states.values()];
 }
 
-root.HistoryModel={changePresentation,verifiedUpdate,HISTORY_START,inScope,level11Values,historicalReferences,timelineGroups,updatePresentation,changeCategory,cardCategory,damageChanges,compare,additionalStats,changeKind,referenceForChange,affectedForms,detectCrossings};
+root.HistoryModel={relatedCards,changePresentation,verifiedUpdate,HISTORY_START,inScope,level11Values,historicalReferences,timelineGroups,updatePresentation,changeCategory,cardCategory,damageChanges,compare,additionalStats,changeKind,referenceForChange,affectedForms,detectCrossings};
 })(globalThis);
