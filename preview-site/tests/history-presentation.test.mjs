@@ -86,3 +86,7 @@ test('Season 46 Mega Minion formula and related Spear Goblins are explicit',()=>
  const spear=u.changes.find(c=>c.cardName==='Spear Goblins');assert.deepEqual(HistoryModel.relatedCards(u,spear).map(r=>r.name),['Spear Goblins','Goblin Hut','Goblin Gang','Goblin Giant']);assert.match(HistoryModel.relatedCards(u,spear)[3].component,/Spawned/);
  assert.deepEqual(u.changes.filter(c=>c.cardName==='Furnace').map(c=>HistoryModel.changeCategory(u,c)),['buff','nerf']);
 });
+test('Season 48 displays unit exponents and Phoenix DPS without inventing absolute damage',()=>{
+ const u=HISTORY_DATA.updates.find(u=>u.id==='e6f01b25-e110-5aa4-bb9b-c6b8fa7b1d79');const display=stat=>HistoryModel.changePresentation(u,u.changes.find(c=>c.stat===stat));
+ assert.deepEqual([display('Deploy Delay Speed').before,display('Deploy Delay Speed').after],['1/0.1 sec⁻¹','1/0.2 sec⁻¹']);assert.equal(display('Spawn Attack Area').after,'28.3 tiles²');assert.equal(display('DPS').symbolic,true);assert.equal(display('DPS').percent,'-10%');assert.equal(display('Freeze Duration').percent,'-7.7%');
+});

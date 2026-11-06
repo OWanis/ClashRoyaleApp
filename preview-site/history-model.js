@@ -45,13 +45,14 @@ function changePresentation(update,change){
  const single=change.before==null||['','—','-'].includes(change.before);
  const unit=change.unit==='value'&&/\n[\d.]+ tiles\n[\d.]+ tiles?$/.test(change.quote||'')?' tiles':change.unit==='seconds'?' s':change.unit==='tiles'?' tiles':change.unit==='percent'?'%':change.unit==='elixir'?' elixir':'';
  const sourceLines=(change.quote||'').split('\n').map(s=>s.trim());
- const format=value=>{const signedValue=typeof value==='number'&&value>=0&&sourceLines.slice(1).some(line=>line==='+'+value+(change.unit==='percent'?'%':''));return typeof value==='number'?(signedValue?'+':'')+String(value)+unit:String(value??'').replace(/^([+-])\s+(?=\d)/,'$1');};
+ const format=value=>{const signedValue=typeof value==='number'&&value>=0&&sourceLines.slice(1).some(line=>line==='+'+value+(change.unit==='percent'?'%':''));return typeof value==='number'?(signedValue?'+':'')+String(value)+unit:String(value??'').replace(/^([+-])\s+(?=\d)/,'$1').replace(/\bsec\s+(?:\^\s*)?-1\b/g,'sec⁻¹').replace(/\btiles?\s+(?:\^\s*)?2\b/g,'tiles²');};
  const signed=single&&change.unit==='percent'?change.quote?.match(/([+-]\s*\d+(?:\.\d+)?)%/):null;
  let note=update.id==='08fc975e-b81d-5767-a1e3-83e716be6662'&&change.cardName==='Skeleton King'&&change.stat==='Pushback'&&update.excerpt.includes('immunity doesn’t work against The Log')?'Except The Log':null;
  const quotedPercent=(single?change.quote:sourceLines.slice(0,Math.max(1,sourceLines.length-2)).join(' '))?.match(/([+-]\s*\d+(?:\.\d+)?)%/);
  let percent=quotedPercent?quotedPercent[1].replace(/\s/g,'')+'%':null;
  const novemberPercent={'3ba1c0e4-a30a-53a3-b5b5-946b001bd3ce':['Damage\n                    -10%','-10%'],'5a5ef8bf-a5e6-5e30-8354-0684cef4b84b':['Egg Hit Points (HP)\n                    -34%','-34%']}[change.id];
  if(novemberPercent&&update.excerpt?.includes(novemberPercent[0]))percent=novemberPercent[1];
+ if(change.id==='b783f089-5aec-5dea-b3d1-66deb6c6c5d8')percent=null;
  if(!percent&&change.stat==='Movement Speed'){const a=String(change.before).match(/\((\d+)\)/),b=String(change.after).match(/\((\d+)\)/);if(a&&b&&Number(a[1])>0){const delta=Number(((Number(b[1])/Number(a[1])-1)*100).toFixed(1));percent=(delta>0?'+':'')+delta+'%';}}
  if(!percent&&level11Values(update,change)&&Number.isFinite(change.before)&&Number.isFinite(change.after)&&change.before!==0&&change.before!==change.after){const delta=(change.after-change.before)/Math.abs(change.before)*100;const rounded=Number(delta.toFixed(1));percent=(rounded>0?'+':'')+rounded+'%';}
  // Preserve the source's distinction between seconds per hit and hits per second.
@@ -64,7 +65,7 @@ function changePresentation(update,change){
   if(match&&Number(match[3].slice(2))===change.before&&Number(match[4].slice(2))===change.after)rate={label:match[1],percent:match[2],before:match[3],after:match[4]};
  }
  if(change.unit==='seconds'){const timingNote=change.quote?.match(/(\d+(?:\.\d+)?) sec (faster|slower|sooner)/);if(timingNote)note=timingNote[1]+' s '+timingNote[2];}
- const symbolic=/DPS$/.test(change.stat)&&/^DMG \/ \d+(?:\.\d+)?$/.test(change.before)&&/^DMG \/ \d+(?:\.\d+)?$/.test(change.after);
+ const symbolic=/DPS$/.test(change.stat)&&/^DMG\s*\/\s*\d+(?:\.\d+)?(?:\s+dmg\/sec)?$/.test(change.before)&&/^DMG\s*\/\s*\d+(?:\.\d+)?(?:\s+dmg\/sec)?$/.test(change.after);
  if(update.id==='22d81425-fd9a-5c9b-9aa4-fcdc21347b01'&&change.cardName==='Rocket'&&change.stat==='Crown Tower Damage'&&/30%[\s\S]*25%/.test(update.excerpt))rate={label:'Crown Tower multiplier',before:'30%',after:'25%',percent:'-17%',unit:'of normal damage'};
  const season40Label=update.id==='8d353b91-7619-5f5e-9d1c-fd83be53fa1d'?({'Goblin Gang|Count':'Spear Goblin Count','Elixir Golem|EGolem 1 Hit Time':'Elixir Golem · Hit Time','Elixir Golem|EGolem 2 Hit Time':'Elixir Golemite · Hit Time','Elixir Golem|EGolem 3 Hit Time':'Elixir Blob · Hit Time','Cannon Cart|Destroyed HP':'Stationary Cannon · Hitpoints'}[change.cardName+'|'+change.stat]):null;
  return {symbolic,label:(change.cardName==='Phoenix'&&change.stat==='Egg Hit Points'?'Egg Hitpoints':null)||season40Label||(timing&&/^(Hit Speed|Hit Time)/.test(change.stat)?change.quote.match(/^(?:First )?Hit Time/)[0]:change.stat.replace(/\s+[+-](?:\s+\d+(?:\.\d+)?\s*sec)?$/, '')),rate,single,before:format(change.before),after:signed?signed[1].replace(/\s/g,'')+'%':format(change.after),note,percent:single&&change.unit==='percent'?null:percent};
@@ -90,6 +91,7 @@ function relatedCards(update,change){
  return [];
 }
 function changeCategory(update,change){
+ if(update.id==='e6f01b25-e110-5aa4-bb9b-c6b8fa7b1d79'&&change.cardName==='Goblins'&&change.stat==='Deploy Delay Speed')return 'nerf';
  if(update.id==='80fa387d-c2eb-530a-a766-f1fcdb675eda'&&change.cardName==='Mighty Miner')return change.stat==='Hitpoints'?'buff':change.stat==='Movement Speed'?'nerf':'rework';
  if(update.id==='5bd1ac7d-925a-5bd4-9934-a00a1b78d683'&&change.cardName==='Barbarian Barrel'&&change.stat==='Distance'&&update.excerpt.includes('distance nerf'))return 'nerf';
  const category=change.classification||updatePresentation(update).changes?.[change.id]||'unclassified';
@@ -98,7 +100,7 @@ function changeCategory(update,change){
  // explicitly labeled reworks/fixes retain the source classification.
  if(['buff','nerf','rework'].includes(category)&&Number.isFinite(change.before)&&Number.isFinite(change.after)&&change.before!==change.after){
   if(['damage','hp','healing'].includes(change.unit))return change.after>change.before?'buff':'nerf';
-  if(change.unit==='seconds'&&/hit speed|hit frequency|first hit|first attack|deploy time|cooldown|cast time|cooking time|production speed|spawn rate|spawn pause|spawn time|spawn delay|spawn frequency|spawn interval|elixir generation/i.test(change.stat))return change.after<change.before?'buff':'nerf';
+  if(change.unit==='seconds'&&/hit speed|hit frequency|first hit|first attack|deploy time|deploy delay time|cooldown|cast time|cooking time|production speed|spawn rate|spawn pause|spawn time|spawn delay|spawn frequency|spawn interval|elixir generation/i.test(change.stat))return change.after<change.before?'buff':'nerf';
   if(change.unit==='seconds'&&/^life\s*time$/i.test(change.stat))return change.after>change.before?'buff':'nerf';
   if(/^(death spawn|spawns per wave|spawn count(?: per wave)?|total spawned|count)$/i.test(change.stat))return change.after>change.before?'buff':'nerf';
   if(change.unit==='elixir')return /destruction|generation|production|produced/i.test(change.stat)?(change.after>change.before?'buff':'nerf'):(change.after<change.before?'buff':'nerf');
