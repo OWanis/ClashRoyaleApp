@@ -43,12 +43,12 @@ function snapshotPatches(update){
 function updatePresentation(update){const result=update.presentation||presentation[update.id]||{seasonLabel:null,changes:{}};return update.id==='08fc975e-b81d-5767-a1e3-83e716be6662'?{...result,seasonLabel:'November 2021 · Season 29'}:result;}
 function changePresentation(update,change){
  const single=change.before==null||['','—','-'].includes(change.before);
- const unit=change.unit==='seconds'?' s':change.unit==='tiles'?' tiles':change.unit==='percent'?'%':change.unit==='elixir'?' elixir':'';
+ const unit=change.unit==='value'&&/\n[\d.]+ tiles\n[\d.]+ tiles?$/.test(change.quote||'')?' tiles':change.unit==='seconds'?' s':change.unit==='tiles'?' tiles':change.unit==='percent'?'%':change.unit==='elixir'?' elixir':'';
  const sourceLines=(change.quote||'').split('\n').map(s=>s.trim());
  const format=value=>{const signedValue=typeof value==='number'&&value>=0&&sourceLines.slice(1).some(line=>line==='+'+value+(change.unit==='percent'?'%':''));return typeof value==='number'?(signedValue?'+':'')+String(value)+unit:String(value??'').replace(/^([+-])\s+(?=\d)/,'$1');};
  const signed=single&&change.unit==='percent'?change.quote?.match(/([+-]\s*\d+(?:\.\d+)?)%/):null;
  const note=update.id==='08fc975e-b81d-5767-a1e3-83e716be6662'&&change.cardName==='Skeleton King'&&change.stat==='Pushback'&&update.excerpt.includes('immunity doesn’t work against The Log')?'Except The Log':null;
- const quotedPercent=(single?change.quote:sourceLines[0])?.match(/([+-]\s*\d+(?:\.\d+)?)%/);
+ const quotedPercent=(single?change.quote:sourceLines.slice(0,Math.max(1,sourceLines.length-2)).join(' '))?.match(/([+-]\s*\d+(?:\.\d+)?)%/);
  let percent=quotedPercent?quotedPercent[1].replace(/\s/g,'')+'%':null;
  if(!percent&&level11Values(update,change)&&Number.isFinite(change.before)&&Number.isFinite(change.after)&&change.before!==0&&change.before!==change.after){const delta=(change.after-change.before)/Math.abs(change.before)*100;const rounded=Number(delta.toFixed(1));percent=(rounded>0?'+':'')+rounded+'%';}
  // Preserve the source's distinction between seconds per hit and hits per second.
@@ -62,7 +62,14 @@ function changePresentation(update,change){
  }
  return {label:timing?change.quote.match(/^(?:First )?Hit Time/)[0]:change.stat.replace(/\s+[+-](?:\s+\d+(?:\.\d+)?\s*sec)?$/, ''),rate,single,before:format(change.before),after:signed?signed[1].replace(/\s/g,'')+'%':format(change.after),note,percent:single&&change.unit==='percent'?null:percent};
 }
+function elixirStages(update,changes){
+ if(update.id!=='f9672f7f-6950-58dc-ab65-0d896a696675'||!changes.every(c=>c.cardName==='Elixir Golem'))return [];
+ const find=stat=>changes.find(c=>c.stat===stat);
+ const stages=[['Elixir Golem',1,'Hitpoints'],['Elixir Golemites',2,'Elixir Golemite Hitpoints'],['Elixir Blobs',4,null]].map(([name,count,hp],i)=>({name,count,release:find('Blob '+(i+1)+' Elixir Release'),total:find('x'+count),hp:find(hp)}));
+ return stages.every(s=>s.release&&s.total)?stages:[];
+}
 function relatedCards(update,change){
+ if(update.id==='f9672f7f-6950-58dc-ab65-0d896a696675'&&change.cardName==='Fire Spirit'&&change.stat==='Damage'&&update.excerpt.includes('toning down\nFurnace'))return [{name:'Fire Spirit',component:'Damage'},{name:'Furnace',component:'Spawned Fire Spirit · Damage'}];
  // Explicit source relationships only: a spawned unit's buff is not its parent's attack.
  if(update.id==='5bd1ac7d-925a-5bd4-9934-a00a1b78d683'&&['Barbarians','Barbarian Barrel'].includes(change.cardName)&&change.stat==='Hit Speed'&&update.excerpt.includes('Barbarians, Battle Ram and Barbarian Hut')&&update.excerpt.includes('will also be getting this buff'))return ['Barbarians','Barbarian Barrel','Battle Ram','Barbarian Hut'].map(name=>({name,component:name==='Barbarians'?'Hit Time':'Spawned Barbarian · Hit Time'}));
  if(update.effectiveDate==='2022-02-03'&&change.cardName==='Musketeer'&&change.stat==='Hit Speed'&&update.excerpt.includes('Three Musketeers are also buffed because of this buff.'))return [{name:'Musketeer',component:'Hit Time'},{name:'Three Musketeers',component:'Musketeer · Hit Time'}];
@@ -230,5 +237,5 @@ function historicalReferences(update,templates,history=root.HISTORY_DATA?.update
  return [...states.values()];
 }
 
-root.HistoryModel={relatedCards,changePresentation,verifiedUpdate,HISTORY_START,inScope,level11Values,historicalReferences,timelineGroups,updatePresentation,changeCategory,cardCategory,damageChanges,compare,additionalStats,changeKind,referenceForChange,affectedForms,detectCrossings};
+root.HistoryModel={elixirStages,relatedCards,changePresentation,verifiedUpdate,HISTORY_START,inScope,level11Values,historicalReferences,timelineGroups,updatePresentation,changeCategory,cardCategory,damageChanges,compare,additionalStats,changeKind,referenceForChange,affectedForms,detectCrossings};
 })(globalThis);

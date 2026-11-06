@@ -40,3 +40,10 @@ test('June shared Barbarian changes include source-confirmed parent cards and re
  assert.deepEqual(HistoryModel.relatedCards({...u,id:'other'},c),[]);
  const mother=u.changes.find(c=>c.cardName==='Mother Witch'&&c.stat==='Hit Speed');assert.equal(HistoryModel.changePresentation(u,mother).rate.percent,'+10%');
 });
+test('August Elixir Golem totals belong to their stages, with Level 11 HP',()=>{
+ const u=HISTORY_DATA.updates.find(u=>u.effectiveDate==='2022-07-28'),stages=HistoryModel.elixirStages(u,u.changes.filter(c=>c.cardName==='Elixir Golem'));assert.equal(stages.length,3);
+ for(const stage of stages){assert.equal(parseFloat(stage.release.before)*stage.count,parseFloat(stage.total.before));assert.equal(parseFloat(stage.release.after)*stage.count,parseFloat(stage.total.after));}
+ assert.deepEqual(stages.map(s=>s.hp?.after),[1568,763,undefined]);
+ const fireball=u.changes.find(c=>c.cardName==='Fireball');assert.equal(HistoryModel.changePresentation(u,fireball).percent,'-44%');
+ assert.equal(HistoryModel.changePresentation(u,u.changes.find(c=>c.cardName==='Prince')).after,'3 tiles');
+});
