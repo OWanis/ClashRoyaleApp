@@ -44,10 +44,11 @@ function updatePresentation(update){const result=update.presentation||presentati
 function changePresentation(update,change){
  const single=change.before==null||['','—','-'].includes(change.before);
  const unit=change.unit==='seconds'?' s':change.unit==='tiles'?' tiles':change.unit==='percent'?'%':change.unit==='elixir'?' elixir':'';
- const format=value=>typeof value==='number'?String(value)+unit:String(value??'');
+ const sourceLines=(change.quote||'').split('\n').map(s=>s.trim());
+ const format=value=>{const signedValue=typeof value==='number'&&value>=0&&sourceLines.slice(1).some(line=>line==='+'+value+(change.unit==='percent'?'%':''));return typeof value==='number'?(signedValue?'+':'')+String(value)+unit:String(value??'').replace(/^([+-])\s+(?=\d)/,'$1');};
  const signed=single&&change.unit==='percent'?change.quote?.match(/([+-]\s*\d+(?:\.\d+)?)%/):null;
  const note=update.id==='08fc975e-b81d-5767-a1e3-83e716be6662'&&change.cardName==='Skeleton King'&&change.stat==='Pushback'&&update.excerpt.includes('immunity doesn’t work against The Log')?'Except The Log':null;
- const quotedPercent=change.quote?.match(/([+-]\s*\d+(?:\.\d+)?)%/);
+ const quotedPercent=(single?change.quote:sourceLines[0])?.match(/([+-]\s*\d+(?:\.\d+)?)%/);
  let percent=quotedPercent?quotedPercent[1].replace(/\s/g,'')+'%':null;
  if(!percent&&level11Values(update,change)&&Number.isFinite(change.before)&&Number.isFinite(change.after)&&change.before!==0&&change.before!==change.after){const delta=(change.after-change.before)/Math.abs(change.before)*100;const rounded=Number(delta.toFixed(1));percent=(rounded>0?'+':'')+rounded+'%';}
  // Preserve the source's distinction between seconds per hit and hits per second.
@@ -59,7 +60,7 @@ function changePresentation(update,change){
   const match=following.match(/^\s*((?:First )?Hit Speed)\s+([+-]\d+(?:\.\d+)?%)\s*(?:\(Faster\))?\s*\n(1\/[\d.]+)\s*\n(1\/[\d.]+)/);
   if(match&&Number(match[3].slice(2))===change.before&&Number(match[4].slice(2))===change.after)rate={label:match[1],percent:match[2],before:match[3],after:match[4]};
  }
- return {label:timing?change.quote.match(/^(?:First )?Hit Time/)[0]:change.stat,rate,single,before:format(change.before),after:signed?signed[1].replace(/\s/g,'')+'%':format(change.after),note,percent:single&&change.unit==='percent'?null:percent};
+ return {label:timing?change.quote.match(/^(?:First )?Hit Time/)[0]:change.stat.replace(/\s+[+-](?:\s+\d+(?:\.\d+)?\s*sec)?$/, ''),rate,single,before:format(change.before),after:signed?signed[1].replace(/\s/g,'')+'%':format(change.after),note,percent:single&&change.unit==='percent'?null:percent};
 }
 function changeCategory(update,change){
  const category=change.classification||updatePresentation(update).changes?.[change.id]||'unclassified';
@@ -68,10 +69,10 @@ function changeCategory(update,change){
  // explicitly labeled reworks/fixes retain the source classification.
  if(['buff','nerf','rework'].includes(category)&&Number.isFinite(change.before)&&Number.isFinite(change.after)&&change.before!==change.after){
   if(['damage','hp','healing'].includes(change.unit))return change.after>change.before?'buff':'nerf';
-  if(change.unit==='seconds'&&/hit speed|hit frequency|first hit|first attack|deploy time|cooldown|cast time|cooking time|production speed|spawn rate/i.test(change.stat))return change.after<change.before?'buff':'nerf';
+  if(change.unit==='seconds'&&/hit speed|hit frequency|first hit|first attack|deploy time|cooldown|cast time|cooking time|production speed|spawn rate|spawn pause|elixir generation/i.test(change.stat))return change.after<change.before?'buff':'nerf';
   if(change.unit==='seconds'&&/^lifetime$/i.test(change.stat))return change.after>change.before?'buff':'nerf';
   if(/^(death spawn|spawns per wave)$/i.test(change.stat))return change.after>change.before?'buff':'nerf';
-  if(change.unit==='elixir')return change.after<change.before?'buff':'nerf';
+  if(change.unit==='elixir')return /destruction|generation|production|produced/i.test(change.stat)?(change.after>change.before?'buff':'nerf'):(change.after<change.before?'buff':'nerf');
  }
  return category;
 }

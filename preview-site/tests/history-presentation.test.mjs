@@ -23,3 +23,12 @@ test('February timing breakdown preserves reciprocal rates and relative-only fir
  const inferno=HistoryModel.changePresentation(u,u.changes.find(c=>c.cardName==='Inferno Tower'));assert.equal(inferno.single,true);assert.equal(inferno.after,'+25%');assert.equal(inferno.rate,null);
  const balloon=u.changes.find(c=>c.cardName==='Balloon'&&c.unit==='damage');assert.deepEqual([balloon.before,balloon.after],[960,640]);
 });
+test('April preserves signed boosts, cleans relative buffs, and classifies production correctly',()=>{
+ const u=HISTORY_DATA.updates.find(u=>u.effectiveDate==='2022-04-04'),find=(name,stat)=>u.changes.find(c=>c.cardName===name&&c.stat===stat);
+ const giant=HistoryModel.changePresentation(u,find('Giant Skeleton','Hitpoints +'));assert.deepEqual([giant.label,giant.single,giant.after],['Hitpoints',true,'+7%']);
+ const tomb=HistoryModel.changePresentation(u,find('Tombstone','Spawn Rate'));assert.deepEqual([tomb.single,tomb.after],[true,'+5%']);
+ const queen=HistoryModel.changePresentation(u,find('Archer Queen','Hit Speed Boost'));assert.deepEqual([queen.before,queen.after,queen.percent],['+200%','+180%','-10%']);
+ const snare=HistoryModel.changePresentation(u,find('Ram Rider','Bola Snare'));assert.deepEqual([snare.before,snare.after,snare.percent],['-85%','-70%','+17.6%']);
+ const mirror=HistoryModel.changePresentation(u,find('Mirror','Level'));assert.deepEqual([mirror.before,mirror.after],['+1','+2']);
+ for(const [stat,category]of [['Elixir at Destruction','buff'],['Lifetime','nerf'],['Elixir Generation','nerf']])assert.equal(HistoryModel.changeCategory(u,find('Elixir Collector',stat)),category);
+});
