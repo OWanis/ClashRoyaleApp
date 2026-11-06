@@ -23,9 +23,11 @@ const presentation={
     }
   }
 };
+const january2024Proofs={"37bfc981-f8bb-53e1-adc5-78d1fd93c075": [1800, 1600, "hp", "Little Prince release guide: Guardienne HP1800 compared to Knight1766 at tournament Level11."], "09195839-dd66-535d-a97b-ca5696e6e5b1": [110, 100, "damage", "Little Prince release guide explicitly states110 damage at tournament standard Level11."], "97f250e7-e06f-58e7-8c47-5dc6e578a95c": [3424, 3616, "hp", "Pinned March2023 game table GiantSkeleton HP2140 \u00d7160% Level11 =3424."], "358c07bc-e8b0-5951-9298-5fab2a9faed1": [240, 256, "hp", "Pinned March2023 SkeletonWarrior ShieldHitpoints150 \u00d7160% Level11 =240."], "a82962ba-4546-5168-a966-393243bffc28": [222, 230, "damage", "Pinned March2023 BombSkeletonProjectile Damage87 \u00d7256% Level11, floored =222."], "e5290bbd-5f0c-5f0f-af5a-5fe6d5353b58": [310, 335, "damage", "Pinned March2023 GoldenKnight DashDamage310 at Champion tournament Level11."]};
 function verifiedUpdate(update){
  const proofs=root.HISTORY_VERIFICATIONS?.changes||{};
  return {...update,changes:update.changes.map(c=>{
+  const january=january2024Proofs[c.id];if(update.id==='a05cf451-cc2c-5d9d-8cae-efa053ee6a6e'&&january&&c.unit==='relative')return {...c,before:january[0],after:january[1],unit:january[2],levelReference:11,levelVerification:{level:11,sourceUrl:'https://royaleapi.com/blog/season-55-balance',method:january[3]+' The January report supplies the matching before value and changed after value.',referenceSources:['https://royaleapi.com/blog/little-prince-guide-2023-november','https://github.com/smlbiobot/cr-csv/tree/899e45efc765fbf3902927bb2e37dc04a78f7823/assets/csv_logic']}};
   if(update.id==='58f6106c-b535-51ff-885e-6ab216b6ac26'&&c.id==='7a7060d6-8adc-5d3a-a18b-7cd61e69740e'&&c.before===215&&c.after===184&&c.stat==='Power Shot Damage')return {...c,levelReference:11,levelVerification:{level:11,method:'RoyaleAPI release screenshot labels Level 11 and Showing Challenge Levels, with Power Shot Damage 215. December report matches that before value and gives 184 after.',sourceUrl:'https://royaleapi.com/blog/archers-evolution-2023-november',imageUrl:'https://cdns3.royaleapi.com/static/img/blog/2023-11-season53/archers-evo/v1-900c195c/evo-archers-info.jpg',imageSha256:'17f42c6fcad99446845b7b4ca4e7f8b7e0a6d69276b84db3fbb253ac9d61e1ec',balanceSourceUrl:update.sourceUrl}};
   const proof=proofs[c.id];
   if(!proof||proof.level!==11||proof.effectiveDate!==update.effectiveDate||proof.cardFormId!==c.cardFormId||proof.stat!==c.stat||proof.before!==c.before||proof.after!==c.after)return c;
@@ -44,7 +46,7 @@ function snapshotPatches(update){
 }
 function updatePresentation(update){if(update.id==='80fa387d-c2eb-530a-a766-f1fcdb675eda')return {...update.presentation,seasonLabel:'December 2022 · Season 42'};if(update.id==='e7d42138-c3d1-50cb-b666-61e56b35b3fe')return {...update.presentation,seasonLabel:'October 2022 · Q3'};const result=update.presentation||presentation[update.id]||{seasonLabel:null,changes:{}};return update.id==='08fc975e-b81d-5767-a1e3-83e716be6662'?{...result,seasonLabel:'November 2021 · Season 29'}:result;}
 function changePresentation(update,change){
- const single=change.before==null||['','—','-'].includes(change.before);
+ const single=change.unit==='relative'||change.before==null||['','—','-'].includes(change.before);
  const unit=change.unit==='value'&&/\n[\d.]+ tiles\n[\d.]+ tiles?$/.test(change.quote||'')?' tiles':change.unit==='seconds'?' s':change.unit==='tiles'?' tiles':change.unit==='percent'?'%':change.unit==='elixir'?' elixir':'';
  const sourceLines=(change.quote||'').split('\n').map(s=>s.trim());
  const evolutionBonus=change.formType==='evolution'&&/Bonus Multiplier$/.test(change.stat);
@@ -53,9 +55,11 @@ function changePresentation(update,change){
  let note=update.id==='08fc975e-b81d-5767-a1e3-83e716be6662'&&change.cardName==='Skeleton King'&&change.stat==='Pushback'&&update.excerpt.includes('immunity doesn’t work against The Log')?'Except The Log':null;
  const quotedPercent=(single?change.quote:sourceLines.slice(0,Math.max(1,sourceLines.length-2)).join(' '))?.match(/([+-]\s*\d+(?:\.\d+)?)%/);
  let percent=quotedPercent?quotedPercent[1].replace(/\s/g,'')+'%':null;
+ if(change.unit==='relative')percent=String(change.after).match(/[+-]\d+(?:\.\d+)?%/)?.[0]||percent;
  const novemberPercent={'3ba1c0e4-a30a-53a3-b5b5-946b001bd3ce':['Damage\n                    -10%','-10%'],'5a5ef8bf-a5e6-5e30-8354-0684cef4b84b':['Egg Hit Points (HP)\n                    -34%','-34%']}[change.id];
  if(novemberPercent&&update.excerpt?.includes(novemberPercent[0]))percent=novemberPercent[1];
  if(change.id==='bd4dd330-d566-5640-aec4-16ba6d8d3089')percent='-7.6%';
+ if(january2024Proofs[change.id])percent=null;
  if(change.id==='3c46ffe7-8a26-50c5-98e7-c2e8dbe8f921')percent=null;
  if(change.id==='b783f089-5aec-5dea-b3d1-66deb6c6c5d8')percent=null;
  if(!percent&&change.stat==='Movement Speed'){const a=String(change.before).match(/\((\d+)\)/),b=String(change.after).match(/\((\d+)\)/);if(a&&b&&Number(a[1])>0){const delta=Number(((Number(b[1])/Number(a[1])-1)*100).toFixed(1));percent=(delta>0?'+':'')+delta+'%';}}

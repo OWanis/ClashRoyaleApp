@@ -118,3 +118,8 @@ test('Season 54 Power Shot damage is verified against the Level 11 release scree
  const raw=HISTORY_DATA.updates.find(u=>u.id==='58f6106c-b535-51ff-885e-6ab216b6ac26'),u=HistoryModel.verifiedUpdate(raw),c=u.changes.find(c=>c.stat==='Power Shot Damage');assert.equal(HistoryModel.level11Values(u,c),true);assert.deepEqual([c.before,c.after],[215,184]);assert.match(c.levelVerification.imageSha256,/^[a-f0-9]{64}$/);assert.equal(raw.changes.find(c=>c.stat==='Power Shot Damage').levelReference,undefined);
  const d=HistoryModel.changePresentation(u,c);assert.deepEqual([d.before,d.after,d.percent],['215','184','-15%']);const goblin=HistoryModel.changePresentation(u,u.changes.find(c=>c.cardName==='Goblin Giant'));assert.equal(goblin.after,'1/1.7 hits/sec');
 });
+test('January 2024 verified values display while unverified charge stays relative-only',()=>{
+ const raw=HISTORY_DATA.updates.find(u=>u.effectiveDate==='2024-01-03'),u=HistoryModel.verifiedUpdate(raw);assert.equal(u.changes.filter(c=>c.levelVerification).length,6);
+ const lp=u.changes.filter(c=>c.cardName==='Little Prince');assert.deepEqual(lp.map(c=>[c.before,c.after]),[[1800,1600],[110,100]]);assert.ok(lp.every(c=>HistoryModel.level11Values(u,c)));
+ const recruits=HistoryModel.changePresentation(u,u.changes.find(c=>c.cardName==='Royal Recruits'));assert.equal(recruits.percent,'-8%');assert.equal(recruits.single,true);
+});
