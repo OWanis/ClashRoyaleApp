@@ -96,3 +96,9 @@ test('Season 49 belongs to July while retaining its June 30 date and signed bonu
  const c=u.changes.find(c=>c.stat==='First Hit Speed'),d=HistoryModel.changePresentation(u,c);assert.deepEqual([d.before,d.after,d.percent],['1/0.6 sec⁻¹','1/0.65 sec⁻¹','-7.6%']);
  const card={name:'Firecracker',forms:[{id:'b',formType:'base'},{id:'e',formType:'evolution'},{id:'h',formType:'hero'}]};assert.deepEqual(HistoryModel.affectedForms(u,c,[{card}]),['b','e']);
 });
+test('Season 50 distinguishes rework directions, symbolic Tesla DPS and evolution HP bonuses',()=>{
+ const u=HISTORY_DATA.updates.find(u=>u.id==='0cee7cb8-cccd-536e-bcb3-bc8c9d6b6eba');const sk=u.changes.filter(c=>c.cardName==='Skeletons');assert.deepEqual(sk.map(c=>HistoryModel.changeCategory(u,c)),['buff','nerf']);assert.equal(HistoryModel.cardCategory(u,sk),'rework');
+ const tesla=HistoryModel.changePresentation(u,u.changes.find(c=>c.cardName==='Tesla'&&c.stat==='DPS'));assert.equal(tesla.symbolic,true);assert.equal(tesla.percent,'+9%');assert.equal(tesla.before,'DMG/1.2 sec⁻¹');
+ const fc=HistoryModel.changePresentation(u,u.changes.find(c=>c.cardName==='Firecracker'&&c.stat==='Hitpoints'));assert.equal(fc.note,'Evolution HP bonus reduced');assert.deepEqual([fc.before,fc.after],['435','394']);
+ const rg=HistoryModel.changePresentation(u,u.changes.find(c=>c.cardName==='Royal Giant'));assert.deepEqual([rg.rate.before,rg.rate.after],['+20%','+10%']);
+});

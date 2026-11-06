@@ -66,8 +66,12 @@ function changePresentation(update,change){
   if(match&&Number(match[3].slice(2))===change.before&&Number(match[4].slice(2))===change.after)rate={label:match[1],percent:match[2],before:match[3],after:match[4]};
  }
  if(change.unit==='seconds'){const timingNote=change.quote?.match(/(\d+(?:\.\d+)?) sec (faster|slower|sooner)/);if(timingNote)note=timingNote[1]+' s '+timingNote[2];}
- const symbolic=/DPS$/.test(change.stat)&&/^DMG\s*\/\s*\d+(?:\.\d+)?(?:\s+dmg\/sec)?$/.test(change.before)&&/^DMG\s*\/\s*\d+(?:\.\d+)?(?:\s+dmg\/sec)?$/.test(change.after);
+ const symbolic=/DPS$/.test(change.stat)&&/^DMG\s*\/\s*\d+(?:\.\d+)?(?:\s+(?:dmg\/sec|sec\s*-1))?$/.test(change.before)&&/^DMG\s*\/\s*\d+(?:\.\d+)?(?:\s+(?:dmg\/sec|sec\s*-1))?$/.test(change.after);
  if(update.id==='22d81425-fd9a-5c9b-9aa4-fcdc21347b01'&&change.cardName==='Rocket'&&change.stat==='Crown Tower Damage'&&/30%[\s\S]*25%/.test(update.excerpt))rate={label:'Crown Tower multiplier',before:'30%',after:'25%',percent:'-17%',unit:'of normal damage'};
+ if(update.id==='0cee7cb8-cccd-536e-bcb3-bc8c9d6b6eba'&&change.formType==='evolution'&&change.stat==='Hitpoints'){
+  if(change.cardName==='Royal Giant')rate={label:'Evolution HP bonus',before:'+20%',after:'+10%',percent:'',unit:'over Base'};
+  if(change.cardName==='Firecracker')note='Evolution HP bonus reduced';
+ }
  const season40Label=update.id==='8d353b91-7619-5f5e-9d1c-fd83be53fa1d'?({'Goblin Gang|Count':'Spear Goblin Count','Elixir Golem|EGolem 1 Hit Time':'Elixir Golem · Hit Time','Elixir Golem|EGolem 2 Hit Time':'Elixir Golemite · Hit Time','Elixir Golem|EGolem 3 Hit Time':'Elixir Blob · Hit Time','Cannon Cart|Destroyed HP':'Stationary Cannon · Hitpoints'}[change.cardName+'|'+change.stat]):null;
  return {symbolic,label:(change.cardName==='Phoenix'&&change.stat==='Egg Hit Points'?'Egg Hitpoints':null)||season40Label||(timing&&/^(Hit Speed|Hit Time)/.test(change.stat)?change.quote.match(/^(?:First )?Hit Time/)[0]:change.stat.replace(/\s+[+-](?:\s+\d+(?:\.\d+)?\s*sec)?$/, '')),rate,single,before:format(change.before),after:signed?signed[1].replace(/\s/g,'')+'%':format(change.after),note,percent:single&&change.unit==='percent'?null:percent};
 }
@@ -103,7 +107,8 @@ function changeCategory(update,change){
   if(['damage','hp','healing'].includes(change.unit))return change.after>change.before?'buff':'nerf';
   if(change.unit==='seconds'&&/hit speed|hit frequency|first hit|first attack|deploy time|deploy delay time|cooldown|cast time|cooking time|production speed|spawn rate|spawn pause|spawn time|spawn delay|spawn frequency|spawn interval|elixir generation/i.test(change.stat))return change.after<change.before?'buff':'nerf';
   if(change.unit==='seconds'&&/^life\s*time$/i.test(change.stat))return change.after>change.before?'buff':'nerf';
-  if(/^(death spawn|spawns per wave|spawn count(?: per wave)?|total spawned|count)$/i.test(change.stat))return change.after>change.before?'buff':'nerf';
+  if(/^(death spawn|spawns per wave|spawn count(?: per wave)?|total spawned|max count|count)$/i.test(change.stat))return change.after>change.before?'buff':'nerf';
+  if(/^cycles?$/i.test(change.stat))return change.after<change.before?'buff':'nerf';
   if(change.unit==='elixir')return /destruction|generation|production|produced/i.test(change.stat)?(change.after>change.before?'buff':'nerf'):(change.after<change.before?'buff':'nerf');
  }
  return category;
