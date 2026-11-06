@@ -153,3 +153,18 @@ test('Season 59 shared icons replace duplicate rows and retain separate Evolutio
  const fire=visible.filter(c=>c.cardName==='Firecracker');assert.deepEqual(fire.map(c=>HistoryModel.changeCategory(u,c)),['nerf','buff','buff','buff']);assert.deepEqual(fire.map(c=>HistoryModel.changePresentation(u,c).percent),['-23%','+20%','+25%',null]);
  const zap=HistoryModel.changePresentation(u,u.changes.find(c=>c.cardName==='Zap'));assert.notEqual(zap.note,'Bonus over Base');
 });
+test('Season 60 fills values, fixes units and shares the Spear Goblin buff',()=>{
+ const raw=HISTORY_DATA.updates.find(u=>u.effectiveDate==='2024-06-16'),u=HistoryModel.verifiedUpdate(raw),visible=HistoryModel.displayChanges(u.changes);
+ const find=(name,stat)=>u.changes.find(c=>c.cardName===name&&c.stat===stat);
+ for(const [name,stat,a,b]of [['Little Prince','Ability Damage',399,207],['Little Prince','Guardian First Hit Time',.2,.5],['Tesla','Electro Pulse Stun Duration',1,.5],['Tesla','Electro Pulse Damage',192,148],['Spear Goblins','First Hit Time',.5,.3],['Dart Goblin','Damage',131,142],['Goblin Cage','Cage Hitpoints',742,780],['Void','First Hit Time',.4,1],['Void','Hit Speed',.667,.769],['Dagger Duchess','Damage',153,112],['Dagger Duchess','Hit Speed',.606,.8],['Dagger Duchess','Daggers Stored',8,6]]){const c=find(name,stat);assert.deepEqual([c.before,c.after],[a,b]);assert.ok(HistoryModel.level11Values(u,c));}
+ assert.deepEqual(HistoryModel.relatedCards(u,find('Spear Goblins','First Hit Time')).map(c=>c.name),['Spear Goblins','Goblin Gang','Goblin Giant','Goblin Hut']);assert.equal(visible.filter(c=>['Goblin Gang','Goblin Giant','Goblin Hut'].includes(c.cardName)).length,0);
+ const knight=HistoryModel.changePresentation(u,find('Knight','Hitpoint Multiplier'));assert.deepEqual([knight.before,knight.after,knight.percent],['+10%','0%','-9%']);
+ assert.deepEqual(visible.filter(c=>c.cardName==='Void').map(c=>HistoryModel.changeSymbol(u,c)),['↓','↑']);assert.equal(HistoryModel.cardCategory(u,visible.filter(c=>c.cardName==='Void')),'rework');
+ assert.equal(HistoryModel.changePresentation(u,find('Little Prince','Ability Knockback')).percent,'-20%');
+ assert.equal(raw.changes.find(c=>c.stat==='Guardian First Hit Speed').before,2);assert.deepEqual(HistoryModel.verifiedUpdate(u),u);
+});
+test('June emergency adds announced Healer nerf and both Goblin Machine damage values',()=>{
+ const raw=HISTORY_DATA.updates.find(u=>u.effectiveDate==='2024-06-19'),u=HistoryModel.verifiedUpdate(raw),machine=u.changes.filter(c=>c.cardName==='Goblin Machine');assert.deepEqual(machine.map(c=>[c.before,c.after]),[[588,391],[588,195],[3.5,4]]);assert.ok(machine.every(c=>HistoryModel.level11Values(u,c)));
+ const healer=u.changes.find(c=>c.cardName==='Battle Healer');assert.deepEqual([healer.before,healer.after],[33,0]);assert.equal(healer.effectiveDateKnown,false);assert.match(HistoryModel.changePresentation(u,healer).note,/Already applied/);assert.equal(HistoryModel.verifiedUpdate(u).changes.length,u.changes.length);assert.equal(raw.changes.length,4);
+ const fixes=HISTORY_DATA.updates.find(u=>u.effectiveDate==='2024-06-17');assert.match(fixes.sourceUrl,/game-update-june-17/);assert.match(fixes.excerpt,/Fixed Tesla's behavior when it is frozen during deployment/);assert.equal(HistoryModel.changeSymbol(fixes,fixes.changes[0]),'⟳');
+});
