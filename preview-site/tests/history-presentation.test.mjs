@@ -102,3 +102,10 @@ test('Season 50 distinguishes rework directions, symbolic Tesla DPS and evolutio
  const fc=HistoryModel.changePresentation(u,u.changes.find(c=>c.cardName==='Firecracker'&&c.stat==='Hitpoints'));assert.equal(fc.note,'Evolution HP bonus reduced');assert.deepEqual([fc.before,fc.after],['435','394']);
  const rg=HistoryModel.changePresentation(u,u.changes.find(c=>c.cardName==='Royal Giant'));assert.deepEqual([rg.rate.before,rg.rate.after],['+20%','+10%']);
 });
+test('Season 52 converts evolution multipliers into bonuses and preserves reciprocal units',()=>{
+ const u=HISTORY_DATA.updates.find(u=>u.id==='13db4bb9-f07c-5df3-a475-aaa59250b6d5');
+ const bonuses=u.changes.filter(c=>/Bonus Multiplier/.test(c.stat)).map(c=>HistoryModel.changePresentation(u,c));assert.deepEqual(bonuses.map(d=>[d.before,d.after]),[['+30%','+20%'],['+9%','0%'],['+30%','+25%']]);assert.ok(bonuses.every(d=>d.note==='Bonus over Base'));
+ const bomb=HistoryModel.changePresentation(u,u.changes.find(c=>c.cardName==='Bomb Tower'));assert.equal(bomb.rate.after,'1/1.8 sec⁻¹');
+ assert.deepEqual(u.changes.filter(c=>c.cardName==='Giant Snowball').map(c=>HistoryModel.changeCategory(u,c)),['buff','nerf']);
+ assert.equal(HistoryModel.changePresentation(u,u.changes.find(c=>c.cardName==='Magic Archer')).percent,'+60%');
+});
