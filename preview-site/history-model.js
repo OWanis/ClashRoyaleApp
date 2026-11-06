@@ -60,7 +60,8 @@ function changePresentation(update,change){
   const match=following.match(/^\s*((?:First )?Hit Speed)\s+([+-]\d+(?:\.\d+)?%)\s*(?:\(Faster\))?\s*\n(1\/[\d.]+)\s*\n(1\/[\d.]+)/);
   if(match&&Number(match[3].slice(2))===change.before&&Number(match[4].slice(2))===change.after)rate={label:match[1],percent:match[2],before:match[3],after:match[4]};
  }
- return {label:timing?change.quote.match(/^(?:First )?Hit Time/)[0]:change.stat.replace(/\s+[+-](?:\s+\d+(?:\.\d+)?\s*sec)?$/, ''),rate,single,before:format(change.before),after:signed?signed[1].replace(/\s/g,'')+'%':format(change.after),note,percent:single&&change.unit==='percent'?null:percent};
+ const season40Label=update.id==='8d353b91-7619-5f5e-9d1c-fd83be53fa1d'?({'Goblin Gang|Count':'Spear Goblin Count','Elixir Golem|EGolem 1 Hit Time':'Elixir Golem · Hit Time','Elixir Golem|EGolem 2 Hit Time':'Elixir Golemite · Hit Time','Elixir Golem|EGolem 3 Hit Time':'Elixir Blob · Hit Time','Cannon Cart|Destroyed HP':'Stationary Cannon · Hitpoints'}[change.cardName+'|'+change.stat]):null;
+ return {label:season40Label||(timing?change.quote.match(/^(?:First )?Hit Time/)[0]:change.stat.replace(/\s+[+-](?:\s+\d+(?:\.\d+)?\s*sec)?$/, '')),rate,single,before:format(change.before),after:signed?signed[1].replace(/\s/g,'')+'%':format(change.after),note,percent:single&&change.unit==='percent'?null:percent};
 }
 function elixirStages(update,changes){
  if(update.id!=='f9672f7f-6950-58dc-ab65-0d896a696675'||!changes.every(c=>c.cardName==='Elixir Golem'))return [];
@@ -83,9 +84,9 @@ function changeCategory(update,change){
  // explicitly labeled reworks/fixes retain the source classification.
  if(['buff','nerf','rework'].includes(category)&&Number.isFinite(change.before)&&Number.isFinite(change.after)&&change.before!==change.after){
   if(['damage','hp','healing'].includes(change.unit))return change.after>change.before?'buff':'nerf';
-  if(change.unit==='seconds'&&/hit speed|hit frequency|first hit|first attack|deploy time|cooldown|cast time|cooking time|production speed|spawn rate|spawn pause|elixir generation/i.test(change.stat))return change.after<change.before?'buff':'nerf';
-  if(change.unit==='seconds'&&/^lifetime$/i.test(change.stat))return change.after>change.before?'buff':'nerf';
-  if(/^(death spawn|spawns per wave)$/i.test(change.stat))return change.after>change.before?'buff':'nerf';
+  if(change.unit==='seconds'&&/hit speed|hit frequency|first hit|first attack|deploy time|cooldown|cast time|cooking time|production speed|spawn rate|spawn pause|spawn time|elixir generation/i.test(change.stat))return change.after<change.before?'buff':'nerf';
+  if(change.unit==='seconds'&&/^life\s*time$/i.test(change.stat))return change.after>change.before?'buff':'nerf';
+  if(/^(death spawn|spawns per wave|spawn count|total spawned)$/i.test(change.stat))return change.after>change.before?'buff':'nerf';
   if(change.unit==='elixir')return /destruction|generation|production|produced/i.test(change.stat)?(change.after>change.before?'buff':'nerf'):(change.after<change.before?'buff':'nerf');
  }
  return category;

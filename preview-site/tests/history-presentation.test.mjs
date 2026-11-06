@@ -47,3 +47,9 @@ test('August Elixir Golem totals belong to their stages, with Level 11 HP',()=>{
  const fireball=u.changes.find(c=>c.cardName==='Fireball');assert.equal(HistoryModel.changePresentation(u,fireball).percent,'-44%');
  assert.equal(HistoryModel.changePresentation(u,u.changes.find(c=>c.cardName==='Prince')).after,'3 tiles');
 });
+test('Season 40 names the affected component and colors individual Hut changes',()=>{
+ const u=HISTORY_DATA.updates.find(u=>u.effectiveDate==='2022-09-29');
+ const gang=u.changes.find(c=>c.cardName==='Goblin Gang'),d=HistoryModel.changePresentation(u,gang);assert.equal(d.label,'Spear Goblin Count');assert.deepEqual([d.before,d.after,d.percent],['2','3','+50%']);
+ for(const [stat,category]of [['Elixir Cost','buff'],['Spawn Time','nerf'],['Spawn Count','buff'],['Life Time','nerf'],['Death Spawn','nerf'],['Total Spawned','nerf']])assert.equal(HistoryModel.changeCategory(u,u.changes.find(c=>c.cardName==='Barbarian Hut'&&c.stat===stat)),category);
+ assert.equal(HistoryModel.changePresentation(u,u.changes.find(c=>c.cardName==='Cannon Cart')).label,'Stationary Cannon · Hitpoints');
+});
