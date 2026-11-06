@@ -40,15 +40,28 @@ function snapshotPatches(update){
  }
  return [...groups.values()];
 }
-function updatePresentation(update){return update.presentation||presentation[update.id]||{seasonLabel:null,changes:{}};}
+function updatePresentation(update){const result=update.presentation||presentation[update.id]||{seasonLabel:null,changes:{}};return update.id==='08fc975e-b81d-5767-a1e3-83e716be6662'?{...result,seasonLabel:'November 2021 · Season 29'}:result;}
+function changePresentation(update,change){
+ const single=change.before==null||['','—','-'].includes(change.before);
+ const unit=change.unit==='seconds'?' s':change.unit==='tiles'?' tiles':change.unit==='percent'?'%':change.unit==='elixir'?' elixir':'';
+ const format=value=>typeof value==='number'?String(value)+unit:String(value??'');
+ const signed=single&&change.unit==='percent'?change.quote?.match(/([+-]\s*\d+(?:\.\d+)?)%/):null;
+ const note=update.id==='08fc975e-b81d-5767-a1e3-83e716be6662'&&change.cardName==='Skeleton King'&&change.stat==='Pushback'&&update.excerpt.includes('immunity doesn’t work against The Log')?'Except The Log':null;
+ const quotedPercent=change.quote?.match(/([+-]\s*\d+(?:\.\d+)?)%/);
+ let percent=quotedPercent?quotedPercent[1].replace(/\s/g,'')+'%':null;
+ if(!percent&&level11Values(update,change)&&Number.isFinite(change.before)&&Number.isFinite(change.after)&&change.before!==0&&change.before!==change.after){const delta=(change.after-change.before)/Math.abs(change.before)*100;const rounded=Number(delta.toFixed(1));percent=(rounded>0?'+':'')+rounded+'%';}
+ return {single,before:format(change.before),after:signed?signed[1].replace(/\s/g,'')+'%':format(change.after),note,percent:single&&change.unit==='percent'?null:percent};
+}
 function changeCategory(update,change){
  const category=change.classification||updatePresentation(update).changes?.[change.id]||'unclassified';
  // Some source sections group mixed changes under one heading. Only reverse a
  // heading for a stat whose benefit direction is unambiguous; mass/range and
  // explicitly labeled reworks/fixes retain the source classification.
- if(['buff','nerf'].includes(category)&&Number.isFinite(change.before)&&Number.isFinite(change.after)&&change.before!==change.after){
+ if(['buff','nerf','rework'].includes(category)&&Number.isFinite(change.before)&&Number.isFinite(change.after)&&change.before!==change.after){
   if(['damage','hp','healing'].includes(change.unit))return change.after>change.before?'buff':'nerf';
-  if(change.unit==='seconds'&&/hit speed|hit frequency|first hit|first attack|deploy time|cooldown|cast time|cooking time|production speed/i.test(change.stat))return change.after<change.before?'buff':'nerf';
+  if(change.unit==='seconds'&&/hit speed|hit frequency|first hit|first attack|deploy time|cooldown|cast time|cooking time|production speed|spawn rate/i.test(change.stat))return change.after<change.before?'buff':'nerf';
+  if(change.unit==='seconds'&&/^lifetime$/i.test(change.stat))return change.after>change.before?'buff':'nerf';
+  if(/^(death spawn|spawns per wave)$/i.test(change.stat))return change.after>change.before?'buff':'nerf';
   if(change.unit==='elixir')return change.after<change.before?'buff':'nerf';
  }
  return category;
@@ -200,5 +213,5 @@ function historicalReferences(update,templates,history=root.HISTORY_DATA?.update
  return [...states.values()];
 }
 
-root.HistoryModel={verifiedUpdate,HISTORY_START,inScope,level11Values,historicalReferences,timelineGroups,updatePresentation,changeCategory,cardCategory,damageChanges,compare,additionalStats,changeKind,referenceForChange,affectedForms,detectCrossings};
+root.HistoryModel={changePresentation,verifiedUpdate,HISTORY_START,inScope,level11Values,historicalReferences,timelineGroups,updatePresentation,changeCategory,cardCategory,damageChanges,compare,additionalStats,changeKind,referenceForChange,affectedForms,detectCrossings};
 })(globalThis);

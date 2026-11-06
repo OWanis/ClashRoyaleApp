@@ -4,11 +4,11 @@ import {readFileSync} from 'node:fs';
 import '../history-data.js';import '../history-verifications.js';import '../one-shot-model.js';import '../history-model.js';
 const cards=JSON.parse(readFileSync(new URL('../index.html',import.meta.url),'utf8').match(/<script id="catalog-data" type="application\/json">(.*?)<\/script>/s)[1]).cards;
 const rows=OneShot.build(cards).rows;
-test('seven independently reproduced deltas resolve without changing raw imported notes',()=>{
+test('eight independently reproduced deltas resolve without changing raw imported notes',()=>{
  const raw=HISTORY_DATA.updates.find(u=>u.effectiveDate==='2021-12-07'),before=JSON.stringify(raw),resolved=HistoryModel.verifiedUpdate(raw);
- assert.equal(resolved.changes.filter(c=>c.levelVerification).length,7);assert.equal(JSON.stringify(raw),before);
+ assert.equal(resolved.changes.filter(c=>c.levelVerification).length,8);assert.equal(JSON.stringify(raw),before);
  const dart=resolved.changes.find(c=>c.cardName==='Dart Goblin');assert.equal(dart.levelReference,11);assert.deepEqual([dart.before,dart.after],[120,131]);
- assert.equal(resolved.changes.find(c=>c.cardName==='Battle Ram').levelReference,undefined,'charge multiplier not assumed');
+ const ram=resolved.changes.find(c=>c.cardName==='Battle Ram');assert.equal(ram.levelReference,11);assert.ok(ram.levelVerification.evidence.every(e=>e.field==='DamageSpecial'),'special damage directly measured, no assumed charge multiplier');
  const altered=structuredClone(raw);altered.changes.find(c=>c.cardName==='Dart Goblin').after++;assert.equal(HistoryModel.verifiedUpdate(altered).changes.find(c=>c.cardName==='Dart Goblin').levelReference,undefined,'proof cannot attach to different numbers');
 });
 test('all supplemental facts retain exact source arithmetic, hashes and immutable URLs',()=>{

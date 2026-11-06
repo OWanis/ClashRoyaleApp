@@ -39,3 +39,6 @@ for(const a of historicalArt){
  if(bytes.length!==a.bytes||createHash('sha256').update(bytes).digest('hex')!==a.sha256)throw Error('Historical artwork checksum mismatch');
  await writeFile('public/historical-art/'+a.filename,bytes);
 }
+
+await mkdir('public/fonts',{recursive:true});
+for(const file of ['BarlowCondensed-ExtraBold.ttf','OFL.txt'])await copyFile('fonts/'+file,'public/fonts/'+file);

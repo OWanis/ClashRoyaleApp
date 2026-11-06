@@ -55,7 +55,7 @@ test('source classifications drive colors instead of numeric direction; season l
  assert.equal(HistoryModel.cardCategory(update,update.changes.filter(c=>c.cardName==='Skeleton Barrel')),'rework');
  assert.equal(HistoryModel.updatePresentation({id:'unknown'}).seasonLabel,null);
  assert.equal(HistoryModel.changeCategory(update,{id:'unknown'}),'unclassified');
- assert.deepEqual(update.changes.reduce((n,c)=>{const k=HistoryModel.changeCategory(update,c);n[k]=(n[k]||0)+1;return n;},{}),{nerf:5,buff:4,rework:3});
+ assert.deepEqual(update.changes.reduce((n,c)=>{const k=HistoryModel.changeCategory(update,c);n[k]=(n[k]||0)+1;return n;},{}),{nerf:6,buff:5,rework:1});
 });
 test('2026 archive keeps all patch dates, explicit source quotes and unknown levels',()=>{
  const year=HISTORY_DATA.updates.filter(u=>u.effectiveDate.startsWith('2026'));assert.equal(year.length,16);assert.equal(year.reduce((n,u)=>n+u.changes.length,0),296);
