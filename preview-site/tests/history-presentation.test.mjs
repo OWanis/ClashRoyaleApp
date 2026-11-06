@@ -17,3 +17,9 @@ test('December changes show individual directions and sourced or calculated perc
  const ram=u.changes.find(c=>c.cardName==='Battle Ram');assert.equal(HistoryModel.level11Values(u,ram),true);assert.deepEqual([HistoryModel.changePresentation(u,ram).before,HistoryModel.changePresentation(u,ram).after,HistoryModel.changePresentation(u,ram).percent],['530','572','+8%']);
  const ice=u.changes.find(c=>c.cardName==='Ice Wizard');assert.equal(HistoryModel.changePresentation(u,ice).single,true);
 });
+test('February timing breakdown preserves reciprocal rates and relative-only first hit speed',()=>{
+ const u=HISTORY_DATA.updates.find(u=>u.effectiveDate==='2022-02-03');
+ for(const [name,before,after,percent]of [['Balloon','1/3','1/2','+50%'],['Mini P.E.K.K.A','1/1.7','1/1.6','+6%'],['Musketeer','1/1.1','1/1','+10%']]){const c=u.changes.find(c=>c.cardName===name&&c.unit==='seconds'),d=HistoryModel.changePresentation(u,c);assert.equal(d.label,'Hit Time');assert.deepEqual(d.rate,{label:'Hit Speed',before,after,percent});assert.equal(HistoryModel.changeCategory(u,c),'buff');}
+ const inferno=HistoryModel.changePresentation(u,u.changes.find(c=>c.cardName==='Inferno Tower'));assert.equal(inferno.single,true);assert.equal(inferno.after,'+25%');assert.equal(inferno.rate,null);
+ const balloon=u.changes.find(c=>c.cardName==='Balloon'&&c.unit==='damage');assert.deepEqual([balloon.before,balloon.after],[960,640]);
+});

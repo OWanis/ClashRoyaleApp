@@ -50,7 +50,16 @@ function changePresentation(update,change){
  const quotedPercent=change.quote?.match(/([+-]\s*\d+(?:\.\d+)?)%/);
  let percent=quotedPercent?quotedPercent[1].replace(/\s/g,'')+'%':null;
  if(!percent&&level11Values(update,change)&&Number.isFinite(change.before)&&Number.isFinite(change.after)&&change.before!==0&&change.before!==change.after){const delta=(change.after-change.before)/Math.abs(change.before)*100;const rounded=Number(delta.toFixed(1));percent=(rounded>0?'+':'')+rounded+'%';}
- return {single,before:format(change.before),after:signed?signed[1].replace(/\s/g,'')+'%':format(change.after),note,percent:single&&change.unit==='percent'?null:percent};
+ // Preserve the source's distinction between seconds per hit and hits per second.
+ let rate=null;
+ const timing=change.unit==='seconds'&&/^(First )?Hit Time\b/.test(change.quote||'');
+ if(timing&&change.before>0&&change.after>0){
+  const at=(update.excerpt||'').indexOf(change.quote);
+  const following=at<0?'':update.excerpt.slice(at+change.quote.length,at+change.quote.length+120);
+  const match=following.match(/^\s*((?:First )?Hit Speed)\s+([+-]\d+(?:\.\d+)?%)\s*(?:\(Faster\))?\s*\n(1\/[\d.]+)\s*\n(1\/[\d.]+)/);
+  if(match&&Number(match[3].slice(2))===change.before&&Number(match[4].slice(2))===change.after)rate={label:match[1],percent:match[2],before:match[3],after:match[4]};
+ }
+ return {label:timing?change.quote.match(/^(?:First )?Hit Time/)[0]:change.stat,rate,single,before:format(change.before),after:signed?signed[1].replace(/\s/g,'')+'%':format(change.after),note,percent:single&&change.unit==='percent'?null:percent};
 }
 function changeCategory(update,change){
  const category=change.classification||updatePresentation(update).changes?.[change.id]||'unclassified';
