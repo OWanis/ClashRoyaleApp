@@ -58,3 +58,8 @@ test('October Q3 label and Goblin shared first-hit changes remain explicit',()=>
  const count=u.changes.find(c=>c.stat==='Count');assert.equal(HistoryModel.changeCategory(u,count),'buff');
  const gang=u.changes.find(c=>c.cardName==='Goblin Gang');assert.equal(HistoryModel.changePresentation(u,gang).label,'Goblin · First Hit Time');assert.equal(HistoryModel.changePresentation(u,gang).percent,'+100%');assert.equal(HistoryModel.relatedCards(u,gang).length,4);
 });
+test('November emergency updates retain source dates, percentages and nerf directions',()=>{
+ const first=HISTORY_DATA.updates.find(u=>u.effectiveDate==='2022-11-02'),second=HISTORY_DATA.updates.find(u=>u.effectiveDate==='2022-11-21');assert.equal(first.sourceUrl,'https://royaleapi.com/blog/season41');assert.match(first.excerpt,/applied on Wednesday, November 2/);
+ assert.deepEqual(first.changes.map(c=>HistoryModel.changePresentation(first,c).percent),['-10%','+7.5%','+13%']);assert.ok(first.changes.every(c=>HistoryModel.changeCategory(first,c)==='nerf'));
+ const egg=HistoryModel.changePresentation(second,second.changes[0]);assert.deepEqual([egg.label,egg.before,egg.after,egg.percent],['Egg Hitpoints','363','239','-34%']);
+});
