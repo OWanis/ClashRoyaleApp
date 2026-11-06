@@ -68,3 +68,9 @@ test('December groups run earliest first and Mighty Miner reversal is a mixed re
  const last=items.find(u=>u.effectiveDate==='2022-12-22');assert.equal(last.sourceUrl,'https://royaleapi.com/blog/season43');assert.equal(HistoryModel.cardCategory(last,last.changes),'rework');assert.deepEqual(last.changes.map(c=>HistoryModel.changeCategory(last,c)),['nerf','buff']);assert.equal(HistoryModel.changePresentation(last,last.changes[0]).percent,'-33.3%');
  const first=items.find(u=>u.effectiveDate==='2022-12-07');assert.equal(HistoryModel.changePresentation(first,first.changes.find(c=>c.cardName==='Mighty Miner')).percent,'+50%');
 });
+import '../release-data.js';
+test('Valkyrie Evolution stays in January 2024 Season 55 despite the source title typo',()=>{
+ const u=RELEASE_DATA.updates.find(u=>u.id==='release-valkyrie-evolution-2024-january');assert.equal(u.effectiveDate,'2024-01-01');assert.equal(u.seasonMonth,'2024-01');assert.equal(u.presentation.seasonLabel,'January 2024 · Season 55');assert.match(u.seasonCorrection.quote,/January 1, 2024/);
+ const groups=HistoryModel.timelineGroups([...HISTORY_DATA.updates,...RELEASE_DATA.updates],'season');assert.equal(groups.find(g=>g.items.some(i=>i.id===u.id)).key,'2024-01');
+ for(const group of groups)for(const item of group.items)assert.equal(group.key.slice(0,4),item.effectiveDate.slice(0,4),'Cross-year season assignment requires explicit review: '+item.id);
+});
