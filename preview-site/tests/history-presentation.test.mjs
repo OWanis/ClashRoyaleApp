@@ -109,3 +109,8 @@ test('Season 52 converts evolution multipliers into bonuses and preserves recipr
  assert.deepEqual(u.changes.filter(c=>c.cardName==='Giant Snowball').map(c=>HistoryModel.changeCategory(u,c)),['buff','nerf']);
  assert.equal(HistoryModel.changePresentation(u,u.changes.find(c=>c.cardName==='Magic Archer')).percent,'+60%');
 });
+test('Season 53 Effective DPS is a signed standalone nerf and rates have no extra seconds suffix',()=>{
+ const u=HISTORY_DATA.updates.find(u=>u.effectiveDate==='2023-11-13');const d=HistoryModel.changePresentation(u,u.changes.find(c=>c.stat==='Effective DPS'));assert.deepEqual([d.single,d.after,d.percent],[true,'-18%',null]);
+ const speed=HistoryModel.changePresentation(u,u.changes.find(c=>c.cardName==='Knight'&&c.stat==='Hit Speed'));assert.deepEqual([speed.before,speed.after],['1.11 hits/sec','0.909 hits/sec']);
+ const recruits=HistoryModel.changePresentation(u,u.changes.find(c=>c.cardName==='Royal Recruits'));assert.deepEqual([recruits.before,recruits.after],['+12%','+6%']);
+});
