@@ -131,3 +131,25 @@ test('Season 57 verifies HP, corrects source time units and separates rework dir
  const knight=HistoryModel.changePresentation(u,u.changes.find(c=>c.cardName==='Knight'&&c.stat==='Damage Multiplier'));assert.deepEqual([knight.before,knight.after,knight.percent],['+10%','0%','-9%']);
  const march18=HISTORY_DATA.updates.find(u=>u.effectiveDate==='2024-03-18');assert.match(march18.sourceUrl,/game-update-lucky-drops/);assert.match(march18.excerpt,/Evolved Skeletons are no longer inconsistently destroyed/);assert.match(march18.excerpt,/Fixed an interaction inconsistency between Tesla and Wall Breakers/);
 });
+test('Season 59 fills verified Level11 values and preserves raw evidence',()=>{
+ const raw=HISTORY_DATA.updates.find(u=>u.effectiveDate==='2024-05-07'),u=HistoryModel.verifiedUpdate(raw);
+ const expected=[['Archers','Power Shot Damage',184,215],['Royal Giant','Hitpoints',3072,3164],['Royal Recruits','Hitpoints',532,547],['Valkyrie','Tornado Damage',76,84],['Wall Breakers','Runner Damage',392,196],['Cannoneer','Damage',422,401],['Dagger Duchess','Hitpoints',3204,2768],['Poison','Crown Tower Damage per Second',28,23]];
+ for(const [name,stat,before,after] of expected){const c=u.changes.find(c=>c.cardName===name&&c.stat===stat);assert.ok(HistoryModel.level11Values(u,c),name);assert.deepEqual([c.before,c.after],[before,after]);assert.ok(c.levelVerification.method);}
+ assert.equal(raw.changes.find(c=>c.stat==='Power Shot Damage').unit,'relative');
+ const valk=HistoryModel.changePresentation(u,u.changes.find(c=>c.stat==='Tornado Damage'));assert.equal(valk.percent,'+11%');
+ const power=HistoryModel.changePresentation(u,u.changes.find(c=>c.stat==='Power Shot Damage'));assert.equal(power.percent,'+18%');
+ assert.equal(HistoryModel.updatePresentation(u).seasonLabel,'May 2024 · Season 59');
+});
+test('Season 59 shared icons replace duplicate rows and retain separate Evolution bonuses',()=>{
+ const u=HistoryModel.verifiedUpdate(HISTORY_DATA.updates.find(u=>u.effectiveDate==='2024-05-07')),visible=HistoryModel.displayChanges(u.changes);
+ assert.deepEqual(visible.filter(c=>c.cardName==='Battle Ram').map(c=>c.stat),['Heavy Troop Pushback']);
+ const barb=u.changes.find(c=>c.cardName==='Barbarians');assert.deepEqual(HistoryModel.relatedCards(u,barb).map(c=>[c.name,c.formType]),[['Barbarians','evolution'],['Battle Ram','evolution']]);
+ for(const name of ['Royal Giant','Royal Recruits']){
+  const changes=visible.filter(c=>c.cardName===name);assert.deepEqual(changes.map(c=>c.stat),['Hitpoints','Hitpoint Multiplier']);
+  const card={name,forms:[{id:'b',formType:'base'},{id:'e',formType:'evolution'},{id:'h',formType:'hero'}]};assert.deepEqual(HistoryModel.affectedForms(u,changes[0],[{card}]),['b','e']);
+  assert.deepEqual(changes.map(c=>HistoryModel.changeCategory(u,c)),['buff','nerf']);
+  const d=HistoryModel.changePresentation(u,changes[1]);assert.equal(d.after,'0%');assert.equal(d.rate.after,name==='Royal Giant'?'3164':'547');
+ }
+ const fire=visible.filter(c=>c.cardName==='Firecracker');assert.deepEqual(fire.map(c=>HistoryModel.changeCategory(u,c)),['nerf','buff','buff','buff']);assert.deepEqual(fire.map(c=>HistoryModel.changePresentation(u,c).percent),['-23%','+20%','+25%',null]);
+ const zap=HistoryModel.changePresentation(u,u.changes.find(c=>c.cardName==='Zap'));assert.notEqual(zap.note,'Bonus over Base');
+});

@@ -24,6 +24,8 @@ const presentation={
   }
 };
 const january2024Proofs={"37bfc981-f8bb-53e1-adc5-78d1fd93c075": [1800, 1600, "hp", "Little Prince release guide: Guardienne HP1800 compared to Knight1766 at tournament Level11."], "09195839-dd66-535d-a97b-ca5696e6e5b1": [110, 100, "damage", "Little Prince release guide explicitly states110 damage at tournament standard Level11."], "97f250e7-e06f-58e7-8c47-5dc6e578a95c": [3424, 3616, "hp", "Pinned March2023 game table GiantSkeleton HP2140 \u00d7160% Level11 =3424."], "358c07bc-e8b0-5951-9298-5fab2a9faed1": [240, 256, "hp", "Pinned March2023 SkeletonWarrior ShieldHitpoints150 \u00d7160% Level11 =240."], "a82962ba-4546-5168-a966-393243bffc28": [222, 230, "damage", "Pinned March2023 BombSkeletonProjectile Damage87 \u00d7256% Level11, floored =222."], "e5290bbd-5f0c-5f0f-af5a-5fe6d5353b58": [310, 335, "damage", "Pinned March2023 GoldenKnight DashDamage310 at Champion tournament Level11."]};
+const MAY_2024='211ab4b0-d0a4-5137-bc00-c9338c13af44';
+const may2024Proofs={"Archers|Power Shot Damage": [184, 215, "damage", "December2023 Level11 Power Shot is184. May restores the original2x multiplier; November2023 Level11 release screenshot shows215 at2x (not rounded184 \u00d71.18)."], "Royal Giant|Hitpoints": [3072, 3164, "hp", "Pinned March2023 RoyalGiant HP1200 \u00d7256% =3072 at Level11."], "Royal Recruits|Hitpoints": [532, 547, "hp", "Pinned March2023 Recruit HP208 \u00d7256%, floored =532 at Level11."], "Valkyrie|Tornado Damage": [76, 84, "damage", "RoyaleAPI January2024 release image evo-valkyrie-info-01.jpg explicitly labels Level11 with Tornado Damage76."], "Wall Breakers|Runner Damage": [392, 196, "damage", "May final graphic uses Level11 baselines: RoyalGiant3072, Valkyrie tornado76, Duchess3204 and Cannoneer422 independently match dated Level11 evidence. Runner damage392\u2192196 is retained from that same final graphic and official patch, not the earlier release-preview runner195."], "Cannoneer|Damage": [422, 401, "damage", "RoyaleAPI release comparison places422 damage alongside TowerPrincess109 damage/3052HP, matching Level11; April Duchess comparison repeats these values beside the explicitly Level11 Duchess3204."], "Dagger Duchess|Hitpoints": [3204, 2768, "hp", "RoyaleAPI April release screenshot s58-dagger-duchess-01-300-5.jpg explicitly shows Level11 and3204HP."], "Poison|Crown Tower Damage per Second": [28, 23, "dps", "May final graphic uses the corroborated Level11 baselines and reports224\u2192184 total Crown Tower Damage; over8seconds this is28\u219223 per second, matching Supercell."]};
 function verifiedUpdate(update){
  const proofs=root.HISTORY_VERIFICATIONS?.changes||{};
  return {...update,changes:update.changes.map(c=>{
@@ -35,6 +37,10 @@ function verifiedUpdate(update){
    }[c.id];
    if(hp&&c.unit==='hp'&&c.before===hp[0]&&c.after===hp[1])return {...c,levelReference:11,levelVerification:{level:11,method:hp[2]+' March final report supplies the matching before and changed after values.',sourceUrl:update.sourceUrl,referenceSources:[hp[3]]}};
    if(c.id==='117aac13-c953-50fa-a08c-03d7bed1f269'&&c.unit==='source notation')return {...c,before:0.8,after:0.7,unit:'seconds',sourceCorrection:{sourceUrl:'https://cdns3.royaleapi.com/static/img/blog/2024-03-season57/balance/v2-22c94fcc/s57-balance-02-72-1.jpg',reason:'Final v2 graphic shows First Hit Time 0.8 →0.7; article table incorrectly says 800/700 Seconds.'}};
+  }
+  if(update.id===MAY_2024){
+   const proof=may2024Proofs[c.cardName+'|'+c.stat];
+   if(proof&&((c.before===proof[0]&&c.after===proof[1])||(c.cardName==='Archers'&&c.unit==='relative')))return {...c,before:proof[0],after:proof[1],unit:proof[2],levelReference:11,levelVerification:{level:11,method:proof[3],sourceUrl:update.sourceUrl,referenceSources:['https://royaleapi.com/blog/season-59-balance','https://royaleapi.com/blog/archers-evolution-2023-november','https://royaleapi.com/blog/cannoneer-january-2024','https://royaleapi.com/blog/dagger-duchess-2024-april','https://royaleapi.com/blog/valkyrie-evolution-2024-january','https://github.com/smlbiobot/cr-csv/tree/899e45efc765fbf3902927bb2e37dc04a78f7823/assets/csv_logic']}};
   }
   const january=january2024Proofs[c.id];if(update.id==='a05cf451-cc2c-5d9d-8cae-efa053ee6a6e'&&january&&c.unit==='relative')return {...c,before:january[0],after:january[1],unit:january[2],levelReference:11,levelVerification:{level:11,sourceUrl:'https://royaleapi.com/blog/season-55-balance',method:january[3]+' The January report supplies the matching before value and changed after value.',referenceSources:['https://royaleapi.com/blog/little-prince-guide-2023-november','https://github.com/smlbiobot/cr-csv/tree/899e45efc765fbf3902927bb2e37dc04a78f7823/assets/csv_logic']}};
   if(update.id==='58f6106c-b535-51ff-885e-6ab216b6ac26'&&c.id==='7a7060d6-8adc-5d3a-a18b-7cd61e69740e'&&c.before===215&&c.after===184&&c.stat==='Power Shot Damage')return {...c,levelReference:11,levelVerification:{level:11,method:'RoyaleAPI release screenshot labels Level 11 and Showing Challenge Levels, with Power Shot Damage 215. December report matches that before value and gives 184 after.',sourceUrl:'https://royaleapi.com/blog/archers-evolution-2023-november',imageUrl:'https://cdns3.royaleapi.com/static/img/blog/2023-11-season53/archers-evo/v1-900c195c/evo-archers-info.jpg',imageSha256:'17f42c6fcad99446845b7b4ca4e7f8b7e0a6d69276b84db3fbb253ac9d61e1ec',balanceSourceUrl:update.sourceUrl}};
@@ -53,12 +59,12 @@ function snapshotPatches(update){
  }
  return [...groups.values()];
 }
-function updatePresentation(update){if(update.id==='80fa387d-c2eb-530a-a766-f1fcdb675eda')return {...update.presentation,seasonLabel:'December 2022 · Season 42'};if(update.id==='e7d42138-c3d1-50cb-b666-61e56b35b3fe')return {...update.presentation,seasonLabel:'October 2022 · Q3'};const result=update.presentation||presentation[update.id]||{seasonLabel:null,changes:{}};return update.id==='08fc975e-b81d-5767-a1e3-83e716be6662'?{...result,seasonLabel:'November 2021 · Season 29'}:result;}
+function updatePresentation(update){if(update.id===MAY_2024)return {...update.presentation,seasonLabel:'May 2024 · Season 59'};if(update.id==='80fa387d-c2eb-530a-a766-f1fcdb675eda')return {...update.presentation,seasonLabel:'December 2022 · Season 42'};if(update.id==='e7d42138-c3d1-50cb-b666-61e56b35b3fe')return {...update.presentation,seasonLabel:'October 2022 · Q3'};const result=update.presentation||presentation[update.id]||{seasonLabel:null,changes:{}};return update.id==='08fc975e-b81d-5767-a1e3-83e716be6662'?{...result,seasonLabel:'November 2021 · Season 29'}:result;}
 function changePresentation(update,change){
  const single=change.unit==='relative'||change.before==null||['','—','-'].includes(change.before);
- const unit=change.unit==='value'&&/\n[\d.]+ tiles\n[\d.]+ tiles?$/.test(change.quote||'')?' tiles':change.unit==='seconds'?' s':change.unit==='hits per second'?' hits/sec':change.unit==='tiles'?' tiles':change.unit==='percent'?'%':change.unit==='elixir'?' elixir':'';
+ const unit=change.unit==='value'&&/\n[\d.]+ tiles\n[\d.]+ tiles?$/.test(change.quote||'')?' tiles':change.unit==='seconds'?' s':change.unit==='hits per second'?' hits/sec':change.unit==='tiles'?' tiles':change.unit==='percent'?'%':change.unit==='multiplier'?'×':change.unit==='elixir'?' elixir':'';
  const sourceLines=(change.quote||'').split('\n').map(s=>s.trim());
- const evolutionBonus=change.formType==='evolution'&&/(?:Bonus|Damage|Hitpoint) Multiplier$/.test(change.stat);
+ const evolutionBonus=change.formType==='evolution'&&/^(?:.*Bonus|Damage|Hitpoint) Multiplier$/.test(change.stat);
  const format=value=>{if(evolutionBonus&&typeof value==='number'){const bonus=Number(((value-1)*100).toFixed(2));return (bonus>0?'+':'')+bonus+'%';}const signedValue=typeof value==='number'&&value>=0&&sourceLines.slice(1).some(line=>line==='+'+value+(change.unit==='percent'?'%':''));return typeof value==='number'?(signedValue?'+':'')+String(value)+unit:String(value??'').replace(/HP\/sec/g,/Hit Speed/.test(change.stat)?'hits/sec':'HP/sec').replace(/^([+-])\s+(?=\d)/,'$1').replace(/\bhits per sec\b/g,'hits/sec').replace(/\bsec\s+(?:\^\s*)?-1\b/g,'sec⁻¹').replace(/\btiles?\s+(?:\^\s*)?2\b/g,'tiles²');};
  const signed=single&&change.unit==='percent'?change.quote?.match(/([+-]\s*\d+(?:\.\d+)?)%/):null;
  let note=update.id==='08fc975e-b81d-5767-a1e3-83e716be6662'&&change.cardName==='Skeleton King'&&change.stat==='Pushback'&&update.excerpt.includes('immunity doesn’t work against The Log')?'Except The Log':null;
@@ -72,6 +78,11 @@ function changePresentation(update,change){
   const stat=change.stat==='Hitpoints'?'HP':change.stat==='Attack Rate'?'Hit Speed':change.stat==='Hitpoint Multiplier'?'HP Multiplier':change.stat;
   const i=sourceLines.indexOf(stat);if(i>=0&&/^[+-]\d+(?:\.\d+)?%$/.test(sourceLines[i+1]||''))percent=sourceLines[i+1];
   if(change.id==='117aac13-c953-50fa-a08c-03d7bed1f269')percent='-13%';
+ }
+ if(update.id===MAY_2024){
+  const labels={'Hitpoint Multiplier':change.cardName==='Royal Giant'||change.cardName==='Royal Recruits'?'Evolution Bonus Hit Points':'Bonus Hit Points','Hitpoints':change.cardName==='Royal Giant'||change.cardName==='Royal Recruits'?change.cardName+' Hit Points':'Hit Points','Crown Tower Damage per Second':'Crown Tower Damage/sec','Second and Third Zap Damage Multiplier':'2nd and 3rd Zap Damage'};
+  const label=labels[change.stat]||change.stat,index=sourceLines.findIndex(line=>line.endsWith(label+':'));
+  percent=index>=0?sourceLines[index+1]?.match(/[+-]\d+(?:\.\d+)?%/)?.[0]||null:null;
  }
  if(january2024Proofs[change.id])percent=null;
  if(change.id==='3c46ffe7-8a26-50c5-98e7-c2e8dbe8f921')percent=null;
@@ -97,7 +108,16 @@ function changePresentation(update,change){
  }
  const season40Label=update.id==='8d353b91-7619-5f5e-9d1c-fd83be53fa1d'?({'Goblin Gang|Count':'Spear Goblin Count','Elixir Golem|EGolem 1 Hit Time':'Elixir Golem · Hit Time','Elixir Golem|EGolem 2 Hit Time':'Elixir Golemite · Hit Time','Elixir Golem|EGolem 3 Hit Time':'Elixir Blob · Hit Time','Cannon Cart|Destroyed HP':'Stationary Cannon · Hitpoints'}[change.cardName+'|'+change.stat]):null;
  if(evolutionBonus)note='Bonus over Base';
- return {symbolic,label:(evolutionBonus?change.stat.replace(' Multiplier','').replace(/^(Damage|Hitpoint)$/, '$1 Bonus'):null)||(change.cardName==='Phoenix'&&change.stat==='Egg Hit Points'?'Egg Hitpoints':null)||season40Label||(timing&&/^(Hit Speed|Hit Time)/.test(change.stat)?change.quote.match(/^(?:First )?Hit Time/)[0]:change.stat.replace(/\s+[+-](?:\s+\d+(?:\.\d+)?\s*sec)?$/, '')),rate,single,before:format(change.before),after:signed?signed[1].replace(/\s/g,'')+'%':format(change.after),note,percent:single&&change.unit==='percent'?null:percent};
+ if(update.id===MAY_2024){
+  if(change.cardName==='Royal Giant'&&change.stat==='Hitpoint Multiplier')rate={label:'Total Evolution HP',before:'3379',after:'3164',percent:'',unit:'Level 11'};
+  if(change.cardName==='Royal Recruits'&&change.stat==='Hitpoint Multiplier')rate={label:'Total Evolution HP after both changes',single:true,after:'547',percent:'',unit:'Level 11'};
+  if(change.cardName==='Poison')note='Total Crown Tower damage over 8 s: 224 → 184';
+  if(change.cardName==='Poison')rate={label:'Crown Tower damage multiplier',before:'30%',after:'25%',percent:'',unit:'of normal damage'};
+  if(change.cardName==='Archers'&&change.stat==='Power Shot Damage')rate={label:'Power Shot multiplier',before:'1.7×',after:'2×',percent:'',unit:'normal damage'};
+  if(change.formType==='base'&&['Royal Giant','Royal Recruits'].includes(change.cardName))note='Shared base HP increase; Evolution bonus changes below.';
+ }
+
+ return {symbolic,label:(update.id===MAY_2024&&change.stat==='Bonus First Hit Speed'?'First Hit Time':null)||(evolutionBonus?change.stat.replace(' Multiplier','').replace(/^(Damage|Hitpoint)$/, '$1 Bonus'):null)||(change.cardName==='Phoenix'&&change.stat==='Egg Hit Points'?'Egg Hitpoints':null)||season40Label||(timing&&/^(Hit Speed|Hit Time)/.test(change.stat)?change.quote.match(/^(?:First )?Hit Time/)[0]:change.stat.replace(/\s+[+-](?:\s+\d+(?:\.\d+)?\s*sec)?$/, '')),rate,single,before:format(change.before),after:signed?signed[1].replace(/\s/g,'')+'%':format(change.after),note,percent:single&&change.unit==='percent'?null:percent};
 }
 function elixirStages(update,changes){
  if(update.id!=='f9672f7f-6950-58dc-ab65-0d896a696675'||!changes.every(c=>c.cardName==='Elixir Golem'))return [];
@@ -106,9 +126,11 @@ function elixirStages(update,changes){
  return stages.every(s=>s.release&&s.total)?stages:[];
 }
 function displayChanges(changes){
- const seen=new Set();return changes.filter(c=>{if(c.unit!=='seconds'||!/^Hit Time\b/.test(c.quote||''))return true;const key=[c.cardFormId,c.before,c.after].join('|');if(seen.has(key))return false;seen.add(key);return true;});
+ const hidden=new Set(['923a6dbc-6f75-5706-93e5-efe881adb77d','8334bb46-fe89-5776-b98e-f83e9ada5b46','387d5326-0fb6-5b05-a9c6-1c0896c6ea0c','c8234546-eb79-58f0-a8c6-1f16a334701d']);
+ const seen=new Set();return changes.filter(c=>{if(hidden.has(c.id))return false;if(c.unit!=='seconds'||!/^Hit Time\b/.test(c.quote||''))return true;const key=[c.cardFormId,c.before,c.after].join('|');if(seen.has(key))return false;seen.add(key);return true;});
 }
 function relatedCards(update,change){
+ if(update.id===MAY_2024&&change.cardName==='Barbarians'&&change.formType==='evolution')return [{name:'Barbarians',formType:'evolution',component:change.stat},{name:'Battle Ram',formType:'evolution',component:'Spawned Evolved Barbarian · '+change.stat}];
  if(update.id==='a669ce0a-8011-536b-b93a-5b3b2700f954'&&change.cardName==='Spear Goblins'&&change.stat==='Attack Range')return ['Spear Goblins','Goblin Hut','Goblin Gang','Goblin Giant'].map(name=>({name,component:name==='Goblin Giant'?'Spawned Spear Goblins · Attack Range':'Spear Goblins · Attack Range'}));
  if(update.id==='09a06b2b-1ba6-5f25-b791-adcd9f00a59c'&&['Minions','Minion Horde'].includes(change.cardName)&&change.stat==='Damage')return [{name:'Minions',component:'Damage'},{name:'Minion Horde',component:'Minion · Damage'}];
  if(update.id==='fd6b2a80-dd1d-5906-9213-1fbe80a72b1c'&&change.cardName==='Rage')return [{name:'Rage',component:change.stat},{name:'Lumberjack',component:'Dropped Rage · '+change.stat}];
@@ -120,6 +142,11 @@ function relatedCards(update,change){
  return [];
 }
 function changeCategory(update,change){
+ if(update.id===MAY_2024){
+  if(change.unit==='multiplier'&&change.before!==change.after)return change.after>change.before?'buff':'nerf';
+  if(['Power Shot Damage','Boost Duration','Big Sparks Duration','Small Sparks Duration','Movement Slowdown','Death Electro Pulse','Runner Speed'].includes(change.stat))return 'buff';
+ }
+
  if(update.id==='d213d8e9-d8ff-543d-b11d-7763b5302892'&&change.cardName==='Goblin Drill'&&change.stat==='Duration')return 'buff';
  if(update.id==='e6f01b25-e110-5aa4-bb9b-c6b8fa7b1d79'&&change.cardName==='Goblins'&&change.stat==='Deploy Delay Speed')return 'nerf';
  if(update.id==='80fa387d-c2eb-530a-a766-f1fcdb675eda'&&change.cardName==='Mighty Miner')return change.stat==='Hitpoints'?'buff':change.stat==='Movement Speed'?'nerf':'rework';
@@ -195,6 +222,7 @@ function coreStat(change){
  return null;
 }
 function affectedForms(update,change,rows,history=root.HISTORY_DATA?.updates||[update]){
+ if(update.id===MAY_2024&&['Royal Giant','Royal Recruits'].includes(change.cardName)&&change.formType==='base'&&change.stat==='Hitpoints'){const card=rows.find(r=>r.card.name===change.cardName)?.card;return card?card.forms.filter(f=>['base','evolution'].includes(f.formType)).map(f=>f.id):[change.cardFormId];}
  if(update.id==='cee95369-b297-546b-8735-813c2d076d67'&&change.cardName==='Firecracker'&&/^First Hit/.test(change.stat)){const card=rows.find(r=>r.card.name==='Firecracker')?.card;return card?card.forms.filter(f=>['base','evolution'].includes(f.formType)).map(f=>f.id):[change.cardFormId];}
  const source=referenceForChange(change,rows),forms=[change.cardFormId],kind=coreStat(change);
  if(!kind||source?.panelKind!=='main')return forms;
