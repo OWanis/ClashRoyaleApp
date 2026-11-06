@@ -114,3 +114,7 @@ test('Season 53 Effective DPS is a signed standalone nerf and rates have no extr
  const speed=HistoryModel.changePresentation(u,u.changes.find(c=>c.cardName==='Knight'&&c.stat==='Hit Speed'));assert.deepEqual([speed.before,speed.after],['1.11 hits/sec','0.909 hits/sec']);
  const recruits=HistoryModel.changePresentation(u,u.changes.find(c=>c.cardName==='Royal Recruits'));assert.deepEqual([recruits.before,recruits.after],['+12%','+6%']);
 });
+test('Season 54 Power Shot damage is verified against the Level 11 release screenshot',()=>{
+ const raw=HISTORY_DATA.updates.find(u=>u.id==='58f6106c-b535-51ff-885e-6ab216b6ac26'),u=HistoryModel.verifiedUpdate(raw),c=u.changes.find(c=>c.stat==='Power Shot Damage');assert.equal(HistoryModel.level11Values(u,c),true);assert.deepEqual([c.before,c.after],[215,184]);assert.match(c.levelVerification.imageSha256,/^[a-f0-9]{64}$/);assert.equal(raw.changes.find(c=>c.stat==='Power Shot Damage').levelReference,undefined);
+ const d=HistoryModel.changePresentation(u,c);assert.deepEqual([d.before,d.after,d.percent],['215','184','-15%']);const goblin=HistoryModel.changePresentation(u,u.changes.find(c=>c.cardName==='Goblin Giant'));assert.equal(goblin.after,'1/1.7 hits/sec');
+});

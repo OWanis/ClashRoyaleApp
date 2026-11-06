@@ -25,7 +25,9 @@ const presentation={
 };
 function verifiedUpdate(update){
  const proofs=root.HISTORY_VERIFICATIONS?.changes||{};
- return {...update,changes:update.changes.map(c=>{const proof=proofs[c.id];
+ return {...update,changes:update.changes.map(c=>{
+  if(update.id==='58f6106c-b535-51ff-885e-6ab216b6ac26'&&c.id==='7a7060d6-8adc-5d3a-a18b-7cd61e69740e'&&c.before===215&&c.after===184&&c.stat==='Power Shot Damage')return {...c,levelReference:11,levelVerification:{level:11,method:'RoyaleAPI release screenshot labels Level 11 and Showing Challenge Levels, with Power Shot Damage 215. December report matches that before value and gives 184 after.',sourceUrl:'https://royaleapi.com/blog/archers-evolution-2023-november',imageUrl:'https://cdns3.royaleapi.com/static/img/blog/2023-11-season53/archers-evo/v1-900c195c/evo-archers-info.jpg',imageSha256:'17f42c6fcad99446845b7b4ca4e7f8b7e0a6d69276b84db3fbb253ac9d61e1ec',balanceSourceUrl:update.sourceUrl}};
+  const proof=proofs[c.id];
   if(!proof||proof.level!==11||proof.effectiveDate!==update.effectiveDate||proof.cardFormId!==c.cardFormId||proof.stat!==c.stat||proof.before!==c.before||proof.after!==c.after)return c;
   return {...c,levelReference:11,levelVerification:proof};
  })};
@@ -46,7 +48,7 @@ function changePresentation(update,change){
  const unit=change.unit==='value'&&/\n[\d.]+ tiles\n[\d.]+ tiles?$/.test(change.quote||'')?' tiles':change.unit==='seconds'?' s':change.unit==='tiles'?' tiles':change.unit==='percent'?'%':change.unit==='elixir'?' elixir':'';
  const sourceLines=(change.quote||'').split('\n').map(s=>s.trim());
  const evolutionBonus=change.formType==='evolution'&&/Bonus Multiplier$/.test(change.stat);
- const format=value=>{if(evolutionBonus&&typeof value==='number'){const bonus=Number(((value-1)*100).toFixed(2));return (bonus>0?'+':'')+bonus+'%';}const signedValue=typeof value==='number'&&value>=0&&sourceLines.slice(1).some(line=>line==='+'+value+(change.unit==='percent'?'%':''));return typeof value==='number'?(signedValue?'+':'')+String(value)+unit:String(value??'').replace(/^([+-])\s+(?=\d)/,'$1').replace(/\bhits per sec\b/g,'hits/sec').replace(/\bsec\s+(?:\^\s*)?-1\b/g,'sec⁻¹').replace(/\btiles?\s+(?:\^\s*)?2\b/g,'tiles²');};
+ const format=value=>{if(evolutionBonus&&typeof value==='number'){const bonus=Number(((value-1)*100).toFixed(2));return (bonus>0?'+':'')+bonus+'%';}const signedValue=typeof value==='number'&&value>=0&&sourceLines.slice(1).some(line=>line==='+'+value+(change.unit==='percent'?'%':''));return typeof value==='number'?(signedValue?'+':'')+String(value)+unit:String(value??'').replace(/HP\/sec/g,/Hit Speed/.test(change.stat)?'hits/sec':'HP/sec').replace(/^([+-])\s+(?=\d)/,'$1').replace(/\bhits per sec\b/g,'hits/sec').replace(/\bsec\s+(?:\^\s*)?-1\b/g,'sec⁻¹').replace(/\btiles?\s+(?:\^\s*)?2\b/g,'tiles²');};
  const signed=single&&change.unit==='percent'?change.quote?.match(/([+-]\s*\d+(?:\.\d+)?)%/):null;
  let note=update.id==='08fc975e-b81d-5767-a1e3-83e716be6662'&&change.cardName==='Skeleton King'&&change.stat==='Pushback'&&update.excerpt.includes('immunity doesn’t work against The Log')?'Except The Log':null;
  const quotedPercent=(single?change.quote:sourceLines.slice(0,Math.max(1,sourceLines.length-2)).join(' '))?.match(/([+-]\s*\d+(?:\.\d+)?)%/);
