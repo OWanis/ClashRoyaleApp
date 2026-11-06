@@ -123,3 +123,11 @@ test('January 2024 verified values display while unverified charge stays relativ
  const lp=u.changes.filter(c=>c.cardName==='Little Prince');assert.deepEqual(lp.map(c=>[c.before,c.after]),[[1800,1600],[110,100]]);assert.ok(lp.every(c=>HistoryModel.level11Values(u,c)));
  const recruits=HistoryModel.changePresentation(u,u.changes.find(c=>c.cardName==='Royal Recruits'));assert.equal(recruits.percent,'-8%');assert.equal(recruits.single,true);
 });
+test('Season 57 verifies HP, corrects source time units and separates rework directions',()=>{
+ const raw=HISTORY_DATA.updates.find(u=>u.effectiveDate==='2024-03-05'),u=HistoryModel.verifiedUpdate(raw);
+ for(const [name,a,b] of [['Goblin Giant',3336,3232],['Monk',2000,2150],['Goblin Drill',1440,1312]]){const c=u.changes.find(c=>c.cardName===name&&c.unit==='hp');assert.ok(HistoryModel.level11Values(u,c));assert.deepEqual([c.before,c.after],[a,b]);}
+ const magic=u.changes.find(c=>c.cardName==='Magic Archer');assert.deepEqual([magic.before,magic.after,magic.unit],[0.8,0.7,'seconds']);assert.match(raw.changes.find(c=>c.id===magic.id).before,/as reported/);
+ const drill=u.changes.filter(c=>c.cardName==='Goblin Drill');assert.deepEqual(drill.map(c=>HistoryModel.changeCategory(u,c)),['buff','buff','nerf']);assert.deepEqual(drill.map(c=>HistoryModel.changePresentation(u,c).percent),['+11%','-50%','-9%']);
+ const knight=HistoryModel.changePresentation(u,u.changes.find(c=>c.cardName==='Knight'&&c.stat==='Damage Multiplier'));assert.deepEqual([knight.before,knight.after,knight.percent],['+10%','0%','-9%']);
+ const march18=HISTORY_DATA.updates.find(u=>u.effectiveDate==='2024-03-18');assert.match(march18.sourceUrl,/game-update-lucky-drops/);assert.match(march18.excerpt,/Evolved Skeletons are no longer inconsistently destroyed/);assert.match(march18.excerpt,/Fixed an interaction inconsistency between Tesla and Wall Breakers/);
+});

@@ -27,6 +27,15 @@ const january2024Proofs={"37bfc981-f8bb-53e1-adc5-78d1fd93c075": [1800, 1600, "h
 function verifiedUpdate(update){
  const proofs=root.HISTORY_VERIFICATIONS?.changes||{};
  return {...update,changes:update.changes.map(c=>{
+  if(update.id==='d213d8e9-d8ff-543d-b11d-7763b5302892'){
+   const hp={
+    '42d5313a-025c-5664-a406-61e7c8c14fb7':[3336,3232,'RoyaleAPI August 2023 explicitly labels Goblin Giant HP 3147 →3336 Level 11.','https://royaleapi.com/blog/season-50-balance'],
+    '4ce2ff01-96e7-5452-bb28-6fda7d1cf707':[2000,2150,'Pinned March2023 Monk HP2000 at Champion tournament Level11.','https://github.com/smlbiobot/cr-csv/tree/899e45efc765fbf3902927bb2e37dc04a78f7823/assets/csv_logic'],
+    '6319ff07-9b4d-510b-bf7d-9e060782d530':[1440,1312,'Pinned March2023 GoblinDrill HP900 ×160% Epic Level11 =1440.','https://github.com/smlbiobot/cr-csv/tree/899e45efc765fbf3902927bb2e37dc04a78f7823/assets/csv_logic']
+   }[c.id];
+   if(hp&&c.unit==='hp'&&c.before===hp[0]&&c.after===hp[1])return {...c,levelReference:11,levelVerification:{level:11,method:hp[2]+' March final report supplies the matching before and changed after values.',sourceUrl:update.sourceUrl,referenceSources:[hp[3]]}};
+   if(c.id==='117aac13-c953-50fa-a08c-03d7bed1f269'&&c.unit==='source notation')return {...c,before:0.8,after:0.7,unit:'seconds',sourceCorrection:{sourceUrl:'https://cdns3.royaleapi.com/static/img/blog/2024-03-season57/balance/v2-22c94fcc/s57-balance-02-72-1.jpg',reason:'Final v2 graphic shows First Hit Time 0.8 →0.7; article table incorrectly says 800/700 Seconds.'}};
+  }
   const january=january2024Proofs[c.id];if(update.id==='a05cf451-cc2c-5d9d-8cae-efa053ee6a6e'&&january&&c.unit==='relative')return {...c,before:january[0],after:january[1],unit:january[2],levelReference:11,levelVerification:{level:11,sourceUrl:'https://royaleapi.com/blog/season-55-balance',method:january[3]+' The January report supplies the matching before value and changed after value.',referenceSources:['https://royaleapi.com/blog/little-prince-guide-2023-november','https://github.com/smlbiobot/cr-csv/tree/899e45efc765fbf3902927bb2e37dc04a78f7823/assets/csv_logic']}};
   if(update.id==='58f6106c-b535-51ff-885e-6ab216b6ac26'&&c.id==='7a7060d6-8adc-5d3a-a18b-7cd61e69740e'&&c.before===215&&c.after===184&&c.stat==='Power Shot Damage')return {...c,levelReference:11,levelVerification:{level:11,method:'RoyaleAPI release screenshot labels Level 11 and Showing Challenge Levels, with Power Shot Damage 215. December report matches that before value and gives 184 after.',sourceUrl:'https://royaleapi.com/blog/archers-evolution-2023-november',imageUrl:'https://cdns3.royaleapi.com/static/img/blog/2023-11-season53/archers-evo/v1-900c195c/evo-archers-info.jpg',imageSha256:'17f42c6fcad99446845b7b4ca4e7f8b7e0a6d69276b84db3fbb253ac9d61e1ec',balanceSourceUrl:update.sourceUrl}};
   const proof=proofs[c.id];
@@ -47,9 +56,9 @@ function snapshotPatches(update){
 function updatePresentation(update){if(update.id==='80fa387d-c2eb-530a-a766-f1fcdb675eda')return {...update.presentation,seasonLabel:'December 2022 · Season 42'};if(update.id==='e7d42138-c3d1-50cb-b666-61e56b35b3fe')return {...update.presentation,seasonLabel:'October 2022 · Q3'};const result=update.presentation||presentation[update.id]||{seasonLabel:null,changes:{}};return update.id==='08fc975e-b81d-5767-a1e3-83e716be6662'?{...result,seasonLabel:'November 2021 · Season 29'}:result;}
 function changePresentation(update,change){
  const single=change.unit==='relative'||change.before==null||['','—','-'].includes(change.before);
- const unit=change.unit==='value'&&/\n[\d.]+ tiles\n[\d.]+ tiles?$/.test(change.quote||'')?' tiles':change.unit==='seconds'?' s':change.unit==='tiles'?' tiles':change.unit==='percent'?'%':change.unit==='elixir'?' elixir':'';
+ const unit=change.unit==='value'&&/\n[\d.]+ tiles\n[\d.]+ tiles?$/.test(change.quote||'')?' tiles':change.unit==='seconds'?' s':change.unit==='hits per second'?' hits/sec':change.unit==='tiles'?' tiles':change.unit==='percent'?'%':change.unit==='elixir'?' elixir':'';
  const sourceLines=(change.quote||'').split('\n').map(s=>s.trim());
- const evolutionBonus=change.formType==='evolution'&&/Bonus Multiplier$/.test(change.stat);
+ const evolutionBonus=change.formType==='evolution'&&/(?:Bonus|Damage|Hitpoint) Multiplier$/.test(change.stat);
  const format=value=>{if(evolutionBonus&&typeof value==='number'){const bonus=Number(((value-1)*100).toFixed(2));return (bonus>0?'+':'')+bonus+'%';}const signedValue=typeof value==='number'&&value>=0&&sourceLines.slice(1).some(line=>line==='+'+value+(change.unit==='percent'?'%':''));return typeof value==='number'?(signedValue?'+':'')+String(value)+unit:String(value??'').replace(/HP\/sec/g,/Hit Speed/.test(change.stat)?'hits/sec':'HP/sec').replace(/^([+-])\s+(?=\d)/,'$1').replace(/\bhits per sec\b/g,'hits/sec').replace(/\bsec\s+(?:\^\s*)?-1\b/g,'sec⁻¹').replace(/\btiles?\s+(?:\^\s*)?2\b/g,'tiles²');};
  const signed=single&&change.unit==='percent'?change.quote?.match(/([+-]\s*\d+(?:\.\d+)?)%/):null;
  let note=update.id==='08fc975e-b81d-5767-a1e3-83e716be6662'&&change.cardName==='Skeleton King'&&change.stat==='Pushback'&&update.excerpt.includes('immunity doesn’t work against The Log')?'Except The Log':null;
@@ -59,6 +68,11 @@ function changePresentation(update,change){
  const novemberPercent={'3ba1c0e4-a30a-53a3-b5b5-946b001bd3ce':['Damage\n                    -10%','-10%'],'5a5ef8bf-a5e6-5e30-8354-0684cef4b84b':['Egg Hit Points (HP)\n                    -34%','-34%']}[change.id];
  if(novemberPercent&&update.excerpt?.includes(novemberPercent[0]))percent=novemberPercent[1];
  if(change.id==='bd4dd330-d566-5640-aec4-16ba6d8d3089')percent='-7.6%';
+ if(update.id==='d213d8e9-d8ff-543d-b11d-7763b5302892'){
+  const stat=change.stat==='Hitpoints'?'HP':change.stat==='Attack Rate'?'Hit Speed':change.stat==='Hitpoint Multiplier'?'HP Multiplier':change.stat;
+  const i=sourceLines.indexOf(stat);if(i>=0&&/^[+-]\d+(?:\.\d+)?%$/.test(sourceLines[i+1]||''))percent=sourceLines[i+1];
+  if(change.id==='117aac13-c953-50fa-a08c-03d7bed1f269')percent='-13%';
+ }
  if(january2024Proofs[change.id])percent=null;
  if(change.id==='3c46ffe7-8a26-50c5-98e7-c2e8dbe8f921')percent=null;
  if(change.id==='b783f089-5aec-5dea-b3d1-66deb6c6c5d8')percent=null;
@@ -83,7 +97,7 @@ function changePresentation(update,change){
  }
  const season40Label=update.id==='8d353b91-7619-5f5e-9d1c-fd83be53fa1d'?({'Goblin Gang|Count':'Spear Goblin Count','Elixir Golem|EGolem 1 Hit Time':'Elixir Golem · Hit Time','Elixir Golem|EGolem 2 Hit Time':'Elixir Golemite · Hit Time','Elixir Golem|EGolem 3 Hit Time':'Elixir Blob · Hit Time','Cannon Cart|Destroyed HP':'Stationary Cannon · Hitpoints'}[change.cardName+'|'+change.stat]):null;
  if(evolutionBonus)note='Bonus over Base';
- return {symbolic,label:(evolutionBonus?change.stat.replace(' Multiplier',''):null)||(change.cardName==='Phoenix'&&change.stat==='Egg Hit Points'?'Egg Hitpoints':null)||season40Label||(timing&&/^(Hit Speed|Hit Time)/.test(change.stat)?change.quote.match(/^(?:First )?Hit Time/)[0]:change.stat.replace(/\s+[+-](?:\s+\d+(?:\.\d+)?\s*sec)?$/, '')),rate,single,before:format(change.before),after:signed?signed[1].replace(/\s/g,'')+'%':format(change.after),note,percent:single&&change.unit==='percent'?null:percent};
+ return {symbolic,label:(evolutionBonus?change.stat.replace(' Multiplier','').replace(/^(Damage|Hitpoint)$/, '$1 Bonus'):null)||(change.cardName==='Phoenix'&&change.stat==='Egg Hit Points'?'Egg Hitpoints':null)||season40Label||(timing&&/^(Hit Speed|Hit Time)/.test(change.stat)?change.quote.match(/^(?:First )?Hit Time/)[0]:change.stat.replace(/\s+[+-](?:\s+\d+(?:\.\d+)?\s*sec)?$/, '')),rate,single,before:format(change.before),after:signed?signed[1].replace(/\s/g,'')+'%':format(change.after),note,percent:single&&change.unit==='percent'?null:percent};
 }
 function elixirStages(update,changes){
  if(update.id!=='f9672f7f-6950-58dc-ab65-0d896a696675'||!changes.every(c=>c.cardName==='Elixir Golem'))return [];
@@ -106,6 +120,7 @@ function relatedCards(update,change){
  return [];
 }
 function changeCategory(update,change){
+ if(update.id==='d213d8e9-d8ff-543d-b11d-7763b5302892'&&change.cardName==='Goblin Drill'&&change.stat==='Duration')return 'buff';
  if(update.id==='e6f01b25-e110-5aa4-bb9b-c6b8fa7b1d79'&&change.cardName==='Goblins'&&change.stat==='Deploy Delay Speed')return 'nerf';
  if(update.id==='80fa387d-c2eb-530a-a766-f1fcdb675eda'&&change.cardName==='Mighty Miner')return change.stat==='Hitpoints'?'buff':change.stat==='Movement Speed'?'nerf':'rework';
  if(update.id==='5bd1ac7d-925a-5bd4-9934-a00a1b78d683'&&change.cardName==='Barbarian Barrel'&&change.stat==='Distance'&&update.excerpt.includes('distance nerf'))return 'nerf';
