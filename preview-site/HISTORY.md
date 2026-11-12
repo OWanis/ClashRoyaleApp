@@ -306,3 +306,30 @@ s64-emergency.html SHA256: `f35f657d7acc38f0026e0f1411fba4cd3579b934d795ea7e665c
 s64-pekka-2.jpg SHA256: `db31f5ff352c562caf0a1b24ec20eaaea34df7a964475ee7d5b42f245fa9209c`.
 
 s64-zap-2.jpg SHA256: `3168dcdb0e7bf87b63689878bbc7e2f61c52dcb9dfb86face40aed6e974641a2`.
+
+Season 65 audit: [RoyaleAPI's November report](https://royaleapi.com/blog/season-65-balance-november-2024) contains five cards / six stat rows. The existing official import has four cards / five rows; the missing fifth card is Cannon Evolution's pre-release Deploy Barrage Crown Tower damage adjustment. All six rows now appear, with scoped Level 11 evidence and the pre-release status visible. Raw imports and database observations remain unchanged.
+
+| Card/form | Stat | Reviewed before → after | Change |
+| --- | --- | --- | --- |
+| Ram Rider | Ram damage | 266 → 250 | −6% |
+| Ram Rider | Ram charge damage | 532 → 500 | −6% |
+| Goblinstein | Monster HP | 2752 → 2598 | −6% |
+| P.E.K.K.A Evolution | Heal per kill | 376 → 282 | −25% |
+| Musketeer Evolution | Sniper damage per bullet | 326 → 392 | +20% |
+| Cannon Evolution | Deploy Barrage Crown Tower damage | 320 → 79 | −75%, pre-release report |
+
+P.E.K.K.A conflict: RoyaleAPI lists 281 after, while [Supercell's final November note](https://supercell.com/en/games/clashroyale/blog/release-notes/november-balance-changes/) explicitly lists 282. The reviewed display keeps the primary source's 282, which is exactly 25% below 376, and visibly identifies RoyaleAPI's 281. Both quotes/values are retained in sourceConflict and the original import is preserved. The label is “Heal per Kill”, consistent with the mechanic; the primary source calls it “Heal per death”.
+
+Level 11 evidence: pinned March 2023 characters.csv Ram Damage220 and DamageSpecial440 at Legendary multiplier121% give 266 and532 after flooring. Both November reports match those starting values and supply250/500; the Rider's separate snare damage is unaffected. Goblinstein's release guide explicitly gives Monster2752HP at tournament standard, alongside independently established Level11 controls such as Knight1766HP; November gives2598. The Monster HP change maps to the Monster component panel, never Doctor HP. P.E.K.K.A376 was verified in the S64 Level11 comparison graphic; the primary November note supplies282. Musketeer's release comparison image explicitly shows Level11/Showing Challenge Levels and326 Sniper Damage; both final November sources give392. Snipe remains unable to target Crown Towers. Ram charge remains limited to buildings and Crown Towers, so newly visible values do not create incompatible troop matchups.
+
+Cannon's [release guide](https://royaleapi.com/blog/cannon-evolution-new-card-2024-november) explicitly labels Deploy Barrage320 damage at tournament standard(Level11). The November report supplies Crown Tower320→79. This is a report before release, absent from the primary November balance note; its precise effective day is not established. The supplemental row retains reviewStatus:preview, a visible pre-release note, and no inferred playable date. It is excluded from automatic/manual damage comparisons, historical combat anchors, and current-card stat supplementation. No ordinary Cannon attack nerf is inferred. The main November date remains uncertain: RoyaleAPI says “tentatively Thursday (November14)”, and publication of the official article on November14 alone does not confirm an effective day. The season is labeled November2024 · Season65.
+
+Source access improvement: every event header in month/season views now links directly to its primary source and any additional reviewed change sources, with publisher labels. Date view also exposes additional reviewed sources. The S64 October17 Goblinstein nerfs and Electro Dragon Evolution invisible-chain fix are sourced to [Supercell's maintenance note](https://supercell.com/en/games/clashroyale/blog/release-notes/maintenance-bug-fixes-and-balance-changes-2/), under BALANCE CHANGES and BUG FIXES respectively. They are separate from RoyaleAPI's October8 final-balance report. The Supercell page was freshly checked during this review and still contains both sections; no separate RoyaleAPI article is claimed.
+
+Retained evidence: `.local/evidence/season-65-audit/royaleapi.html`, six extracted rows in `rows.json`, `s65-official.html` and the Musketeer Level11 screenshot. Exact-match overlays check original IDs, pairs, units and form IDs, and are idempotent. Source conflicts and preview status remain explicit.
+
+royaleapi.html SHA256: `1f15ac7e94bbc3213b4b00e7977c6b825e6989fdfcd4f40b356e214754e95f03`.
+
+s65-official.html SHA256: `08f723c8483d21369c7da9e859406e64b940045986274c39809a5c480d686fdc`.
+
+s65-musketeer.jpg SHA256: `ab10af735c64c47ff586f1e9ec096083d45d9adb40163b9ba885c2fcd6b89cf2`.

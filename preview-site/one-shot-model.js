@@ -111,6 +111,8 @@ function filter(rows,{kind='both',query='',numbering='original',cardId=''}={}){
  const q=query.trim().toLowerCase();return rows.filter(r=>(!cardId||r.card.forms.some(f=>f.formType==='base'&&f.id===cardId))&&(kind==='both'||r.kind===kind)&&[r.card.name,r.form.formType,r.context,r.label].join(' ').toLowerCase().includes(q)).map((r,i)=>({...r,displayRank:numbering==='filtered'?i+1:r.rank}));
 }
 function targetEligibility(d,h){
+ if(d.form?.id==='8e3a2deb-0427-4da5-8525-1a37d3218cad'&&d.field==='Sniper Damage'&&h.towerHP)return 'Musketeer Snipe cannot target Crown Towers.';
+ if(d.form?.id==='46bb3a07-0991-4d01-93df-ac6d4ba3a31b'&&d.field==='Charge Damage'&&!h.towerHP&&!(h.card?.cardType==='building'&&h.panelKind==='main'))return 'Ram Rider charge targets buildings and Crown Towers.';
  if(d.card?.cardType==='spell'&&d.panelKind==='main'&&['Barbarian Barrel','Royal Delivery'].includes(d.card.name)&&(h.towerHP||h.card?.cardType==='building'))return 'This spell hit damages troops only.';
  if(d.towerDamage&&!h.towerHP)return 'Crown Tower damage applies only to Crown Towers.';
  if(h.towerHP&&!d.towerDamage&&Object.keys(d.fields||{}).some(k=>/crown tower|reflected tower damage/i.test(k)))return 'Use this attack’s separate Crown Tower damage entry.';

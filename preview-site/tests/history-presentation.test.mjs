@@ -316,3 +316,27 @@ test('qualitative damage mechanics remain visible without inventing numerical co
  const c={unit:'mechanic',stat:'Emergence Damage and Knockback',before:'Present',after:'Removed'};assert.equal(HistoryModel.level11Values({level:null},c),true);assert.equal(HistoryModel.changeKind(c),null);
  assert.equal(HistoryModel.level11Values({level:null},{unit:'damage',stat:'Death Damage',before:100,after:90}),false);
 });
+
+test('Season 65 restores all five imported Level11 stats and records the Pekka source conflict',()=>{
+ const raw=HISTORY_DATA.updates.find(u=>u.effectiveDate==='2024-11-14'),saved=JSON.stringify(raw),u=HistoryModel.verifiedUpdate(raw);
+ const expected=[['Ram Rider','Damage','266','250','-6%','nerf'],['Ram Rider','Charge Damage','532','500','-6%','nerf'],['Goblinstein','Monster Hitpoints','2752','2598','-6%','nerf'],['P.E.K.K.A','Heal per Kill','376','282','-25%','nerf'],['Musketeer','Sniper Damage','326','392','+20%','buff']];
+ assert.equal(u.changes.length,6);assert.equal(new Set(u.changes.map(c=>c.cardName)).size,5);
+ for(const [name,stat,a,b,pct,cat]of expected){const c=u.changes.find(c=>c.cardName===name&&c.stat===stat),d=HistoryModel.changePresentation(u,c);assert.deepEqual([d.before,d.after,d.percent],[a,b,pct],name);assert.equal(HistoryModel.changeCategory(u,c),cat);assert.equal(c.levelReference,11);assert.ok(c.levelVerification.sourceUrl);assert.equal(c.originalQuote,raw.changes.find(r=>r.id===c.id).quote);}
+ const pekka=u.changes.find(c=>c.cardName==='P.E.K.K.A');assert.deepEqual([pekka.sourceConflict.reportedAfter,pekka.sourceConflict.officialAfter],[281,282]);assert.match(HistoryModel.changePresentation(u,pekka).note,/RoyaleAPI lists 281/);assert.match(pekka.sourceUrl,/supercell\.com/);assert.match(pekka.sourceConflict.sourceUrl,/royaleapi\.com/);
+ assert.equal(HistoryModel.updatePresentation(u).seasonLabel,'November 2024 · Season 65');assert.equal(u.effectiveDateKnown,false,'Tentative deployment day is not confirmed by publication date');
+ assert.deepEqual(HistoryModel.verifiedUpdate(u),u);assert.equal(JSON.stringify(raw),saved);
+ const changed={...raw,changes:raw.changes.map(c=>c.cardName==='Musketeer'?{...c,before:999}:c)};assert.equal(HistoryModel.verifiedUpdate(changed).changes.find(c=>c.cardName==='Musketeer').levelReference,undefined);
+});
+test('Season 65 Cannon preview is visible but cannot become a historical or current combat fact',()=>{
+ const u=HistoryModel.verifiedUpdate(HISTORY_DATA.updates.find(u=>u.effectiveDate==='2024-11-14')),c=u.changes.find(c=>c.cardName==='Cannon'),d=HistoryModel.changePresentation(u,c);
+ assert.deepEqual([d.before,d.after,d.percent],['320','79','-75%']);assert.equal(c.stat,'Deploy Barrage Crown Tower Damage');assert.equal(c.reviewStatus,'preview');assert.match(d.note,/Pre-release/);assert.equal(c.effectiveDateKnown,false);assert.equal(HistoryModel.changeKind(c),null);assert.equal(HistoryModel.level11Values(u,c),true);
+ assert.ok(!HistoryModel.damageChanges(u).some(r=>r.id===c.id));assert.ok(!HistoryModel.detectCrossings(u,[]).some(r=>r.change.id===c.id));assert.deepEqual(HistoryModel.additionalStats([u],c.cardFormId),[]);
+});
+test('Season 65 component mappings preserve Monster HP and attack targeting',async()=>{
+ const {readFile}=await import('node:fs/promises');await import('../one-shot-model.js');
+ const {cards}=JSON.parse((await readFile(new URL('../index.html',import.meta.url),'utf8')).match(/<script id="catalog-data" type="application\/json">(.*?)<\/script>/s)[1]);const rows=OneShot.build(cards).rows;
+ const u=HistoryModel.verifiedUpdate(HISTORY_DATA.updates.find(u=>u.effectiveDate==='2024-11-14')),monster=HistoryModel.referenceForChange(u.changes.find(c=>c.cardName==='Goblinstein'),rows);assert.equal(monster.context,'Monster');assert.equal(monster.panelKind,'component_stats');assert.notEqual(monster.panelKind,'main');
+ const charge=HistoryModel.referenceForChange(u.changes.find(c=>c.stat==='Charge Damage'),rows),snipe=HistoryModel.referenceForChange(u.changes.find(c=>c.stat==='Sniper Damage'),rows),hp=name=>rows.find(r=>r.card.name===name&&r.form.formType==='base'&&r.field==='Hitpoints');
+ assert.ok(OneShot.targetEligibility(charge,hp('Skeletons')));assert.equal(OneShot.targetEligibility(charge,hp('Cannon')),null);assert.equal(OneShot.targetEligibility(charge,hp('Tower Princess')),null);
+ assert.ok(OneShot.targetEligibility(snipe,hp('Tower Princess')));assert.equal(OneShot.targetEligibility(snipe,hp('Cannon')),null);assert.equal(OneShot.targetEligibility(snipe,hp('Skeletons')),null);
+});

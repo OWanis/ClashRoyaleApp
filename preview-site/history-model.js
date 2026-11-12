@@ -175,6 +175,27 @@ function october2024Change(c){
   ...(row.percent?{presentationPercent:row.percent}:{}),...(row.rate?{presentationRate:row.rate}:{}),...(row.note?{presentationNote:row.note}:{}),
   ...(row.proof?{levelReference:11,levelVerification:{level:11,...row.proof,balanceSourceUrl:OCTOBER_SOURCE}}:{})};
 }
+const NOVEMBER_2024='f7c5cc53-7b08-5f74-b881-db10baa7a560';
+const NOVEMBER_SOURCE='https://royaleapi.com/blog/season-65-balance-november-2024';
+const november2024Rows={
+ "f68ffba4-b808-5a24-9b30-403084024271":{"expected": [266, 250, "damage", "46bb3a07-0991-4d01-93df-ac6d4ba3a31b"], "stat": "Damage", "quote": "Damage\n-6%\n266 Hit Points\n250 Hit Points", "proof": {"sourceUrl": "https://github.com/smlbiobot/cr-csv/tree/899e45efc765fbf3902927bb2e37dc04a78f7823/assets/csv_logic", "method": "Pinned characters.csv Ram Damage220 and DamageSpecial440 ×LegendaryLevel11 multiplier121%, floored=266 and532. Both final November reports match these starting values and give250/500. Rider snare damage is a separate component."}},
+ "b73e472d-3875-5c85-8d8c-e67ecfcd4812":{"expected": [532, 500, "damage", "46bb3a07-0991-4d01-93df-ac6d4ba3a31b"], "stat": "Charge Damage", "quote": "Charge Damage\n-6%\n532 Hit Points\n500 Hit Points", "proof": {"sourceUrl": "https://github.com/smlbiobot/cr-csv/tree/899e45efc765fbf3902927bb2e37dc04a78f7823/assets/csv_logic", "method": "Pinned characters.csv Ram Damage220 and DamageSpecial440 ×LegendaryLevel11 multiplier121%, floored=266 and532. Both final November reports match these starting values and give250/500. Rider snare damage is a separate component."}},
+ "0c5f4708-b5bb-597e-944b-28b0e09d1972":{"expected": [2752, 2598, "hp", "51bc6e37-a801-4270-b825-38691581c60d"], "stat": "Monster Hitpoints", "quote": "Monster HP\n-6%\n2,752 Hit Points\n2,598 Hit Points", "proof": {"sourceUrl": "https://royaleapi.com/blog/goblinstein-new-card-2024-october", "method": "Release guide explicitly gives Monster2752HP at tournament standard, alongside Level11 control values Knight1766HP. November matches2752 and gives2598; DoctorHP is not changed."}},
+ "e977a29f-7afe-5b0b-a21c-3703840cd026":{"expected": [376, 282, "healing", "6b21613d-1e17-432c-a80e-111fc89a06be"], "stat": "Heal per Kill", "quote": "Heal per death\n:\n376 → 282 (-25.00%)", "sourceUrl": "https://supercell.com/en/games/clashroyale/blog/release-notes/november-balance-changes/", "note": "Supercell gives 282 HP after; RoyaleAPI lists 281 HP.", "sourceConflict": {"sourceUrl": "https://royaleapi.com/blog/season-65-balance-november-2024", "quote": "Heal per Kill\n-25%\n376 Hit Points\n281 Hit Points", "reportedAfter": 281, "officialAfter": 282}, "proof": {"sourceUrl": "https://supercell.com/en/games/clashroyale/blog/release-notes/november-balance-changes/", "referenceSources": ["https://royaleapi.com/blog/season-64-balance"], "method": "Reviewed October Level11 graphic confirms376 healing before. Primary final November note gives282 after (exactly25% less); secondary RoyaleAPI table gives281 and is preserved as a source conflict."}},
+ "9d70325e-3898-55db-a326-c2b0323de727":{"expected": [326, 392, "damage", "8e3a2deb-0427-4da5-8525-1a37d3218cad"], "stat": "Sniper Damage", "quote": "Snipe Damage\n+20%\n326 Hit Points\n392 Hit Points", "proof": {"sourceUrl": "https://royaleapi.com/blog/musketeer-evolution-new-card-2024-november", "imageUrl": "https://cdns3.royaleapi.com/static/img/blog/2024-11-season-65/evo-musk/v1-6f75988b/evo-musk-a-300-2.jpg", "imageSha256": "ab10af735c64c47ff586f1e9ec096083d45d9adb40163b9ba885c2fcd6b89cf2", "method": "Release comparison screenshot explicitly labels Level11/ShowingChallengeLevels and326 Sniper Damage. Both final November notes give392 after. Snipe cannot target Crown Towers."}}
+};
+function november2024Change(c){
+ const row=november2024Rows[c.id];
+ if(!row||c.before!==row.expected[0]||c.after!==row.expected[1]||c.unit!==row.expected[2]||c.cardFormId!==row.expected[3]||c.sourceCorrection?.audit==='season65')return c;
+ return {...c,stat:row.stat,quote:row.quote,originalQuote:c.originalQuote||c.quote,sourceUrl:row.sourceUrl||NOVEMBER_SOURCE,
+  sourceCorrection:{audit:'season65',sourceUrl:NOVEMBER_SOURCE,method:'Reviewed component-specific final report; primary official P.E.K.K.A value retained with secondary-source conflict.'},
+  levelReference:11,levelVerification:{level:11,...row.proof,balanceSourceUrl:row.sourceUrl||NOVEMBER_SOURCE},
+  ...(row.note?{presentationNote:row.note,sourceConflict:row.sourceConflict}:{} )};
+}
+function novemberSupplement(update){
+ if(update.id!==NOVEMBER_2024)return null;
+ return {id:'s65-cannon-deploy-barrage-tower-damage',cardName:'Cannon',cardFormId:'9ca893a1-66b8-4842-90c2-100c758a3014',formType:'evolution',stat:'Deploy Barrage Crown Tower Damage',before:320,after:79,unit:'damage',classification:'nerf',quote:'Tower Damage\n-75%\n320 Hit Points\n79 Hit Points',sourceUrl:NOVEMBER_SOURCE,effectiveDateKnown:false,reviewStatus:'preview',announcementNote:'Pre-release balance adjustment reported by RoyaleAPI.',levelReference:11,levelVerification:{level:11,sourceUrl:'https://royaleapi.com/blog/cannon-evolution-new-card-2024-november',balanceSourceUrl:NOVEMBER_SOURCE,method:'Release guide explicitly labels Level11 Deploy Barrage320. Final November report lists Crown Tower320→79. This adjustment was reported before launch, is absent from the primary November note, and has no independently confirmed effective day. Retained as preview; excluded from combat comparisons and current stat supplementation.'}};
+}
 function juneSupplement(update){
  const sourceUrl='https://royaleapi.com/blog/'+(update.id===JUNE_2024?'season-60-balance':'season-60-balance-emergency');
  if(update.id===JUNE_2024)return {id:'s60-duchess-daggers-stored',cardFormId:'43d1f371-db25-44c3-b064-3fc0a3613133',cardName:'Dagger Duchess',formType:'base',stat:'Daggers Stored',before:8,after:6,unit:'count',classification:'nerf',quote:'Daggers Stored -25%\n8\n6',sourceUrl};
@@ -182,6 +203,7 @@ function juneSupplement(update){
  return null;
 }
 function verifiedUpdate(update){
+ if(update.id===NOVEMBER_2024)update={...update,changes:update.changes.map(november2024Change)};
  if(update.id===OCTOBER_2024)update={...update,effectiveDateKnown:true,effectiveDateBasis:'RoyaleAPI final report: These will go live on 2024-10-08 Tuesday, around 8-9am UTC.',dateVerification:{sourceUrl:OCTOBER_SOURCE},changes:update.changes.map(october2024Change)};
  if(update.id===OCTOBER_EMERGENCY)update={...update,changes:update.changes.map(c=>{
   if(c.cardName==='Electro Dragon')return {...c,classification:'fix'};
@@ -193,7 +215,7 @@ function verifiedUpdate(update){
  if(update.id===AUGUST_2024)update={...update,effectiveDateKnown:true,effectiveDateBasis:'RoyaleAPI final report: These will go live on 2024-08-06 Tuesday, around 8-9am UTC.',dateVerification:{sourceUrl:AUGUST_SOURCE},changes:update.changes.map(august2024Change)};
  if(update.id===JULY_2024)update={...update,effectiveDateKnown:true,effectiveDateBasis:'RoyaleAPI final report: These will go live on 2024-07-02 Tuesday, around 8-9am UTC.',dateVerification:{sourceUrl:JULY_SOURCE},changes:update.changes.map(july2024Change)};
  const proofs=root.HISTORY_VERIFICATIONS?.changes||{};
- const extra=juneSupplement(update);if(extra&&!update.changes.some(c=>c.id===extra.id))update={...update,changes:[...update.changes,extra]};
+ const extra=juneSupplement(update)||novemberSupplement(update);if(extra&&!update.changes.some(c=>c.id===extra.id))update={...update,changes:[...update.changes,extra]};
  return {...update,changes:update.changes.map(c=>{
   if(update.id==='d213d8e9-d8ff-543d-b11d-7763b5302892'){
    const hp={
@@ -233,7 +255,7 @@ function snapshotPatches(update){
  }
  return [...groups.values()];
 }
-function updatePresentation(update){if([OCTOBER_2024,OCTOBER_EMERGENCY].includes(update.id))return {...update.presentation,seasonLabel:'October 2024 · Season 64'};if(update.id===AUGUST_2024)return {...update.presentation,seasonLabel:'August 2024 · Season 62'};if(update.id===JULY_2024)return {...update.presentation,seasonLabel:'July 2024 · Season 61'};if([JUNE_2024,JUNE_EMERGENCY,'497eeec0-1b76-5c05-b74c-96c1488af255'].includes(update.id))return {...update.presentation,seasonLabel:'June 2024 · Season 60'};if(update.id===MAY_2024)return {...update.presentation,seasonLabel:'May 2024 · Season 59'};if(update.id==='80fa387d-c2eb-530a-a766-f1fcdb675eda')return {...update.presentation,seasonLabel:'December 2022 · Season 42'};if(update.id==='e7d42138-c3d1-50cb-b666-61e56b35b3fe')return {...update.presentation,seasonLabel:'October 2022 · Q3'};const result=update.presentation||presentation[update.id]||{seasonLabel:null,changes:{}};return update.id==='08fc975e-b81d-5767-a1e3-83e716be6662'?{...result,seasonLabel:'November 2021 · Season 29'}:result;}
+function updatePresentation(update){if(update.id===NOVEMBER_2024)return {...update.presentation,seasonLabel:'November 2024 · Season 65'};if([OCTOBER_2024,OCTOBER_EMERGENCY].includes(update.id))return {...update.presentation,seasonLabel:'October 2024 · Season 64'};if(update.id===AUGUST_2024)return {...update.presentation,seasonLabel:'August 2024 · Season 62'};if(update.id===JULY_2024)return {...update.presentation,seasonLabel:'July 2024 · Season 61'};if([JUNE_2024,JUNE_EMERGENCY,'497eeec0-1b76-5c05-b74c-96c1488af255'].includes(update.id))return {...update.presentation,seasonLabel:'June 2024 · Season 60'};if(update.id===MAY_2024)return {...update.presentation,seasonLabel:'May 2024 · Season 59'};if(update.id==='80fa387d-c2eb-530a-a766-f1fcdb675eda')return {...update.presentation,seasonLabel:'December 2022 · Season 42'};if(update.id==='e7d42138-c3d1-50cb-b666-61e56b35b3fe')return {...update.presentation,seasonLabel:'October 2022 · Q3'};const result=update.presentation||presentation[update.id]||{seasonLabel:null,changes:{}};return update.id==='08fc975e-b81d-5767-a1e3-83e716be6662'?{...result,seasonLabel:'November 2021 · Season 29'}:result;}
 function changePresentation(update,change){
  const single=change.unit==='relative'||change.before==null||['','—','-'].includes(change.before);
  const unit=update.id===OCTOBER_2024&&change.unit==='dps'?' HP/sec':change.unit==='value'&&/\n[\d.]+ tiles\n[\d.]+ tiles?$/.test(change.quote||'')?' tiles':change.unit==='seconds'?' s':change.unit==='hits per second'?' hits/sec':change.unit==='healing per second'?' HP/sec':change.unit==='tiles'?' tiles':change.unit==='percent'?'%':change.unit==='multiplier'?'×':change.unit==='elixir'?' elixir':'';
@@ -285,7 +307,7 @@ function changePresentation(update,change){
  if([JULY_2024,AUGUST_2024,OCTOBER_2024,OCTOBER_EMERGENCY].includes(update.id)&&change.presentationRate)rate=change.presentationRate;
  if(evolutionBonus)note='Bonus over Base';
  if(change.announcementNote)note=change.announcementNote;
- if([AUGUST_2024,OCTOBER_2024,OCTOBER_EMERGENCY].includes(update.id)&&change.presentationNote)note=change.presentationNote;
+ if([AUGUST_2024,OCTOBER_2024,OCTOBER_EMERGENCY,NOVEMBER_2024].includes(update.id)&&change.presentationNote)note=change.presentationNote;
  if(update.id===JUNE_EMERGENCY&&change.stat==='Rocket Hit Time')rate={label:'Rocket Hit Speed',before:'0.286',after:'0.250',percent:'-13%',unit:'hits/sec'};
  if(update.id===MAY_2024){
   if(change.cardName==='Royal Giant'&&change.stat==='Hitpoint Multiplier')rate={label:'Total Evolution HP',before:'3379',after:'3164',percent:'',unit:'Level 11'};
@@ -354,7 +376,7 @@ function changeCategory(update,change){
 function changeSymbol(update,change){return ({buff:'↑',nerf:'↓',rework:'⟳',fix:'⟳'})[changeCategory(update,change)]||'⟳';}
 function cardCategory(update,changes){const kinds=[...new Set(changes.map(c=>changeCategory(update,c)))];return kinds.length===1?kinds[0]:kinds.includes('unclassified')?'unclassified':'rework';}
 
-function damageChanges(update){return update.changes.filter(c=>c.unit==='damage'&&Number.isFinite(c.before)&&Number.isFinite(c.after));}
+function damageChanges(update){return update.changes.filter(c=>c.reviewStatus!=='preview'&&c.unit==='damage'&&Number.isFinite(c.before)&&Number.isFinite(c.after));}
 function compare(change,hp){
  if(change.unit!=='damage'||!Number.isFinite(change.before)||!Number.isFinite(change.after)||hp.kind!=='hp')throw Error('Numeric damage and HP required');
  const result=value=>({damage:value,reaches:value>=hp.value,remaining:Math.max(0,hp.value-value)});
@@ -363,7 +385,7 @@ function compare(change,hp){
 function additionalStats(updates,formId,displayedFields={}){
  const groups=new Map();
  for(const update of updates.map(verifiedUpdate))for(const change of update.changes){
-  if(!inScope(update)||change.cardFormId!==formId)continue;
+  if(!inScope(update)||change.cardFormId!==formId||change.reviewStatus==='preview')continue;
   const key=change.comparisonKey||change.stat;
   const identity=JSON.stringify([key,change.levelReference??update.level]);
   if(!groups.has(identity))groups.set(identity,[]);
@@ -387,7 +409,7 @@ function level11Values(update,change){
  return !(['damage','hp','hitpoints','healing'].includes(change.unit)||/damage|\bHP\b|hitpoints|hit points|health|healing|DPS|\bDMG\b|Crown Tower(?::|$)/i.test(change.stat));
 }
 function changeKind(change){
- if(change.damageScope==='cast')return null;
+ if(change.damageScope==='cast'||change.reviewStatus==='preview')return null;
  if(!Number.isFinite(change.before)||!Number.isFinite(change.after))return null;
  if(change.unit==='damage')return 'damage';
  if(['hp','hitpoints'].includes(change.unit))return 'hp';
@@ -397,6 +419,7 @@ function referenceForChange(change,rows){
  const kind=changeKind(change),key=change.comparisonKey||change.stat;
  const candidates=rows.filter(r=>r.form.id===change.cardFormId&&r.kind===kind&&!r.aggregate);
  if(change.cardName==='Ice Wizard'&&change.formType==='hero'&&change.stat==='Freeze Damage'){const freeze=candidates.filter(r=>r.panelKind==='ability'&&r.context==='Frosty Fella'&&r.field==='Area Damage');if(freeze.length===1)return freeze[0];}
+ if(change.cardName==='Goblinstein'&&change.stat==='Monster Hitpoints'){const monster=candidates.filter(r=>r.panelKind==='component_stats'&&r.context==='Monster'&&r.field==='Hitpoints');return monster.length===1?monster[0]:null;}
  const exact=candidates.filter(r=>r.field===key);
  if(exact.length===1)return exact[0];
  if(key==='Damage'){

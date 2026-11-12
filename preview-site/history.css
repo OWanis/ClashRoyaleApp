@@ -59,3 +59,5 @@
 @media(min-width:900px){.history-staged{grid-column:span 2}.history-staged .history-stage-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media(max-width:600px){#history-panel{padding:12px;border-radius:14px}.history-banner{padding:20px 16px;min-height:160px}.history-banner:before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(135deg,transparent 0 55px,#ffffff05 55px 58px);z-index:-1}
 .history-banner-copy{max-width:100%}.history-banner-art{right:-100px;opacity:.08}.history-banner-art img{width:150px;height:210px}.history-banner-art img+img{display:none}.history-change{padding:16px}.history-banner-meta{gap:8px 12px}.history-change .history-card-heading img{width:58px;height:74px}}
+
+.history-group-event-actions{display:flex;align-items:center;gap:12px;flex-wrap:wrap}.history-group-source{font-size:13px;white-space:nowrap}
