@@ -258,3 +258,51 @@ Archived void-2024-may HTML SHA256: `8788fbae8dde105b156b1f14f59a86e7899337b930d
 Archived goblin-cage-evolution-new-card-2024-august HTML SHA256: `59b89a9013cdca92a3ffed862c300ccdb283432721ae7fe6b542d9be3ffec635`.
 
 Archived suspicious-bush-2024-august HTML SHA256: `605b05668b88cc0a6d68b06ac5933b3c59a84a547ad456663b7145309b32def3`.
+
+
+Season 64 audit: [RoyaleAPI's final October report](https://royaleapi.com/blog/season-64-balance), published October4, confirms an October8 effective day. All18 source sections /22 table rows are reconciled with23 imported deltas (Bomber appears twice for Base/Evolution). Display merges the matching Bomber change into one row with both icons; both raw form records remain. The17 parent cards display22 distinct change rows. The October17 maintenance is also audited below. No raw imports or database observations are overwritten.
+
+| Card/form | Stat | Before → After | Change / direction |
+| --- | --- | --- | --- |
+| Bomber Base / Evolution | Damage | 230 → 225 | −2%, nerf |
+| Goblin Demolisher | Lifetime after50%HP | 10 → 7 s | −30%, nerf |
+| Void | Damage per strike,1target | 472 → 320 | −32%, nerf |
+| Mortar Evolution | First hit time | 0 → 1 s | Nerf; percentage undefined from zero |
+| P.E.K.K.A Evolution | Heal per kill | 471 → 376 | −20%, nerf |
+| Tesla Base | Hit time; hit speed | 1.2 → 1.1 s;0.83 → 0.91 hits/sec | −8% interval;+9% rate, buff |
+| Tesla Evolution | Death shockwave | Present → Removed | Nerf |
+| Wizard Evolution | Shield knockback | 4 → 3 tiles | −25%, nerf |
+| Cannoneer | First hit time | 0.6 → 0.8 s | +33%, nerf |
+| Cannoneer | Damage | 401 → 386 | −4%, nerf |
+| Goblin Curse | DPS | 25 → 30 HP/sec | +20%, buff |
+| Goblin Machine | Hitpoints | 2196 → 2304 | +5%, buff |
+| Skeleton Barrel | Death damage | 133 → 145 | +9%, buff |
+| Suspicious Bush | Bush movement speed | 45 → 60 | +33%, buff |
+| Goblin Cage Evolution | Capture DPS; hit speed | 306 → 337 HP/sec;0.91 → 1.00 hits/sec | +10%, buff |
+| Goblin Drill Evolution | Second/third emergence damage+knockback | Present → Removed | Nerf |
+| Goblin Drill Evolution | Submerge Goblin deployment delay | No added delay → Added | Nerf |
+| Goblin Drill Evolution | Second-submerge spawn | +1 Goblin | Buff; total count not invented |
+| Zap Evolution | Third strike | Present → Removed | Nerf |
+| Zap Evolution | Second strike damage | 94 → 192 | +104%, buff |
+| Magic Archer | Hitpoints | 532 → 531 | Bug fix,−1HP (−0.2% calculated) |
+| Mother Witch | Hitpoints | 532 → 531 | Bug fix,−1HP (−0.2% calculated) |
+
+Every displayed component has its own percentage and direction. Cannoneer401→386 no longer inherits its first-hit percentage. Tesla's raw1200→1100 and Cannoneer's600→800 are resolved with explicit seconds in the final report/official intervals. Goblin Cage's capture damage ticks change from1.1s to1s; the released Brawler's damage remains unchanged. Goblin Drill and Zap retain overall rework badges while their individual rows show buffs/nerfs. Mortar's real zero is retained without division by zero. Both one-HP fixes retain source0% rounding in their quotes, display the actual532→531 pair, and give the calculated−0.2% plus a−1HP note. Qualitative mechanics (such as removal of damage/knockback) remain visible without a numerical-level proof; they are not numeric combat observations.
+
+Level11 evidence is scoped to matching original IDs, form IDs, numeric pairs and units. Bomber230 is in the explicitly Level11 [Demolisher release guide](https://royaleapi.com/blog/goblin-demolisher-new-card-2024-summer-update); the official October note explicitly names both Base/Evolution. Void472 follows the reviewed August544→472 delta anchored by the explicit Level11 release table. Cannoneer401 follows May's reviewed422→401. Goblin Curse's release explicitly gives25HP/sec at tournamentLevel11. Machine2196 follows the verified July2598→2196. Pinned game tables at899e45efc765fbf3902927bb2e37dc04a78f7823 give SkeletonBalloon's death-spawn SkeletonContainer (characters.csv); buildings.csv SkeletonContainer DeathDamage52 ×CommonLevel11 multiplier256%, floored=133. The same archive gives GoblinBrawler Damage159 ×Rare212%, floored=337; the Evolution release says capture damage is identical to Brawler damage, with1.1s interval and306DPS. Thus capture interval1s gives337DPS without asserting a Brawler damage buff.
+
+Magic Archer's pinned EliteArcher HP440 ×Legendary121%, floored=532, and Mother Witch's independently retained February2023 WitchMother HP440 ×121%=532 establish both before values. The final October tables supply531. Zap's Level11/ShowingChallengeLevels comparison image explicitly gives192 damage. The final report's second-strike94→192 is retained: “half damage” is qualitative evidence, not permission to replace94 with96 by arithmetic. Void is mapped to its per-strike single-target row; no multi-strike total becomes a single hit.
+
+P.E.K.K.A source conflict: both final official/RoyaleAPI notes give471→376 healing per kill. The [release article](https://royaleapi.com/blog/pekka-evolution-new-card-2024-september) prose gives470 (12.5% of3760). Its retrieved comparison graphic labels BaseLevel11 and shows both forms at3760HP, with Evolution healing376, corroborating the final after-value. We preserve471→376 from the final reports and retain the prose470 discrepancy explicitly; we do not claim to independently reproduce471 from the12.5% formula. The article's “What's New” HP wording is not treated as a separate HP nerf; the detailed table changes healing.
+
+[October17 official maintenance](https://supercell.com/en/games/clashroyale/blog/release-notes/maintenance-bug-fixes-and-balance-changes-2/) explicitly supplies Lightning Link duration5→4s(−20%), Crown Tower damage(Level11)71→46(−36% source annotation), and cooldown15→17s(+13%). These three nerfs use their own exact source line rather than all copying−20% from the shared paragraph. The displayed damage percentage is corrected to−35.2%, calculated from71→46, with a visible note identifying the official−36% discrepancy; the original source annotation remains in the quote. Electro Dragon Evolution's failure to chain to invisible troops remains a bug fix, matching the same official note. Both October8 and17 are labeled Season64. No preview release numbers replace these maintenance values.
+
+Retained evidence: `.local/evidence/season-64-audit/royaleapi.html` and22 extracted table rows in `rows.json`, plus `s64-emergency.html`, `s64-pekka-2.jpg`, `s64-zap-2.jpg`. The two exact image URLs and hashes are recorded in each public Level11 proof. Raw imports remain unchanged; the overlay is idempotent and exact-match guarded.
+
+royaleapi.html SHA256: `72768d4b6632a92b1e7c898e47e07bfa7941f2ece63b7e936a2974c24026f673`.
+
+s64-emergency.html SHA256: `f35f657d7acc38f0026e0f1411fba4cd3579b934d795ea7e665c2976b8b38da3`.
+
+s64-pekka-2.jpg SHA256: `db31f5ff352c562caf0a1b24ec20eaaea34df7a964475ee7d5b42f245fa9209c`.
+
+s64-zap-2.jpg SHA256: `3168dcdb0e7bf87b63689878bbc7e2f61c52dcb9dfb86face40aed6e974641a2`.

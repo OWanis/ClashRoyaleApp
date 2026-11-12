@@ -266,3 +266,53 @@ test('Season 62 keeps Arrows full-cast damage separate from single-wave attacks 
  assert.ok(!HistoryModel.detectCrossings(u,rows).some(r=>r.change.cardName==='Arrows'));
  for(const c of u.changes.filter(c=>c.cardName==='Void')){const r=HistoryModel.referenceForChange(c,rows);assert.ok(r);assert.equal(r.aggregate,false);assert.equal(r.towerDamage,false);assert.equal(r.field,c.comparisonKey);}
 });
+
+test('Season 64 audits every final-report row and preserves source evidence',()=>{
+ const raw=HISTORY_DATA.updates.find(u=>u.effectiveDate==='2024-10-08'),saved=JSON.stringify(raw),u=HistoryModel.verifiedUpdate(raw),shown=HistoryModel.displayChanges(u.changes);
+ const expected=[
+  ['Bomber','Damage','230','225','-2%','nerf'],
+  ['Goblin Demolisher','Lifetime after 50% HP','10 s','7 s','-30%','nerf'],
+  ['Void','1 Target Damage','472','320','-32%','nerf'],
+  ['Mortar','First Hit Time','0 s','1 s',null,'nerf'],
+  ['P.E.K.K.A','Heal per Kill','471','376','-20%','nerf'],
+  ['Tesla','Hit Time','1.2 s','1.1 s','-8%','buff'],
+  ['Tesla','Death Shockwave','Present','Removed',null,'nerf'],
+  ['Wizard','Shield Knockback','4 tiles','3 tiles','-25%','nerf'],
+  ['Cannoneer','First Hit Time','0.6 s','0.8 s','+33%','nerf'],
+  ['Cannoneer','Damage','401','386','-4%','nerf'],
+  ['Goblin Curse','Damage per Second','25 HP/sec','30 HP/sec','+20%','buff'],
+  ['Goblin Machine','Hitpoints','2196','2304','+5%','buff'],
+  ['Skeleton Barrel','Death Damage','133','145','+9%','buff'],
+  ['Suspicious Bush','Bush Speed','45','60','+33%','buff'],
+  ['Goblin Cage','Capture Damage per Second','306 HP/sec','337 HP/sec','+10%','buff'],
+  ['Goblin Drill','Second and Third Emergence Damage and Knockback','Present','Removed',null,'nerf'],
+  ['Goblin Drill','Submerge Goblin Deploy Time','No added delay','Deploy time added',null,'nerf'],
+  ['Goblin Drill','Second Submerge Goblin Spawn','','+1 Goblin',null,'buff'],
+  ['Zap','Third Strike','Present','Removed',null,'nerf'],
+  ['Zap','Second Strike Damage','94','192','+104%','buff'],
+  ['Magic Archer','Hitpoints','532','531','-0.2%','fix'],
+  ['Mother Witch','Hitpoints','532','531','-0.2%','fix']
+ ];
+ assert.equal(u.changes.length,23);assert.equal(shown.length,22);assert.equal(new Set(shown.map(c=>c.cardName)).size,17);
+ for(const [name,stat,a,b,pct,category] of expected){const c=shown.find(c=>c.cardName===name&&c.stat===stat);assert.ok(c,name+' '+stat);const d=HistoryModel.changePresentation(u,c);
+  assert.deepEqual([d.before,d.after,d.percent],[a,b,pct],name+' '+stat);assert.equal(HistoryModel.level11Values(u,c),true,name+' '+stat);assert.equal(HistoryModel.changeCategory(u,c),category);
+  assert.equal(c.originalQuote,raw.changes.find(r=>r.id===c.id).quote);if(['damage','hp','healing','dps'].includes(c.unit)){assert.equal(c.levelReference,11);assert.ok(c.levelVerification.sourceUrl);}
+ }
+ const card={name:'Bomber',forms:[{id:'base',formType:'base'},{id:'evo',formType:'evolution'},{id:'hero',formType:'hero'}]},bomber=shown.find(c=>c.cardName==='Bomber');assert.deepEqual(HistoryModel.affectedForms(u,bomber,[{card}]),['base','evo']);
+ for(const name of ['Tesla','Goblin Drill','Zap'])assert.equal(HistoryModel.cardCategory(u,shown.filter(c=>c.cardName===name)),'rework');
+ const tesla=HistoryModel.changePresentation(u,shown.find(c=>c.cardName==='Tesla'&&c.stat==='Hit Time'));assert.deepEqual(tesla.rate,{label:'Hit Speed',before:'0.83',after:'0.91',percent:'+9%',unit:'hits/sec'});
+ const cage=HistoryModel.changePresentation(u,shown.find(c=>c.cardName==='Goblin Cage'));assert.deepEqual(cage.rate,{label:'Capture Hit Speed',before:'0.91',after:'1.00',percent:'+10%',unit:'hits/sec'});assert.match(cage.note,/every 1.1 s before, every 1 s after/);
+ const extra=HistoryModel.changePresentation(u,shown.find(c=>c.cardName==='Goblin Drill'&&c.stat==='Second Submerge Goblin Spawn'));assert.equal(extra.single,true);
+ assert.equal(u.effectiveDateKnown,true);assert.equal(HistoryModel.updatePresentation(u).seasonLabel,'October 2024 · Season 64');assert.deepEqual(HistoryModel.verifiedUpdate(u),u);assert.equal(JSON.stringify(raw),saved);
+ const altered={...raw,changes:raw.changes.map(c=>c.cardName==='Mother Witch'?{...c,after:'different'}:c)};assert.equal(HistoryModel.verifiedUpdate(altered).changes.find(c=>c.cardName==='Mother Witch').levelReference,undefined);
+ const pekka=shown.find(c=>c.cardName==='P.E.K.K.A');assert.match(pekka.levelVerification.method,/470/);assert.match(pekka.levelVerification.imageSha256,/^[a-f0-9]{64}$/);
+});
+test('Season 64 October17 maintenance isolates percentages, corrects damage arithmetic and keeps the fix',()=>{
+ const raw=HISTORY_DATA.updates.find(u=>u.effectiveDate==='2024-10-17'),saved=JSON.stringify(raw),u=HistoryModel.verifiedUpdate(raw);
+ for(const [stat,a,b,pct] of [['Lightning Link Duration','5 s','4 s','-20%'],['Lightning Link Crown Tower Damage (Level 11)','71','46','-35.2%'],['Lightning Link Cooldown','15 s','17 s','+13%']]){const c=u.changes.find(c=>c.stat===stat),d=HistoryModel.changePresentation(u,c);assert.deepEqual([d.before,d.after,d.percent],[a,b,pct]);assert.equal(HistoryModel.changeCategory(u,c),'nerf');assert.equal(HistoryModel.level11Values(u,c),true);assert.equal(c.originalQuote,raw.changes.find(r=>r.id===c.id).quote);}
+ const fix=u.changes.find(c=>c.cardName==='Electro Dragon');assert.equal(HistoryModel.changeCategory(u,fix),'fix');assert.match(fix.quote,/Invisible troops/);assert.equal(HistoryModel.updatePresentation(u).seasonLabel,'October 2024 · Season 64');assert.deepEqual(HistoryModel.verifiedUpdate(u),u);assert.equal(JSON.stringify(raw),saved);
+});
+test('qualitative damage mechanics remain visible without inventing numerical combat stats',()=>{
+ const c={unit:'mechanic',stat:'Emergence Damage and Knockback',before:'Present',after:'Removed'};assert.equal(HistoryModel.level11Values({level:null},c),true);assert.equal(HistoryModel.changeKind(c),null);
+ assert.equal(HistoryModel.level11Values({level:null},{unit:'damage',stat:'Death Damage',before:100,after:90}),false);
+});
