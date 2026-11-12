@@ -225,3 +225,36 @@ Archived wizard-evolution-2024-may HTML SHA256: `302062c9fc85bd83be3d31591d2c303
 Archived tesla-evolution-2024-march HTML SHA256: `783dacddc4728865860b140232b64fd30144db26013e5037d647c0b053730a98`.
 
 Publishing prerequisite found during S61 verification: fourteen official artwork URLs now return different PNG bytes. The already approved originals remain available in the saved preview and match assets.json byte lengths/SHA256. Those exact public originals are retained in pinned-assets/; build.mjs validates and copies them before downloading the remaining174 images. No manifest hashes, displayed artwork or canonical observations change, and mismatched pinned files fail the build. This avoids relying on mutable upstream URLs for those14 images.
+
+Season 62 audit (August 6, 2024): all eleven affected forms / twelve distinct changes checked against [RoyaleAPI's final report](https://royaleapi.com/blog/season-62-balance). Its thirteen table rows include Wizard's shared HP twice (Base and Evolution); the UI keeps one HP change with both icons and an independent Evolution shield nerf. Seven scoped Level 11 proofs restore absolute combat values. Raw imports, IDs and quotes remain intact; overlays require exact original values/units and are idempotent.
+
+| Card/form | Stat | Before → After | Source change |
+| --- | --- | --- | --- |
+| Arrows | Total Crown Tower damage, all 3 waves | 111 → 93 | −16% |
+| Goblin Drill Evolution | Goblins spawned on second submerge | 2 → 1 | −50% |
+| Wizard Base / Evolution | Hitpoints | 720 → 754 | +5% |
+| Wizard Evolution | Shield HP | 296 → 190 | −36% |
+| Cannon Cart | Shielded hit time; hit rate | 1 → 0.9 s; 1.00 → 1.11 hits/sec | −10%; +11% |
+| Electro Wizard | Deploy damage radius | 2.5 → 3 tiles | +20% |
+| Goblin Machine | Rocket hit time; hit rate | 4 → 3.5 s; 0.250 → 0.286 hits/sec | −13%; +14% |
+| Hunter | Hitpoints | 838 → 884 | +5% |
+| Ice Wizard | Attack splash radius | 1 → 1.5 tiles | +50% |
+| Void | Damage per strike, 1 target | 544 → 472 | −13% |
+| Void | Damage per strike, 5+ targets | 48 → 76 | +58% |
+| Skeleton Dragons | Hitpoints, interaction bug fix | 563 → 560 | −1% |
+
+Wizard and Void show independent buff/nerf directions within their reworks. Skeleton Dragons has the sourced bug-fix classification and an explanation of the two-hit Wizard interaction at both Level 11 and Level 15. Source-rounded percentages are retained: Hunter's final RoyaleAPI table says +5% (official import says +6%); Skeleton Dragons says −1% (official import gives unsigned >1%). Original quotes are retained. The final report explicitly confirms August 6 Tuesday as the effective day, separate from its July 31 publication and the official article's August 6 publication; day precision and the S62 label are confirmed in the overlay.
+
+Level 11 evidence: the [Void release guide](https://royaleapi.com/blog/void-2024-may) explicitly normalizes its following tables to Level 11, giving Arrows 111 total tower damage, Void 544 per strong beam and 48 per weak beam. August matches those baselines and supplies after values. Existing pinned February 2023 verifications independently reproduce Wizard 720 HP (340×212%, floored) and Hunter 838 HP (524×160%, floored); August supplies 754 and 884. Wizard's [May release](https://royaleapi.com/blog/wizard-evolution-2024-may) labels 371 shield HP at Level 11, the reviewed [July report](https://royaleapi.com/blog/season-61-balance-2024-july) gives 371→296, and August gives 296→190. Skeleton Dragons' final report explicitly compares the Level 11 interaction to Level 15 alongside its 563→560 table. Current screenshots never fill historical gaps.
+
+Arrows 111→93 is full-cast damage, not one wave. Its reviewed delta has `damageScope:cast`, a three-wave note, and no single-hit mapping/comparison. Void's two target tiers map to their respective nonaggregate per-strike rows, excluding aggregate and Crown Tower values.
+
+Suspicious Bush visibility: read-only inspection confirmed it already exists in `meta_official_dev`, the saved export and the live catalog: one Base form, a 2-elixir Level 11 observation, Bush 81 HP and separate Bush Goblin stats. No duplicate card/observation was added. Catalog searches with active version/type/cost filters now explain that matching cards exist and offer “Show matching Base cards”, preserving the search term while clearing blocking filters. Its release keeps July 30, 2024 and calendar-month placement in July. Its season-content placement is S62, following [RoyaleAPI's Goblin Cage release](https://royaleapi.com/blog/goblin-cage-evolution-new-card-2024-august): “Technically, Suspicious Bush was released in Season 61, but for content release and creation it has been considered part of Season 62.” A visible release note states this distinction. Launch-preview stats remain separate from later screenshot observations. The local release generator preserves the correction on replay.
+
+Retained final report: `.local/evidence/season-62-audit/royaleapi.html`, with thirteen extracted rows in `rows.json`; HTML SHA256 `74915358d91b8cc943a6cb072b7b0e2118da1e6e2f636f01a297b1c220add00d`.
+
+Archived void-2024-may HTML SHA256: `8788fbae8dde105b156b1f14f59a86e7899337b930d23a7b9478be7704e7830a`.
+
+Archived goblin-cage-evolution-new-card-2024-august HTML SHA256: `59b89a9013cdca92a3ffed862c300ccdb283432721ae7fe6b542d9be3ffec635`.
+
+Archived suspicious-bush-2024-august HTML SHA256: `605b05668b88cc0a6d68b06ac5933b3c59a84a547ad456663b7145309b32def3`.

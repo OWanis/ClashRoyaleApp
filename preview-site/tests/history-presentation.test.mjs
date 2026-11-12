@@ -212,3 +212,57 @@ test('Season 61 Tesla shares ordinary attack changes with its existing Evolution
  for(const c of u.changes.filter(c=>c.cardName==='Tesla'))assert.deepEqual(HistoryModel.affectedForms(u,c,[{card}]),['base','evo']);
  const wizard=u.changes.find(c=>c.cardName==='Wizard');assert.deepEqual(HistoryModel.affectedForms(u,wizard,[]),[wizard.cardFormId]);
 });
+
+test('Season 62 final report supplies each component value, percentage and gameplay direction',()=>{
+ const raw=HISTORY_DATA.updates.find(u=>u.effectiveDate==='2024-08-06'),saved=JSON.stringify(raw),u=HistoryModel.verifiedUpdate(raw);
+ const expected=[
+  ['Arrows','Crown Tower Damage','111','93','-16%','nerf'],
+  ['Goblin Drill','Second Submerge Goblin Spawn','2','1','-50%','nerf'],
+  ['Wizard','Hitpoints','720','754','+5%','buff'],
+  ['Wizard','Shield Hitpoints','296','190','-36%','nerf'],
+  ['Cannon Cart','Shielded Cannon Hit Time','1 s','0.9 s','-10%','buff'],
+  ['Electro Wizard','Deploy Damage Radius','2.5 tiles','3 tiles','+20%','buff'],
+  ['Goblin Machine','Rocket Hit Time','4 s','3.5 s','-13%','buff'],
+  ['Hunter','Hitpoints','838','884','+5%','buff'],
+  ['Ice Wizard','Attack Splash Radius','1 tiles','1.5 tiles','+50%','buff'],
+  ['Void','1 Target Damage','544','472','-13%','nerf'],
+  ['Void','5+ Target Damage','48','76','+58%','buff'],
+  ['Skeleton Dragons','Hitpoints','563','560','-1%','fix']
+ ];
+ assert.equal(u.changes.length,12);assert.equal(new Set(u.changes.map(c=>c.cardFormId)).size,11);
+ for(const [name,stat,a,b,pct,category] of expected){
+  const c=u.changes.find(c=>c.cardName===name&&c.stat===stat),d=HistoryModel.changePresentation(u,c);assert.ok(c,name+' '+stat);
+  assert.deepEqual([d.before,d.after,d.percent],[a,b,pct],name+' '+stat);assert.equal(HistoryModel.level11Values(u,c),true);
+  assert.equal(HistoryModel.changeCategory(u,c),category);assert.equal(c.originalQuote,raw.changes.find(r=>r.id===c.id).quote);
+  if(['hp','damage'].includes(c.unit)){assert.equal(c.levelReference,11);assert.ok(c.levelVerification.sourceUrl);}
+ }
+ for(const [name,stat,a,b,pct] of [['Cannon Cart','Shielded Cannon Hit Time','1.00','1.11','+11%'],['Goblin Machine','Rocket Hit Time','0.250','0.286','+14%']]){
+  const c=u.changes.find(c=>c.cardName===name&&c.stat===stat),d=HistoryModel.changePresentation(u,c);assert.deepEqual([d.rate.before,d.rate.after,d.rate.percent,d.rate.unit],[a,b,pct,'hits/sec']);
+ }
+ const wizard=u.changes.filter(c=>c.cardName==='Wizard'),voidChanges=u.changes.filter(c=>c.cardName==='Void');
+ assert.equal(HistoryModel.cardCategory(u,wizard),'rework');assert.equal(HistoryModel.cardCategory(u,voidChanges),'rework');
+ const card={name:'Wizard',forms:[{id:'base',formType:'base'},{id:'evo',formType:'evolution'},{id:'hero',formType:'hero'}]};
+ assert.deepEqual(HistoryModel.affectedForms(u,wizard.find(c=>c.formType==='base'),[{card}]),['base','evo']);
+ assert.match(HistoryModel.changePresentation(u,u.changes.find(c=>c.cardName==='Skeleton Dragons')).note,/consistency fix/);
+ assert.equal(u.effectiveDateKnown,true);assert.equal(HistoryModel.updatePresentation(u).seasonLabel,'August 2024 · Season 62');
+ assert.deepEqual(HistoryModel.verifiedUpdate(u),u);assert.equal(JSON.stringify(raw),saved);
+ const changed={...raw,changes:raw.changes.map(c=>c.cardName==='Arrows'?{...c,before:999}:c)};
+ assert.equal(HistoryModel.verifiedUpdate(changed).changes.find(c=>c.cardName==='Arrows').levelReference,undefined);
+});
+test('Suspicious Bush is present and appears in S62 content while keeping its July30 release',async()=>{
+ const {readFile}=await import('node:fs/promises');
+ const html=await readFile(new URL('../index.html',import.meta.url),'utf8'),data=JSON.parse(html.match(/<script id="catalog-data" type="application\/json">(.*?)<\/script>/s)[1]);
+ const cards=data.cards.filter(c=>c.name==='Suspicious Bush');assert.equal(cards.length,1);assert.equal(cards[0].observations[0].elixir,2);assert.equal(cards[0].observations[0].displayedLevel,11);
+ const bush=RELEASE_DATA.updates.find(u=>u.id==='release-suspicious-bush-2024-august');assert.equal(bush.effectiveDate,'2024-07-30');assert.equal(bush.releaseDate,'2024-07-30');
+ assert.equal(bush.presentation.seasonLabel,'August 2024 · Season 62');assert.match(bush.seasonCorrection.quote,/considered part of Season 62/);
+ assert.equal(HistoryModel.timelineGroups([bush],'season')[0].key,'2024-08');assert.equal(HistoryModel.timelineGroups([bush],'month')[0].key,'2024-07');
+ assert.equal(bush.releases[0].cardFormId,cards[0].forms[0].id);assert.match(bush.seasonGroupingNote,/30 July 2024 during Season 61/);
+});
+test('Season 62 keeps Arrows full-cast damage separate from single-wave attacks and maps Void per strike',async()=>{
+ const {readFile}=await import('node:fs/promises');await import('../one-shot-model.js');
+ const {cards}=JSON.parse((await readFile(new URL('../index.html',import.meta.url),'utf8')).match(/<script id="catalog-data" type="application\/json">(.*?)<\/script>/s)[1]);
+ const rows=OneShot.build(cards).rows,u=HistoryModel.verifiedUpdate(HISTORY_DATA.updates.find(u=>u.effectiveDate==='2024-08-06'));
+ const arrows=u.changes.find(c=>c.cardName==='Arrows');assert.equal(arrows.damageScope,'cast');assert.equal(HistoryModel.changeKind(arrows),null);assert.equal(HistoryModel.referenceForChange(arrows,rows),null);
+ assert.ok(!HistoryModel.detectCrossings(u,rows).some(r=>r.change.cardName==='Arrows'));
+ for(const c of u.changes.filter(c=>c.cardName==='Void')){const r=HistoryModel.referenceForChange(c,rows);assert.ok(r);assert.equal(r.aggregate,false);assert.equal(r.towerDamage,false);assert.equal(r.field,c.comparisonKey);}
+});

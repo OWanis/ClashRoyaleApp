@@ -75,6 +75,68 @@ function july2024Change(c){
   ...(row.percent?{presentationPercent:row.percent,presentationRate:row.rate}:{}),
   ...(proof?{levelReference:11,levelVerification:{level:11,...proof,balanceSourceUrl:JULY_SOURCE}}:{})};
 }
+const AUGUST_2024='78af2798-c05b-55cc-af53-c29b9d0bb2bf';
+const AUGUST_SOURCE='https://royaleapi.com/blog/season-62-balance';
+// Final-table rows, with the official intervals retained beside source hit rates.
+const august2024Rows={
+ "Arrows|Crown Tower Damage":{"expected": [111, 93, "damage"], "stat": "Crown Tower Damage", "before": 111, "after": 93, "unit": "damage", "quote": "Tower Damage\n-16%\n111 Hit Points\n93 Hit Points"},
+ "Goblin Drill|Second Submerge Goblin Spawn":{"expected": ["Extra Goblin", "Extra Goblin removed", "mechanic"], "stat": "Second Submerge Goblin Spawn", "before": 2, "after": 1, "unit": "count", "quote": "Spawned Units from Second Spawn\n-50%\n2\n1"},
+ "Wizard|Hitpoints":{"expected": [720, 754, "hp"], "stat": "Hitpoints", "before": 720, "after": 754, "unit": "hp", "quote": "HP\n+5%\n720 Hit Points\n754 Hit Points"},
+ "Wizard|Shield Hitpoints":{"expected": [296, 190, "hp"], "stat": "Shield Hitpoints", "before": 296, "after": 190, "unit": "hp", "quote": "Shield HP\n-36%\n296 Hit Points\n190 Hit Points"},
+ "Cannon Cart|Shielded Cannon Hit Speed":{"expected": [1, 0.9, "seconds"], "stat": "Shielded Cannon Hit Time", "before": 1, "after": 0.9, "unit": "seconds", "quote": "Hit Speed\n+11%\n1.00 Hits / Second\n1.11 Hits / Second", "percent": "-10%", "rate": {"label": "Shielded Cannon Hit Speed", "before": "1.00", "after": "1.11", "percent": "+11%", "unit": "hits/sec"}},
+ "Electro Wizard|Deploy Damage Radius":{"expected": [2.5, 3, "tiles"], "stat": "Deploy Damage Radius", "before": 2.5, "after": 3, "unit": "tiles", "quote": "Spawn Radius\n+20%\n2.50 Tiles\n3.00 Tiles"},
+ "Goblin Machine|Rocket Hit Speed":{"expected": [4, 3.5, "seconds"], "stat": "Rocket Hit Time", "before": 4, "after": 3.5, "unit": "seconds", "quote": "Rocket Hit Speed\n+14%\n0.250 Hits / Second\n0.286 Hits / Second", "percent": "-13%", "rate": {"label": "Rocket Hit Speed", "before": "0.250", "after": "0.286", "percent": "+14%", "unit": "hits/sec"}},
+ "Hunter|Hitpoints":{"expected": [838, 884, "hp"], "stat": "Hitpoints", "before": 838, "after": 884, "unit": "hp", "quote": "HP\n+5%\n838 Hit Points\n884 Hit Points"},
+ "Ice Wizard|Attack Splash Radius":{"expected": [1, 1.5, "tiles"], "stat": "Attack Splash Radius", "before": 1, "after": 1.5, "unit": "tiles", "quote": "Splash Radius\n+50%\n1.00 Tiles\n1.50 Tiles"},
+ "Void|1 Target Damage":{"expected": [544, 472, "damage"], "stat": "1 Target Damage", "before": 544, "after": 472, "unit": "damage", "quote": "Damage\n-13%\n544 Hit Points\n472 Hit Points"},
+ "Void|5+ Target Damage":{"expected": [48, 76, "damage"], "stat": "5+ Target Damage", "before": 48, "after": 76, "unit": "damage", "quote": "Damage\n+58%\n48 Hit Points\n76 Hit Points"},
+ "Skeleton Dragons|Hitpoints":{"expected": [563, 560, "hp"], "stat": "Hitpoints", "before": 563, "after": 560, "unit": "hp", "quote": "HP\n-1%\n563 Hit Points\n560 Hit Points", "classification": "fix", "note": "Interaction consistency fix: a same-level Wizard now defeats a Skeleton Dragon in two hits at both Level 11 and Level 15."}
+};
+const august2024Proofs={
+ "Arrows|Crown Tower Damage": {
+  "sourceUrl": "https://royaleapi.com/blog/void-2024-may",
+  "method": "Void release explicitly labels the following tables Level 11. Its spell comparison shows Arrows 366 troop damage and 111 tower damage; August matches 111 and supplies 93."
+ },
+ "Wizard|Hitpoints": {
+  "sourceUrl": "https://github.com/smlbiobot/cr-csv/tree/a3bb7efaf985dea26777d0110592f053d3fd5e5d/assets/csv_logic",
+  "method": "Pinned dated Level 11 verification: Wizard raw340 HP ×212%, floored =720. August final report gives720→754 for both Base and Evolution."
+ },
+ "Wizard|Shield Hitpoints": {
+  "sourceUrl": "https://royaleapi.com/blog/wizard-evolution-2024-may",
+  "referenceSources": [
+   "https://royaleapi.com/blog/season-61-balance-2024-july"
+  ],
+  "method": "May release explicitly gives371 Level11 shield HP; reviewed July report changes371→296. August matches296 and supplies190."
+ },
+ "Hunter|Hitpoints": {
+  "sourceUrl": "https://github.com/smlbiobot/cr-csv/tree/a3bb7efaf985dea26777d0110592f053d3fd5e5d/assets/csv_logic",
+  "method": "Pinned dated Level 11 verification: Hunter raw524 HP ×160%, floored =838. August matches838 and supplies884. Final RoyaleAPI +5% annotation retained; official +6% differs."
+ },
+ "Void|1 Target Damage": {
+  "sourceUrl": "https://royaleapi.com/blog/void-2024-may",
+  "method": "Release table explicitly labels Level11 damage per beam544 for1target. August matches544 and supplies472."
+ },
+ "Void|5+ Target Damage": {
+  "sourceUrl": "https://royaleapi.com/blog/void-2024-may",
+  "method": "Release table explicitly labels Level11 damage per beam48 for5+targets. August matches48 and supplies76."
+ },
+ "Skeleton Dragons|Hitpoints": {
+  "sourceUrl": "https://royaleapi.com/blog/season-62-balance",
+  "method": "Final report explicitly explains Level11 Wizard requiring3hits before versus2hits atLevel15, and2hits at both levels after. Its paired HP table gives563→560 at that Level11 normalization; original official note also identifiesLevel11."
+ }
+};
+function august2024Change(c){
+ const key=c.cardName+'|'+c.stat,row=august2024Rows[key];
+ if(!row||c.before!==row.expected[0]||c.after!==row.expected[1]||c.unit!==row.expected[2])return c;
+ const proof=august2024Proofs[key];
+ return {...c,stat:row.stat,before:row.before,after:row.after,unit:row.unit,quote:row.quote,originalQuote:c.originalQuote||c.quote,sourceUrl:AUGUST_SOURCE,
+  sourceCorrection:{sourceUrl:AUGUST_SOURCE,method:'Reviewed final Season62 table; each quote is scoped to its component. Official hit intervals remain separate from RoyaleAPI frequencies. Hunter follows final RoyaleAPI +5%, retaining the conflicting official +6% in originalQuote.'},
+  ...(row.percent?{presentationPercent:row.percent,presentationRate:row.rate}:{}),
+  ...(row.classification?{classification:row.classification,presentationNote:row.note}:{}),
+  ...(c.cardName==='Arrows'?{damageScope:'cast',presentationNote:'Total Crown Tower damage across all 3 waves.'}:{}),
+  ...(c.cardName==='Void'?{comparisonKey:c.stat==='1 Target Damage'?'Damage: 1 Target':'Damage: 5+ Targets'}:{}),
+  ...(proof?{levelReference:11,levelVerification:{level:11,...proof,balanceSourceUrl:AUGUST_SOURCE}}:{})};
+}
 function juneSupplement(update){
  const sourceUrl='https://royaleapi.com/blog/'+(update.id===JUNE_2024?'season-60-balance':'season-60-balance-emergency');
  if(update.id===JUNE_2024)return {id:'s60-duchess-daggers-stored',cardFormId:'43d1f371-db25-44c3-b064-3fc0a3613133',cardName:'Dagger Duchess',formType:'base',stat:'Daggers Stored',before:8,after:6,unit:'count',classification:'nerf',quote:'Daggers Stored -25%\n8\n6',sourceUrl};
@@ -82,6 +144,7 @@ function juneSupplement(update){
  return null;
 }
 function verifiedUpdate(update){
+ if(update.id===AUGUST_2024)update={...update,effectiveDateKnown:true,effectiveDateBasis:'RoyaleAPI final report: These will go live on 2024-08-06 Tuesday, around 8-9am UTC.',dateVerification:{sourceUrl:AUGUST_SOURCE},changes:update.changes.map(august2024Change)};
  if(update.id===JULY_2024)update={...update,effectiveDateKnown:true,effectiveDateBasis:'RoyaleAPI final report: These will go live on 2024-07-02 Tuesday, around 8-9am UTC.',dateVerification:{sourceUrl:JULY_SOURCE},changes:update.changes.map(july2024Change)};
  const proofs=root.HISTORY_VERIFICATIONS?.changes||{};
  const extra=juneSupplement(update);if(extra&&!update.changes.some(c=>c.id===extra.id))update={...update,changes:[...update.changes,extra]};
@@ -124,7 +187,7 @@ function snapshotPatches(update){
  }
  return [...groups.values()];
 }
-function updatePresentation(update){if(update.id===JULY_2024)return {...update.presentation,seasonLabel:'July 2024 · Season 61'};if([JUNE_2024,JUNE_EMERGENCY,'497eeec0-1b76-5c05-b74c-96c1488af255'].includes(update.id))return {...update.presentation,seasonLabel:'June 2024 · Season 60'};if(update.id===MAY_2024)return {...update.presentation,seasonLabel:'May 2024 · Season 59'};if(update.id==='80fa387d-c2eb-530a-a766-f1fcdb675eda')return {...update.presentation,seasonLabel:'December 2022 · Season 42'};if(update.id==='e7d42138-c3d1-50cb-b666-61e56b35b3fe')return {...update.presentation,seasonLabel:'October 2022 · Q3'};const result=update.presentation||presentation[update.id]||{seasonLabel:null,changes:{}};return update.id==='08fc975e-b81d-5767-a1e3-83e716be6662'?{...result,seasonLabel:'November 2021 · Season 29'}:result;}
+function updatePresentation(update){if(update.id===AUGUST_2024)return {...update.presentation,seasonLabel:'August 2024 · Season 62'};if(update.id===JULY_2024)return {...update.presentation,seasonLabel:'July 2024 · Season 61'};if([JUNE_2024,JUNE_EMERGENCY,'497eeec0-1b76-5c05-b74c-96c1488af255'].includes(update.id))return {...update.presentation,seasonLabel:'June 2024 · Season 60'};if(update.id===MAY_2024)return {...update.presentation,seasonLabel:'May 2024 · Season 59'};if(update.id==='80fa387d-c2eb-530a-a766-f1fcdb675eda')return {...update.presentation,seasonLabel:'December 2022 · Season 42'};if(update.id==='e7d42138-c3d1-50cb-b666-61e56b35b3fe')return {...update.presentation,seasonLabel:'October 2022 · Q3'};const result=update.presentation||presentation[update.id]||{seasonLabel:null,changes:{}};return update.id==='08fc975e-b81d-5767-a1e3-83e716be6662'?{...result,seasonLabel:'November 2021 · Season 29'}:result;}
 function changePresentation(update,change){
  const single=change.unit==='relative'||change.before==null||['','—','-'].includes(change.before);
  const unit=change.unit==='value'&&/\n[\d.]+ tiles\n[\d.]+ tiles?$/.test(change.quote||'')?' tiles':change.unit==='seconds'?' s':change.unit==='hits per second'?' hits/sec':change.unit==='healing per second'?' HP/sec':change.unit==='tiles'?' tiles':change.unit==='percent'?'%':change.unit==='multiplier'?'×':change.unit==='elixir'?' elixir':'';
@@ -149,7 +212,7 @@ function changePresentation(update,change){
   const label=labels[change.stat]||change.stat,index=sourceLines.findIndex(line=>line.endsWith(label+':'));
   percent=index>=0?sourceLines[index+1]?.match(/[+-]\d+(?:\.\d+)?%/)?.[0]||null:null;
  }
- if(update.id===JULY_2024&&change.presentationPercent)percent=change.presentationPercent;
+ if([JULY_2024,AUGUST_2024].includes(update.id)&&change.presentationPercent)percent=change.presentationPercent;
  if(january2024Proofs[change.id])percent=null;
  if(change.id==='3c46ffe7-8a26-50c5-98e7-c2e8dbe8f921')percent=null;
  if(change.id==='b783f089-5aec-5dea-b3d1-66deb6c6c5d8')percent=null;
@@ -173,9 +236,10 @@ function changePresentation(update,change){
   if(change.cardName==='Firecracker')note='Evolution HP bonus reduced';
  }
  const season40Label=update.id==='8d353b91-7619-5f5e-9d1c-fd83be53fa1d'?({'Goblin Gang|Count':'Spear Goblin Count','Elixir Golem|EGolem 1 Hit Time':'Elixir Golem · Hit Time','Elixir Golem|EGolem 2 Hit Time':'Elixir Golemite · Hit Time','Elixir Golem|EGolem 3 Hit Time':'Elixir Blob · Hit Time','Cannon Cart|Destroyed HP':'Stationary Cannon · Hitpoints'}[change.cardName+'|'+change.stat]):null;
- if(update.id===JULY_2024&&change.presentationRate)rate=change.presentationRate;
+ if([JULY_2024,AUGUST_2024].includes(update.id)&&change.presentationRate)rate=change.presentationRate;
  if(evolutionBonus)note='Bonus over Base';
  if(change.announcementNote)note=change.announcementNote;
+ if(update.id===AUGUST_2024&&change.presentationNote)note=change.presentationNote;
  if(update.id===JUNE_EMERGENCY&&change.stat==='Rocket Hit Time')rate={label:'Rocket Hit Speed',before:'0.286',after:'0.250',percent:'-13%',unit:'hits/sec'};
  if(update.id===MAY_2024){
   if(change.cardName==='Royal Giant'&&change.stat==='Hitpoint Multiplier')rate={label:'Total Evolution HP',before:'3379',after:'3164',percent:'',unit:'Level 11'};
@@ -275,6 +339,7 @@ function level11Values(update,change){
  return !(['damage','hp','hitpoints','healing'].includes(change.unit)||/damage|\bHP\b|hitpoints|hit points|health|healing|DPS|\bDMG\b|Crown Tower(?::|$)/i.test(change.stat));
 }
 function changeKind(change){
+ if(change.damageScope==='cast')return null;
  if(!Number.isFinite(change.before)||!Number.isFinite(change.after))return null;
  if(change.unit==='damage')return 'damage';
  if(['hp','hitpoints'].includes(change.unit))return 'hp';
@@ -298,6 +363,7 @@ function coreStat(change){
  return null;
 }
 function affectedForms(update,change,rows,history=root.HISTORY_DATA?.updates||[update]){
+ if(update.id===AUGUST_2024&&change.cardName==='Wizard'&&change.formType==='base'&&change.stat==='Hitpoints'){const card=rows.find(r=>r.card.name==='Wizard')?.card;return card?card.forms.filter(f=>['base','evolution'].includes(f.formType)).map(f=>f.id):[change.cardFormId];}
  // Tesla's release explicitly gives it the same ordinary attack as Base.
  if(update.id===JULY_2024&&change.cardName==='Tesla'&&['Damage','Hit Time'].includes(change.stat)){const card=rows.find(r=>r.card.name==='Tesla')?.card;return card?card.forms.filter(f=>['base','evolution'].includes(f.formType)).map(f=>f.id):[change.cardFormId];}
  if(update.id===MAY_2024&&['Royal Giant','Royal Recruits'].includes(change.cardName)&&change.formType==='base'&&change.stat==='Hitpoints'){const card=rows.find(r=>r.card.name===change.cardName)?.card;return card?card.forms.filter(f=>['base','evolution'].includes(f.formType)).map(f=>f.id):[change.cardFormId];}
