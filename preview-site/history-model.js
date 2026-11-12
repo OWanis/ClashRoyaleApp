@@ -29,6 +29,52 @@ const may2024Proofs={"Archers|Power Shot Damage": [184, 215, "damage", "December
 const JUNE_2024='7129a7d2-245e-56be-9aa9-5ee31c85845c';
 const JUNE_EMERGENCY='a079f0e9-7a18-5319-83c5-bb8df3638d0c';
 const june2024Rows={"Giant|Range": [1.6, 1.2, "tiles", "Range", "-25%"], "Little Prince|Ability Damage": [399, 207, "damage", "Ability Damage", "-48%"], "Little Prince|Ability Knockback": [2.5, 2, "tiles", "Ability Knockback", "-20%"], "Little Prince|Guardian First Hit Speed": [0.2, 0.5, "seconds", "Guardian First Hit Time", "+150%"], "Knight|Bonus HP": [1.1, 1, "multiplier", "Hitpoint Multiplier", "-9%"], "Tesla|Electro Pulse Damage": [192, 148, "damage", "Electro Pulse Damage", "-23%"], "Tesla|Electro Pulse Stun Duration": [1, 0.5, "seconds", "Electro Pulse Stun Duration", "-50%"], "Ram Rider|Charge Range": [3, 1.5, "tiles", "Charge Distance", "-50%"], "Prince|Charge Range": [3, 1.5, "tiles", "Charge Distance", "-50%"], "Spear Goblins|First Hit Speed": [0.5, 0.3, "seconds", "First Hit Time", "-40%"], "Dart Goblin|Damage": [131, 142, "damage", "Damage", "+8%"], "Goblin Cage|Cage Hitpoints": [742, 780, "hp", "Cage Hitpoints", "+5%"], "Void|First Hit Delay": [0.4, 1, "seconds", "First Hit Time", "+150%"], "Void|Hit Frequency": [0.667, 0.769, "hits per second", "Hit Speed", "+15%"], "Dagger Duchess|Damage": [153, 112, "damage", "Damage", "-27%"], "Dagger Duchess|Dagger Reload": [0.606, 0.8, "hits per second", "Hit Speed", "+32%"]};
+const JULY_2024='4757c11d-4897-589d-983d-9159578fb3c2';
+const JULY_SOURCE='https://royaleapi.com/blog/season-61-balance-2024-july';
+// Each final-table quote is scoped to its stat, preserving its own percentage.
+const july2024Rows={
+ "Goblin Curse|Radius":{"expected": [4, 3, "tiles"], "stat": "Radius", "before": 4, "after": 3, "unit": "tiles", "quote": "Radius\n-25%\n4.00 Tiles\n3.00 Tiles"},
+ "Goblin Curse|Damage Amplification":{"expected": [35, 20, "percent"], "stat": "Damage Amplification", "before": 35, "after": 20, "unit": "percent", "quote": "Damage Multiplier\n-43%\n35\n20"},
+ "Goblin Demolisher|Death Damage":{"expected": [465, 404, "damage"], "stat": "Death Damage", "before": 465, "after": 404, "unit": "damage", "quote": "Death Damage\n-13%\n465 Hit Points\n404 Hit Points"},
+ "Goblin Demolisher|Death Damage Radius":{"expected": [3, 2.5, "tiles"], "stat": "Death Damage Radius", "before": 3, "after": 2.5, "unit": "tiles", "quote": "Death Damage Radius\n-17%\n3.00 Tiles\n2.50 Tiles"},
+ "Goblin Demolisher|Hit Speed":{"expected": [1.1, 1.2, "seconds"], "stat": "Hit Time", "before": 1.1, "after": 1.2, "unit": "seconds", "quote": "Hit Speed\n-8%\n0.909 Hits / Second\n0.833 Hits / Second", "percent": "+9%", "rate": {"label": "Hit Speed", "before": "0.909", "after": "0.833", "percent": "-8%", "unit": "hits/sec"}},
+ "Goblin Machine|Hitpoints":{"expected": [2598, 2196, "hp"], "stat": "Hitpoints", "before": 2598, "after": 2196, "unit": "hp", "quote": "HP\n-15%\n2,598 Hit Points\n2,196 Hit Points"},
+ "Goblin Machine|First Hit Speed":{"expected": [0.2, 0.5, "seconds"], "stat": "First Hit Time", "before": 0.2, "after": 0.5, "unit": "seconds", "quote": "First Hit Time\n+150%\n0.200 Seconds\n0.500 Seconds"},
+ "Prince|Charge Range":{"expected": [150, 200, "source units"], "stat": "Charge Distance", "before": 1.5, "after": 2, "unit": "tiles", "quote": "Charge Distance\n+33%\n1.50 Tiles\n2.00 Tiles"},
+ "Ram Rider|Charge Range":{"expected": [150, 200, "source units"], "stat": "Charge Distance", "before": 1.5, "after": 2, "unit": "tiles", "quote": "Charge Distance\n+33%\n1.50 Tiles\n2.00 Tiles"},
+ "Tesla|Damage":{"expected": [230, 220, "damage"], "stat": "Damage", "before": 230, "after": 220, "unit": "damage", "quote": "Damage\n-4%\n230 Hit Points\n220 Hit Points"},
+ "Tesla|Hit Speed":{"expected": [1.1, 1.2, "seconds"], "stat": "Hit Time", "before": 1.1, "after": 1.2, "unit": "seconds", "quote": "Hit Speed\n-8%\n0.909 Hits / Second\n0.833 Hits / Second", "percent": "+9%", "rate": {"label": "Hit Speed", "before": "0.909", "after": "0.833", "percent": "-8%", "unit": "hits/sec"}},
+ "Wizard|Shield Hitpoints":{"expected": [371, 296, "hp"], "stat": "Shield Hitpoints", "before": 371, "after": 296, "unit": "hp", "quote": "Shield HP\n-20%\n371 Hit Points\n296 Hit Points"},
+ "Dagger Duchess|Dagger Charge":{"expected": [0.8, 0.9, "seconds"], "stat": "Depleted Hit Speed", "before": 0.8, "after": 0.741, "unit": "hits per second", "quote": "Depleted Hit Speed\n-7%\n0.800 Hits / Second\n0.741 Hits / Second"},
+ "Dagger Duchess|Hit Speed":{"expected": [0.35, 0.45, "seconds"], "stat": "Burst Hit Speed", "before": 2.86, "after": 2.22, "unit": "hits per second", "quote": "Burst Hit Speed\n-22%\n2.86 Hits / Second\n2.22 Hits / Second"}
+};
+const july2024Proofs={
+ "Goblin Demolisher|Death Damage": {
+  "sourceUrl": "https://royaleapi.com/blog/goblin-demolisher-new-card-2024-summer-update",
+  "method": "Release guide explicitly labels tournament standard (level 11), Death Damage 465 HP. July final table matches 465 and supplies 404."
+ },
+ "Goblin Machine|Hitpoints": {
+  "sourceUrl": "https://royaleapi.com/blog/goblin-machine-new-card-2024-summer-update",
+  "method": "Release guide explicitly labels tournament standard (level 11), Health 2598 HP. July final table matches 2598 and supplies 2196."
+ },
+ "Wizard|Shield Hitpoints": {
+  "sourceUrl": "https://royaleapi.com/blog/wizard-evolution-2024-may",
+  "method": "Release guide explicitly says: At level 11, the shield has 371 HP. July final table matches 371 and supplies 296."
+ },
+ "Tesla|Damage": {
+  "sourceUrl": "https://github.com/smlbiobot/cr-csv/tree/899e45efc765fbf3902927bb2e37dc04a78f7823/assets/csv_logic",
+  "method": "Pinned buildings.csv Tesla Damage 90, Common Level 11 multiplier 256%, floor(90 × 256 / 100) = 230. July final table matches 230 and supplies 220."
+ }
+};
+function july2024Change(c){
+ const key=c.cardName+'|'+c.stat,row=july2024Rows[key];
+ if(!row||c.before!==row.expected[0]||c.after!==row.expected[1]||c.unit!==row.expected[2])return c;
+ const proof=july2024Proofs[key];
+ return {...c,stat:row.stat,before:row.before,after:row.after,unit:row.unit,quote:row.quote,originalQuote:c.originalQuote||c.quote,sourceUrl:JULY_SOURCE,
+  sourceCorrection:{sourceUrl:JULY_SOURCE,method:'Reviewed final Season 61 table; each quote contains only its matching stat. Official seconds and RoyaleAPI rates remain separate. Duchess depleted rate follows RoyaleAPI; the conflicting official 0.8→0.9 seconds remains in originalQuote.'},
+  ...(row.percent?{presentationPercent:row.percent,presentationRate:row.rate}:{}),
+  ...(proof?{levelReference:11,levelVerification:{level:11,...proof,balanceSourceUrl:JULY_SOURCE}}:{})};
+}
 function juneSupplement(update){
  const sourceUrl='https://royaleapi.com/blog/'+(update.id===JUNE_2024?'season-60-balance':'season-60-balance-emergency');
  if(update.id===JUNE_2024)return {id:'s60-duchess-daggers-stored',cardFormId:'43d1f371-db25-44c3-b064-3fc0a3613133',cardName:'Dagger Duchess',formType:'base',stat:'Daggers Stored',before:8,after:6,unit:'count',classification:'nerf',quote:'Daggers Stored -25%\n8\n6',sourceUrl};
@@ -36,6 +82,7 @@ function juneSupplement(update){
  return null;
 }
 function verifiedUpdate(update){
+ if(update.id===JULY_2024)update={...update,effectiveDateKnown:true,effectiveDateBasis:'RoyaleAPI final report: These will go live on 2024-07-02 Tuesday, around 8-9am UTC.',dateVerification:{sourceUrl:JULY_SOURCE},changes:update.changes.map(july2024Change)};
  const proofs=root.HISTORY_VERIFICATIONS?.changes||{};
  const extra=juneSupplement(update);if(extra&&!update.changes.some(c=>c.id===extra.id))update={...update,changes:[...update.changes,extra]};
  return {...update,changes:update.changes.map(c=>{
@@ -77,7 +124,7 @@ function snapshotPatches(update){
  }
  return [...groups.values()];
 }
-function updatePresentation(update){if([JUNE_2024,JUNE_EMERGENCY,'497eeec0-1b76-5c05-b74c-96c1488af255'].includes(update.id))return {...update.presentation,seasonLabel:'June 2024 · Season 60'};if(update.id===MAY_2024)return {...update.presentation,seasonLabel:'May 2024 · Season 59'};if(update.id==='80fa387d-c2eb-530a-a766-f1fcdb675eda')return {...update.presentation,seasonLabel:'December 2022 · Season 42'};if(update.id==='e7d42138-c3d1-50cb-b666-61e56b35b3fe')return {...update.presentation,seasonLabel:'October 2022 · Q3'};const result=update.presentation||presentation[update.id]||{seasonLabel:null,changes:{}};return update.id==='08fc975e-b81d-5767-a1e3-83e716be6662'?{...result,seasonLabel:'November 2021 · Season 29'}:result;}
+function updatePresentation(update){if(update.id===JULY_2024)return {...update.presentation,seasonLabel:'July 2024 · Season 61'};if([JUNE_2024,JUNE_EMERGENCY,'497eeec0-1b76-5c05-b74c-96c1488af255'].includes(update.id))return {...update.presentation,seasonLabel:'June 2024 · Season 60'};if(update.id===MAY_2024)return {...update.presentation,seasonLabel:'May 2024 · Season 59'};if(update.id==='80fa387d-c2eb-530a-a766-f1fcdb675eda')return {...update.presentation,seasonLabel:'December 2022 · Season 42'};if(update.id==='e7d42138-c3d1-50cb-b666-61e56b35b3fe')return {...update.presentation,seasonLabel:'October 2022 · Q3'};const result=update.presentation||presentation[update.id]||{seasonLabel:null,changes:{}};return update.id==='08fc975e-b81d-5767-a1e3-83e716be6662'?{...result,seasonLabel:'November 2021 · Season 29'}:result;}
 function changePresentation(update,change){
  const single=change.unit==='relative'||change.before==null||['','—','-'].includes(change.before);
  const unit=change.unit==='value'&&/\n[\d.]+ tiles\n[\d.]+ tiles?$/.test(change.quote||'')?' tiles':change.unit==='seconds'?' s':change.unit==='hits per second'?' hits/sec':change.unit==='healing per second'?' HP/sec':change.unit==='tiles'?' tiles':change.unit==='percent'?'%':change.unit==='multiplier'?'×':change.unit==='elixir'?' elixir':'';
@@ -102,6 +149,7 @@ function changePresentation(update,change){
   const label=labels[change.stat]||change.stat,index=sourceLines.findIndex(line=>line.endsWith(label+':'));
   percent=index>=0?sourceLines[index+1]?.match(/[+-]\d+(?:\.\d+)?%/)?.[0]||null:null;
  }
+ if(update.id===JULY_2024&&change.presentationPercent)percent=change.presentationPercent;
  if(january2024Proofs[change.id])percent=null;
  if(change.id==='3c46ffe7-8a26-50c5-98e7-c2e8dbe8f921')percent=null;
  if(change.id==='b783f089-5aec-5dea-b3d1-66deb6c6c5d8')percent=null;
@@ -125,6 +173,7 @@ function changePresentation(update,change){
   if(change.cardName==='Firecracker')note='Evolution HP bonus reduced';
  }
  const season40Label=update.id==='8d353b91-7619-5f5e-9d1c-fd83be53fa1d'?({'Goblin Gang|Count':'Spear Goblin Count','Elixir Golem|EGolem 1 Hit Time':'Elixir Golem · Hit Time','Elixir Golem|EGolem 2 Hit Time':'Elixir Golemite · Hit Time','Elixir Golem|EGolem 3 Hit Time':'Elixir Blob · Hit Time','Cannon Cart|Destroyed HP':'Stationary Cannon · Hitpoints'}[change.cardName+'|'+change.stat]):null;
+ if(update.id===JULY_2024&&change.presentationRate)rate=change.presentationRate;
  if(evolutionBonus)note='Bonus over Base';
  if(change.announcementNote)note=change.announcementNote;
  if(update.id===JUNE_EMERGENCY&&change.stat==='Rocket Hit Time')rate={label:'Rocket Hit Speed',before:'0.286',after:'0.250',percent:'-13%',unit:'hits/sec'};
@@ -249,6 +298,8 @@ function coreStat(change){
  return null;
 }
 function affectedForms(update,change,rows,history=root.HISTORY_DATA?.updates||[update]){
+ // Tesla's release explicitly gives it the same ordinary attack as Base.
+ if(update.id===JULY_2024&&change.cardName==='Tesla'&&['Damage','Hit Time'].includes(change.stat)){const card=rows.find(r=>r.card.name==='Tesla')?.card;return card?card.forms.filter(f=>['base','evolution'].includes(f.formType)).map(f=>f.id):[change.cardFormId];}
  if(update.id===MAY_2024&&['Royal Giant','Royal Recruits'].includes(change.cardName)&&change.formType==='base'&&change.stat==='Hitpoints'){const card=rows.find(r=>r.card.name===change.cardName)?.card;return card?card.forms.filter(f=>['base','evolution'].includes(f.formType)).map(f=>f.id):[change.cardFormId];}
  if(update.id==='cee95369-b297-546b-8735-813c2d076d67'&&change.cardName==='Firecracker'&&/^First Hit/.test(change.stat)){const card=rows.find(r=>r.card.name==='Firecracker')?.card;return card?card.forms.filter(f=>['base','evolution'].includes(f.formType)).map(f=>f.id):[change.cardFormId];}
  const source=referenceForChange(change,rows),forms=[change.cardFormId],kind=coreStat(change);

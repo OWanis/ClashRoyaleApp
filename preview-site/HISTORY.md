@@ -185,3 +185,43 @@ June19 emergency report supplies GoblinMachine588→391 rocket damage and588→1
 Timeline-wide UI: muted dark category backgrounds, smaller inherited-font headings/stat labels and18px values, lighter font weights, and direction symbols based on each stat's gameplay effect (↑buff, ↓nerf, ⟳rework/fix). Comparison and staged Elixir rows follow the same convention. Navigation is unchanged. This is a dark-theme revision; no new light-theme switch was introduced.
 
 Dark display-theme follow-up: restored the newer condensed display typography, patterned blue/gold banner, larger artwork, rounded cards and subtle depth on dark surfaces. Locally served Barlow Condensed SemiBold (600, Google Fonts/ofl/barlowcondensed under existing OFL) replaces the prior ExtraBold face for this theme. Titles24px/statlabels18px retain the display style while values stay18px. Removed stat-title direction markers from the DOM; only the before/after value separator carries the change arrow. Desktop/mobile browser review and check/build passed.
+
+
+Season 61 audit (July 2, 2024): all eight cards / fourteen imported deltas reviewed against [RoyaleAPI's final report](https://royaleapi.com/blog/season-61-balance-2024-july). A preview overlay preserves the raw import, IDs and original quotes, matches each original numeric pair/unit before applying corrections, and retains the exact individual table row as its new quote. This prevents another component's percentage from leaking into the display. Reapplying the overlay is idempotent. Source-rounded percentages below are retained; timing and frequency have separate percentages.
+
+| Card | Stat | Before → After | Change |
+| --- | --- | --- | --- |
+| Goblin Curse | Radius | 4 → 3 tiles | −25% |
+| Goblin Curse | Damage amplification | 35% → 20% | −43% |
+| Goblin Demolisher | Death damage, Level 11 | 465 → 404 | −13% |
+| Goblin Demolisher | Death damage radius | 3 → 2.5 tiles | −17% |
+| Goblin Demolisher | Hit time; hit speed | 1.1 → 1.2 s; 0.909 → 0.833 hits/sec | +9%; −8% |
+| Goblin Machine | Hitpoints, Level 11 | 2598 → 2196 | −15% |
+| Goblin Machine | First hit time | 0.2 → 0.5 s | +150% |
+| Prince | Charge distance | 1.5 → 2 tiles | +33% |
+| Ram Rider | Charge distance | 1.5 → 2 tiles | +33% |
+| Wizard Evolution | Shield hitpoints, Level 11 | 371 → 296 | −20% |
+| Dagger Duchess | Depleted hit speed | 0.800 → 0.741 hits/sec | −7% |
+| Dagger Duchess | Burst hit speed | 2.86 → 2.22 hits/sec | −22% |
+| Tesla Base / Evolution | Ordinary attack damage, Level 11 | 230 → 220 | −4% |
+| Tesla Base / Evolution | Hit time; hit speed | 1.1 → 1.2 s; 0.909 → 0.833 hits/sec | +9%; −8% |
+
+All rows are gameplay nerfs, including increased hit times and charge distances. Only the value separator carries the downward arrow, retaining the approved dark theme. Prince/Ram Rider's raw source-unit 150→200 is resolved by RoyaleAPI's explicit tile units. Tesla's [Evolution release guide](https://royaleapi.com/blog/tesla-evolution-2024-march) says its other stats remain the same as Base: both ordinary attack rows show the Base/Evolution icons without duplicating pulse damage or extending the change to later forms.
+
+Level 11 evidence: [Demolisher release](https://royaleapi.com/blog/goblin-demolisher-new-card-2024-summer-update) explicitly states tournament standard (level 11) and Death Damage465; [Machine release](https://royaleapi.com/blog/goblin-machine-new-card-2024-summer-update) gives2598HP at that level; [Wizard release](https://royaleapi.com/blog/wizard-evolution-2024-may) explicitly says its Level11 shield has371HP. July matches each starting value and supplies its after value. Tesla's pinned [March2023 game data](https://github.com/smlbiobot/cr-csv/tree/899e45efc765fbf3902927bb2e37dc04a78f7823/assets/csv_logic) has buildings.csv Tesla Damage90 and rarities.csv Common tournament index10/multiplier256%, giving floor(90×256/100)=230. July matches230 and supplies220. These four proofs are scoped to their exact deltas, not an article-wide assumption.
+
+Duchess source conflict: the official import says depleted dagger charge0.8→0.9 seconds, while RoyaleAPI says depleted hit speed0.800→0.741 hits/sec. These are not reciprocals. The reviewed display follows the requested final RoyaleAPI table, consistent with June's already-verified0.8hits/sec starting rate, and retains the conflicting official values in the raw ledger/originalQuote. Burst0.35→0.45seconds is consistent with the final rounded2.86→2.22hits/sec; its rate reduction is−22%, not the+29% increase in interval. No reciprocal timing is invented for the depleted-rate row.
+
+RoyaleAPI explicitly says “These will go live on 2024-07-02 Tuesday, around 8-9am UTC.” The overlay therefore confirms the July2 effective day (day precision only), replacing publication-day uncertainty, and labels the season July2024 · Season61. Raw database data remains untouched.
+
+Retained evidence: `.local/evidence/season-61-audit/royaleapi.html` and `rows.json` (14 extracted table rows). Final report HTML SHA256: `f4ced03101219b8609eefc7681e7e4049307c736db35e7101c31b5cea88bbd18`. Pinned Tesla buildings.csv SHA256: `317e78ed5ba4284fa5e6a3ab4a1bf4ad07b7a6a0d9550ba5128b17f64e8e5aca`; rarities.csv SHA256: `6208e65d4f26d3e9b3d7fe424902cc03b21927f66f227f477734b099ec3a3876`.
+
+Archived goblin-demolisher-new-card-2024-summer-update HTML SHA256: `f38cbce78c63b74eceb3c29895d1314729c6451563f97a25de8bfa361e8f3044`.
+
+Archived goblin-machine-new-card-2024-summer-update HTML SHA256: `9cc65ce152658a11adebfedc9d0655568390fe78e9f641f8c90dc24de6fa406d`.
+
+Archived wizard-evolution-2024-may HTML SHA256: `302062c9fc85bd83be3d31591d2c303c51bf4f4db6a6c2d9f45112ee3e4f84e6`.
+
+Archived tesla-evolution-2024-march HTML SHA256: `783dacddc4728865860b140232b64fd30144db26013e5037d647c0b053730a98`.
+
+Publishing prerequisite found during S61 verification: fourteen official artwork URLs now return different PNG bytes. The already approved originals remain available in the saved preview and match assets.json byte lengths/SHA256. Those exact public originals are retained in pinned-assets/; build.mjs validates and copies them before downloading the remaining174 images. No manifest hashes, displayed artwork or canonical observations change, and mismatched pinned files fail the build. This avoids relying on mutable upstream URLs for those14 images.

@@ -7,6 +7,14 @@ await writeFile('public/robots.txt','User-agent: *\nDisallow: /\n');
 let next=0,completed=0;
 async function download(a){
  if(!/^[a-f0-9]{64}\.png$/.test(a.filename)||new URL(a.url).origin!=='https://api-assets.clashroyale.com')throw new Error('Invalid artwork manifest');
+ // Some CDN URLs now serve different artwork. Keep the approved originals,
+ // with the same manifest checks, when an exact archived copy is available.
+ let pinned;
+ try{pinned=await readFile('pinned-assets/'+a.filename);}catch(error){if(error.code!=='ENOENT')throw error;}
+ if(pinned){
+  if(pinned.length!==a.bytes||createHash('sha256').update(pinned).digest('hex')!==a.sha256)throw new Error('Pinned artwork hash mismatch');
+  await writeFile('public/assets/'+a.filename,pinned);completed++;return;
+ }
  for(let attempt=0;attempt<3;attempt++){
   try{
    const response=await fetch(a.url,{signal:AbortSignal.timeout(30000)});

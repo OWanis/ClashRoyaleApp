@@ -168,3 +168,47 @@ test('June emergency adds announced Healer nerf and both Goblin Machine damage v
  const healer=u.changes.find(c=>c.cardName==='Battle Healer');assert.deepEqual([healer.before,healer.after],[33,0]);assert.equal(healer.effectiveDateKnown,false);assert.match(HistoryModel.changePresentation(u,healer).note,/Already applied/);assert.equal(HistoryModel.verifiedUpdate(u).changes.length,u.changes.length);assert.equal(raw.changes.length,4);
  const fixes=HISTORY_DATA.updates.find(u=>u.effectiveDate==='2024-06-17');assert.match(fixes.sourceUrl,/game-update-june-17/);assert.match(fixes.excerpt,/Fixed Tesla's behavior when it is frozen during deployment/);assert.equal(HistoryModel.changeSymbol(fixes,fixes.changes[0]),'⟳');
 });
+
+test('Season 61 audits every stat with its own percentage, units and Level 11 evidence',()=>{
+ const raw=HISTORY_DATA.updates.find(u=>u.effectiveDate==='2024-07-02'),before=JSON.stringify(raw),u=HistoryModel.verifiedUpdate(raw);
+ const expected=[
+  ['Goblin Curse','Radius','4 tiles','3 tiles','-25%'],
+  ['Goblin Curse','Damage Amplification','35%','20%','-43%'],
+  ['Goblin Demolisher','Death Damage','465','404','-13%'],
+  ['Goblin Demolisher','Death Damage Radius','3 tiles','2.5 tiles','-17%'],
+  ['Goblin Demolisher','Hit Time','1.1 s','1.2 s','+9%'],
+  ['Goblin Machine','Hitpoints','2598','2196','-15%'],
+  ['Goblin Machine','First Hit Time','0.2 s','0.5 s','+150%'],
+  ['Prince','Charge Distance','1.5 tiles','2 tiles','+33%'],
+  ['Ram Rider','Charge Distance','1.5 tiles','2 tiles','+33%'],
+  ['Tesla','Damage','230','220','-4%'],
+  ['Tesla','Hit Time','1.1 s','1.2 s','+9%'],
+  ['Wizard','Shield Hitpoints','371','296','-20%'],
+  ['Dagger Duchess','Depleted Hit Speed','0.8 hits/sec','0.741 hits/sec','-7%'],
+  ['Dagger Duchess','Burst Hit Speed','2.86 hits/sec','2.22 hits/sec','-22%']
+ ];
+ assert.equal(u.changes.length,expected.length);assert.equal(new Set(u.changes.map(c=>c.cardName)).size,8);
+ for(const [name,stat,a,b,pct] of expected){
+  const c=u.changes.find(c=>c.cardName===name&&c.stat===stat);assert.ok(c,name+' '+stat);
+  const d=HistoryModel.changePresentation(u,c);assert.deepEqual([d.before,d.after,d.percent],[a,b,pct],name+' '+stat);
+  assert.equal(HistoryModel.level11Values(u,c),true);assert.equal(HistoryModel.changeSymbol(u,c),'↓');
+  assert.equal(c.originalQuote,raw.changes.find(r=>r.id===c.id).quote);assert.match(c.sourceUrl,/season-61-balance-2024-july$/);
+  if(['hp','damage'].includes(c.unit)){assert.equal(c.levelReference,11);assert.equal(c.levelVerification.level,11);assert.ok(c.levelVerification.sourceUrl);}
+ }
+ for(const name of ['Goblin Demolisher','Tesla']){
+  const c=u.changes.find(c=>c.cardName===name&&c.stat==='Hit Time'),d=HistoryModel.changePresentation(u,c);
+  assert.deepEqual(d.rate,{label:'Hit Speed',before:'0.909',after:'0.833',percent:'-8%',unit:'hits/sec'});
+ }
+ assert.equal(u.effectiveDateKnown,true);assert.match(u.effectiveDateBasis,/2024-07-02 Tuesday/);
+ assert.equal(HistoryModel.updatePresentation(u).seasonLabel,'July 2024 · Season 61');
+ assert.deepEqual(HistoryModel.verifiedUpdate(u),u,'Review overlay must be idempotent');
+ assert.equal(JSON.stringify(raw),before,'Raw import and source quotes must remain intact');
+ const altered={...raw,changes:raw.changes.map(c=>c.stat==='Death Damage'?{...c,before:999}:c)};
+ assert.equal(HistoryModel.verifiedUpdate(altered).changes.find(c=>c.stat==='Death Damage').levelReference,undefined,'A changed source pair must not inherit the old Level 11 proof');
+});
+test('Season 61 Tesla shares ordinary attack changes with its existing Evolution only',()=>{
+ const u=HistoryModel.verifiedUpdate(HISTORY_DATA.updates.find(u=>u.effectiveDate==='2024-07-02'));
+ const card={name:'Tesla',forms:[{id:'base',formType:'base'},{id:'evo',formType:'evolution'},{id:'hero',formType:'hero'}]};
+ for(const c of u.changes.filter(c=>c.cardName==='Tesla'))assert.deepEqual(HistoryModel.affectedForms(u,c,[{card}]),['base','evo']);
+ const wizard=u.changes.find(c=>c.cardName==='Wizard');assert.deepEqual(HistoryModel.affectedForms(u,wizard,[]),[wizard.cardFormId]);
+});
